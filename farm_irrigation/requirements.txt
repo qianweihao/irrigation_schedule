@@ -1,0 +1,26 @@
+# 农场级灌溉设计算法AI - Python依赖包
+# Web框架
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# 地理空间数据处理
+geopandas==0.14.0
+pandas==2.1.1
+shapely==2.0.2
+fiona==1.9.5
+pyproj==3.6.1
+
+# HTTP请求
+requests==2.31.0
+
+# 数学计算
+numpy==1.24.3
+
+# 其他工具
+functools32; python_version < '3.2'
+
+# WSGI服务器（生产环境）
+gunicorn==21.2.0
+
+# 系统监控（可选）
+psutil==5.9.6

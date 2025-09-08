@@ -1,0 +1,247 @@
+{
+  "calc": {
+    "A_cover_mu": 79.99999600000021,
+    "q_avail_m3ph": 240.0,
+    "t_win_h": 20.0,
+    "d_target_mm": 90.0
+  },
+  "total_deficit_m3": 1560.0000780000005,
+  "total_eta_h": 6.500000325000002,
+  "drainage_targets": [],
+  "batches": [
+    {
+      "index": 1,
+      "area_mu": 26.0,
+      "fields": [
+        {
+          "id": "1",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "11",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "12",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 1.2
+        },
+        {
+          "id": "17",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "18",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 6.800000000000001
+        },
+        {
+          "id": "19",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 2.7
+        },
+        {
+          "id": "20",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 2.0
+        },
+        {
+          "id": "21",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 1.9
+        },
+        {
+          "id": "24",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "25",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "26",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 16.8
+        },
+        {
+          "id": "27",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "28",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "29",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "30",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "31",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "32",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "33",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "34",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 1.9
+        },
+        {
+          "id": "35",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 1.5
+        },
+        {
+          "id": "36",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "37",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 3.5999999999999996
+        },
+        {
+          "id": "38",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 1.4000000000000001
+        },
+        {
+          "id": "39",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "40",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 0.0
+        },
+        {
+          "id": "41",
+          "area_mu": 1.0,
+          "canal_id": "C_A",
+          "segment_id": "S0",
+          "distance_rank": 1,
+          "wl_mm": 18.0
+        }
+      ],
+      "stats": {
+        "deficit_vol_m3": 1560.0000780000005,
+        "cap_vol_m3": 4800.0,
+        "eta_hours": 6.500000325000002
+      }
+    }
+  ],
+  "steps": [
+    {
+      "label": "批次 1",
+      "t_start_h": 0.0,
+      "t_end_h": 6.500000325000002,
+      "commands": [
+        {
+          "action": "set",
+          "target": "PUMP",
+          "value": 100,
+          "note": "Batch 1 启动水泵"
+        }
+      ]
+    }
+  ]
+}

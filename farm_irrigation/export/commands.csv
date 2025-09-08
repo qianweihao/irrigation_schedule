@@ -1,0 +1,17 @@
+﻿step_label,action,target,value,note
+T0|drainage,OPEN,A3_4:DRAIN_GATE,1.0,A3_4 drain to WL_opt=80.0mm (WL=150mm)
+T0|batch-1,OPEN,PUMP,1.0,Start pump (Q≈320.0 m3/h)
+T0|batch-1,SET,RG_B2,1.0,Regulator MIX_OR_DOWNSTREAM→100%
+T0|batch-1,SET,RG_A3,1.0,Regulator MIX_OR_DOWNSTREAM→100%
+T0|batch-1,SET,A3:INLETS,1.0,Inlets = 100% within batch
+T0|batch-1,SET,B2:INLETS,1.0,Inlets = 100% within batch
+T1|batch-2,SET,RG_A1,0.0,Regulator ALL_UPSTREAM→0%
+T1|batch-2,SET,RG_B2,1.0,Regulator MIX_OR_DOWNSTREAM→100%
+T1|batch-2,SET,RG_A2,1.0,Regulator MIX_OR_DOWNSTREAM→100%
+T1|batch-2,SET,RG_B1,1.0,Regulator MIX_OR_DOWNSTREAM→100%
+T1|batch-2,SET,B2:INLETS,1.0,Inlets = 100% within batch
+T1|batch-2,SET,A2:INLETS,1.0,Inlets = 100% within batch
+T1|batch-2,SET,A1:INLETS,1.0,Inlets = 100% within batch
+T1|batch-2,SET,B1:INLETS,1.0,Inlets = 100% within batch
+T1|batch-2,NOTE,PUMP,,Keep pump ON
+T2|finalize,STOP,PUMP,,All batches done

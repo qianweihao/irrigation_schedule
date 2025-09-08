@@ -1,0 +1,10 @@
+﻿batch_index,field_id,canal_id,segment_id,area_mu,wl_mm,wl_low,wl_opt,wl_high,deficit_mm,volume_def_m3,share_in_batch,rel_to_regulator,category
+1,A3_1,C_A,A3,30,20,30.0,80.0,140.0,60.0,1200.06,0.5027932960893854,downstream,primary
+1,A3_2,C_A,A3,12,40,30.0,80.0,140.0,40.0,320.01599999999996,0.13407821229050276,downstream,secondary
+1,B2_1,C_B,B2,20,15,30.0,80.0,140.0,65.0,866.7099999999999,0.3631284916201117,downstream,primary
+2,A1_1,C_A,A1,12,28,30.0,80.0,140.0,52.0,416.02079999999995,0.244609956879655,upstream,primary
+2,A1_2,C_A,A1,10,70,30.0,80.0,140.0,10.0,66.67,0.03920031360250882,upstream,secondary
+2,A2_1,C_A,A2,15,25,30.0,80.0,140.0,55.0,550.0274999999999,0.3234025872206977,downstream,primary
+2,A2_2,C_A,A2,9,60,30.0,80.0,140.0,20.0,120.00599999999999,0.07056056448451586,downstream,secondary
+2,B1_2,C_B,B1,14,32,30.0,80.0,140.0,48.0,448.0224,0.26342610740885924,downstream,secondary
+2,B2_2,C_B,B2,5,50,30.0,80.0,140.0,30.0,100.005,0.058800470403763225,downstream,secondary

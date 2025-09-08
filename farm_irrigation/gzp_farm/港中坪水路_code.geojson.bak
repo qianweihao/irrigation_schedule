@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"name": "港中坪水路_code",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Id": 0, "code": "S1", "type": "mian-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.785778587716322, 28.839437100715031 ], [ 111.790832562892831, 28.843891451717923 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S9", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.785685788737169, 28.839137288628251 ], [ 111.786192613931405, 28.838573356369864 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S8", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.787012814139928, 28.840412203835228 ], [ 111.787703809616062, 28.839702172671082 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S7", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.787786257939956, 28.841068756613254 ], [ 111.789920634462248, 28.8394469159918 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S6", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.788504438758082, 28.841688963124454 ], [ 111.791401670478763, 28.839479871526635 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S5", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.788529185152527, 28.841709902381183 ], [ 111.791431175795367, 28.839517942902773 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S2", "type": "main-S", "feed_by": "P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.791679472551095, 28.840472987166663 ], [ 111.789209592027191, 28.842307551602175 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S4", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.78964471216392, 28.842688530078135 ], [ 111.792572876877841, 28.840502757198124 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S3", "type": "branch-S", "feed_by": "P1&P2" }, "geometry": { "type": "LineString", "coordinates": [ [ 111.790606708419375, 28.843527270254128 ], [ 111.792651141315616, 28.841954446529144 ] ] } }
+]
+}
