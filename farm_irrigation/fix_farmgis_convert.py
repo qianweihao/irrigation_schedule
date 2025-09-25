@@ -2,16 +2,26 @@
 import os
 import json
 import math
+import glob
+import sys
+import io
 from copy import deepcopy
+
+# 设置输出编码以解决Windows命令行中文显示问题
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # ========== 配置 ==========
 DIR = "gzp_farm"
-FILES = [
-    "港中坪阀门与节制闸_code.geojson",  # 预计：点
-    "港中坪田块_code.geojson",          # 预计：面
-    "港中坪水路_code.geojson",          # 预计：线
 
-]
+# 动态获取所有 *_code.geojson 文件
+FILES = [os.path.basename(f) for f in glob.glob(os.path.join(DIR, "*_code.geojson"))]
+
+if not FILES:
+    print(f"在 {DIR} 文件夹中未找到任何 *_code.geojson 文件")
+    print("请先运行 farmgis_convert.py 生成 geojson 文件")
+else:
+    print(f"找到 {len(FILES)} 个 geojson 文件: {FILES}")
 
 # 若安装了 shapely，则可尝试自动修复面几何
 try:

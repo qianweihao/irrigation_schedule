@@ -1,0 +1,71 @@
+# auto_to_config.py 配置参数文件
+# ============================================================================
+# 第一部分：纯配置参数
+# 无法从GeoJSON文件中获取，只能通过配置文件设置
+# ============================================================================
+# 默认农场ID
+default_farm_id: "13944136728576"
+# 默认时间窗口（小时）
+default_time_window_h: 20.0
+# 默认目标灌溉深度（毫米）
+default_target_depth_mm: 90.0
+# 坐标系统配置
+crs_config:
+  # 平方米转亩的转换系数
+  sqm_to_mu_factor: 666.6667
+# 默认距离排序值（当无法解析数字时使用）
+default_distance_rank: 9999
+# 文件搜索路径配置
+file_search_paths:
+  # 数据文件搜索路径
+  data_paths: ["gzp_farm", "/mnt/data"]
+  # 水位文件搜索路径（主要依靠接口获取）
+  waterlevels_paths: ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]
+# 默认文件名（仅在__main__中使用） 注意：运行时会动态获取实际的文件名
+default_filenames:
+  segments: "*_code.geojson"  # 匹配farmgis_convert.py生成的任意文件名格式
+  gates: "*_code.geojson"     # 匹配farmgis_convert.py生成的任意文件名格式
+  fields: "*_code.geojson"    # 匹配farmgis_convert.py生成的任意文件名格式
+# 输出配置
+output_config:
+  config_file: "config.json"
+  labeled_dir: "labeled_output"
+# 环境变量名称配置
+env_vars:
+  farm_id: ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]
+# 错误消息配置
+error_messages:
+  file_not_found: "文件不存在"
+  missing_geometry: "缺少 geometry 列"
+  empty_file: "文件为空"
+
+# ============================================================================
+# 第二部分：GeoJSON优先级参数
+# 这些参数优先从GeoJSON文件中获取，配置文件中的值仅作为备选默认值
+# 当GeoJSON中缺少相应数据时，才使用以下配置值
+# ============================================================================
+
+# 默认渠道ID（备选值：当GeoJSON中没有canal_id相关字段时使用）
+default_canal_id: "C_A"
+# 默认水位阈值（毫米）（备选值：当GeoJSON中没有水位相关字段时使用）
+default_water_levels:
+  wl_low: 80.0
+  wl_opt: 100.0
+  wl_high: 140.0
+# 默认田块配置（备选值：当GeoJSON中没有相关字段时使用）
+default_field_config:
+  has_drain_gate: true
+  rel_to_regulator: "downstream"
+# 默认泵配置（备选值：当无法从gates.geojson中检测到泵信息时使用）
+default_pump:
+  name: "AUTO"
+  q_rated_m3ph: 300.0
+  efficiency: 0.8
+# 默认泵列表（备选值：当gates.geojson中没有type="pump"的闸门时使用）
+default_pumps:
+  - name: "P1"
+    q_rated_m3ph: 300.0
+    efficiency: 0.8
+# 地理坐标系统列表（备选值：当无法自动检测GeoJSON的CRS时使用）
+crs_config:
+  geographic_crs: ["EPSG:4326", "EPSG:4490", "WGS84"]

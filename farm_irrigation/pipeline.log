@@ -1,0 +1,490 @@
+2025-09-25 11:43:37,127 - INFO - ��������ļ�...
+2025-09-25 11:43:37,127 - INFO - �����ļ����ͨ��
+2025-09-25 11:43:37,127 - INFO - �������Ŀ¼: ./gzp_farm
+2025-09-25 11:43:37,133 - INFO - �ҵ� 6 ��GIS�����ļ�
+2025-09-25 13:20:54,856 - INFO - ��ʼִ��ũ����ȵ���ϵͳ�Զ�����ˮ��
+2025-09-25 13:20:54,856 - INFO - ����Ŀ¼: ./gzp_farm
+2025-09-25 13:20:54,857 - INFO - ���Ŀ¼: ./output
+2025-09-25 13:20:54,857 - INFO - ��������ļ�...
+2025-09-25 13:20:54,859 - INFO - �����ļ����ͨ��
+2025-09-25 13:20:54,860 - INFO - �������Ŀ¼: ./gzp_farm
+2025-09-25 13:20:54,862 - INFO - �ҵ� 6 ��GIS�����ļ�
+2025-09-25 13:20:54,863 - INFO - === ����1: ����Ԥ���� ===
+2025-09-25 13:20:54,865 - INFO - ����Shapefile�ļ������и�ʽת��...
+2025-09-25 13:20:54,866 - INFO - ��ʼִ��: GIS���ݸ�ʽת��
+2025-09-25 13:20:54,867 - INFO - ����: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:20:57,130 - INFO - ��ʼִ��: GIS�����޸�
+2025-09-25 13:20:57,130 - INFO - ����: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:20:57,687 - INFO - === ����2: �������� ===
+2025-09-25 13:20:57,687 - INFO - ��ʼִ��: ����ϵͳ����
+2025-09-25 13:20:57,687 - INFO - ����: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:20:59,536 - WARNING - ����: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:20:59,542 - INFO - === ����3: ��ȼƻ����� ===
+2025-09-25 13:20:59,543 - INFO - ��ʼִ��: ���ɹ�ȼƻ�
+2025-09-25 13:20:59,543 - INFO - ����: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --output output\irrigation_plan_20250925_132059.json --merge-waterlevels --print-summary
+2025-09-25 13:21:00,060 - ERROR - �������: 2
+2025-09-25 13:21:00,060 - ERROR - �������: usage: run_irrigation_plan.py [-h] [--config CONFIG] [--out OUT]
+                              [--pumps PUMPS] [--zones ZONES] [--summary]
+                              [--realtime]
+run_irrigation_plan.py: error: unrecognized arguments: --output output\irrigation_plan_20250925_132059.json --merge-waterlevels --print-summary
+
+2025-09-25 13:21:00,061 - ERROR - ����3ִ��ʧ�ܣ���ˮ����ֹ
+2025-09-25 13:23:50,715 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:23:50,740 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:23:50,741 - INFO - 输出目录: ./output
+2025-09-25 13:23:50,741 - INFO - 检查依赖文件...
+2025-09-25 13:23:50,743 - INFO - 依赖文件检查通过
+2025-09-25 13:23:50,744 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:23:50,750 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:23:50,751 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:23:50,755 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:23:50,755 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:23:50,756 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:23:53,200 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:23:53,200 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:23:53,200 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:23:53,715 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:23:53,716 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:23:53,716 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:23:53,716 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:23:55,705 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:23:55,706 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:23:55,706 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:23:55,707 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:23:55,708 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --output output\irrigation_plan_20250925_132355.json --merge-waterlevels --print-summary
+2025-09-25 13:23:56,216 - ERROR - [FAIL] 生成灌溉计划 执行失败
+2025-09-25 13:23:56,216 - ERROR - 错误代码: 2
+2025-09-25 13:23:56,216 - ERROR - 错误输出: usage: run_irrigation_plan.py [-h] [--config CONFIG] [--out OUT]
+                              [--pumps PUMPS] [--zones ZONES] [--summary]
+                              [--realtime]
+run_irrigation_plan.py: error: unrecognized arguments: --output output\irrigation_plan_20250925_132355.json --merge-waterlevels --print-summary
+
+2025-09-25 13:23:56,216 - ERROR - 步骤3执行失败，流水线终止
+2025-09-25 13:23:56,216 - ERROR - [FAIL] 自动化流水线执行失败
+2025-09-25 13:25:21,082 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:25:21,082 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:25:21,082 - INFO - 输出目录: ./output
+2025-09-25 13:25:21,082 - INFO - 检查依赖文件...
+2025-09-25 13:25:21,098 - INFO - 依赖文件检查通过
+2025-09-25 13:25:21,098 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:25:21,098 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:25:21,098 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:25:21,098 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:25:21,098 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:25:21,098 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:25:22,766 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:25:22,766 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:25:22,766 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:25:23,229 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:25:23,229 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:25:23,229 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:25:23,229 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:25:24,937 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:25:24,937 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:25:24,937 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:25:24,937 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:25:24,937 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_132524.json --summary
+2025-09-25 13:25:25,417 - INFO - [OK] 生成灌溉计划 执行成功
+2025-09-25 13:25:25,417 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.334824
+2025-09-25 13:25:25,417 - INFO - 生成的文件:
+2025-09-25 13:25:25,417 - INFO -   - output\irrigation_plan_20250925_132524.json
+2025-09-25 13:25:25,417 - INFO - [SUCCESS] 自动化流水线执行成功
+2025-09-25 13:27:02,124 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:27:02,124 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:27:02,124 - INFO - 输出目录: ./output
+2025-09-25 13:27:02,124 - INFO - 检查依赖文件...
+2025-09-25 13:27:02,124 - INFO - 依赖文件检查通过
+2025-09-25 13:27:02,124 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:27:02,135 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:27:02,135 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:27:02,135 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:27:02,135 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:27:02,135 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:27:03,883 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-09-25 13:27:03,883 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:27:03,883 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:27:03,883 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:27:04,358 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-09-25 13:27:04,359 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:27:04,359 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:27:04,360 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:27:04,361 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:27:06,219 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:27:06,219 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:27:06,220 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:27:06,220 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:27:06,221 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_132706.json --summary
+2025-09-25 13:27:06,665 - INFO - 输出: ====== 灌溉决策摘要 ======
+总 ETA: 0.00 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m³/h
+灌溉批次: 0 批
+[done] 计划已写入：F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20250925_132706.json
+
+2025-09-25 13:27:06,665 - INFO - [OK] 生成灌溉计划 执行成功
+2025-09-25 13:27:06,665 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.540214
+2025-09-25 13:27:06,665 - INFO - 生成的文件:
+2025-09-25 13:27:06,665 - INFO -   - output\irrigation_plan_20250925_132524.json
+2025-09-25 13:27:06,680 - INFO -   - output\irrigation_plan_20250925_132706.json
+2025-09-25 13:27:06,680 - INFO - [SUCCESS] 自动化流水线执行成功
+2025-09-25 13:29:19,165 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:29:19,165 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:29:19,166 - INFO - 输出目录: ./output
+2025-09-25 13:29:19,166 - INFO - 检查依赖文件...
+2025-09-25 13:29:19,167 - INFO - 依赖文件检查通过
+2025-09-25 13:29:19,167 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:29:19,167 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:29:19,167 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:29:19,167 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:29:19,167 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:29:19,167 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:29:21,002 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-09-25 13:29:21,003 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:29:21,003 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:29:21,004 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:29:21,466 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-09-25 13:29:21,466 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:29:21,467 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:29:21,467 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:29:21,468 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:29:23,239 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:29:23,239 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:29:23,240 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:29:23,243 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:29:23,243 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_132923.json --summary
+2025-09-25 13:29:23,693 - INFO - 输出: ====== 灌溉决策摘要 ======
+总 ETA: 0.00 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m³/h
+灌溉批次: 0 批
+[done] 计划已写入：F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20250925_132923.json
+
+2025-09-25 13:29:23,693 - INFO - [OK] 生成灌溉计划 执行成功
+2025-09-25 13:29:23,693 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.528501
+2025-09-25 13:29:23,709 - INFO - 生成的文件:
+2025-09-25 13:29:23,709 - INFO -   - output\irrigation_plan_20250925_132524.json
+2025-09-25 13:29:23,709 - INFO -   - output\irrigation_plan_20250925_132706.json
+2025-09-25 13:29:23,709 - INFO -   - output\irrigation_plan_20250925_132923.json
+2025-09-25 13:29:23,709 - INFO - [SUCCESS] 自动化流水线执行成功
+2025-09-25 13:31:14,868 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:31:14,868 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:31:14,868 - INFO - 输出目录: ./output
+2025-09-25 13:31:14,868 - INFO - 检查依赖文件...
+2025-09-25 13:31:14,868 - INFO - 依赖文件检查通过
+2025-09-25 13:31:14,868 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:31:14,868 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:31:14,868 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:31:14,884 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:31:14,886 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:31:14,886 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:31:16,984 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-09-25 13:31:16,984 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:31:16,984 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:31:17,000 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:31:17,434 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-09-25 13:31:17,434 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:31:17,434 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:31:17,434 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:31:17,434 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:31:19,261 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:31:19,261 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:31:19,262 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:31:19,263 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:31:19,263 - INFO - 命令: c:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_133119.json --summary
+2025-09-25 13:31:19,739 - INFO - 输出: ====== 灌溉决策摘要 ======
+总 ETA: 0.00 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m³/h
+灌溉批次: 0 批
+[done] 计划已写入：F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20250925_133119.json
+
+2025-09-25 13:31:19,754 - INFO - [OK] 生成灌溉计划 执行成功
+2025-09-25 13:31:19,755 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.887224
+2025-09-25 13:31:19,755 - INFO - 生成的文件:
+2025-09-25 13:31:19,755 - INFO -   - output\irrigation_plan_20250925_133119.json
+2025-09-25 13:31:19,755 - INFO - [SUCCESS] 自动化流水线执行成功
+2025-09-25 13:44:57,637 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:44:57,641 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:44:57,641 - INFO - 输出目录: ./output
+2025-09-25 13:44:57,641 - INFO - 检查依赖文件...
+2025-09-25 13:44:57,641 - INFO - 依赖文件检查通过
+2025-09-25 13:44:57,641 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:44:57,657 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:44:57,658 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:44:57,659 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:44:57,659 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:44:57,659 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:44:59,629 - INFO - 输出: �ҵ� 3 �� .shp �ļ�
+��ת��: ����ƺˮ·.shp -> ����ƺˮ·_code.geojson
+��ת��: ����ƺ���.shp -> ����ƺ���_code.geojson
+��ת��: ����ƺ���������բ.shp -> ����ƺ���������բ_code.geojson
+ת����ɣ�
+
+2025-09-25 13:44:59,629 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:44:59,630 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:44:59,630 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:45:00,072 - INFO - 输出: �ҵ� 3 �� geojson �ļ�: ['����ƺˮ·_code.geojson', '����ƺ���_code.geojson', '����ƺ���������բ_code.geojson']
+����Ŀ¼: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[����] gzp_farm\����ƺˮ·_code.geojson
+  ��Ҫ��: 9  =>  ����: 9  ɾ��: 0
+  �ѱ��� -> gzp_farm\����ƺˮ·_code.geojson.bak
+  ��д����ϴ����ļ� -> gzp_farm\����ƺˮ·_code.geojson
+
+[����] gzp_farm\����ƺ���_code.geojson
+  ��Ҫ��: 42  =>  ����: 42  ɾ��: 0
+  �ѱ��� -> gzp_farm\����ƺ���_code.geojson.bak
+  ��д����ϴ����ļ� -> gzp_farm\����ƺ���_code.geojson
+
+[����] gzp_farm\����ƺ���������բ_code.geojson
+  ��Ҫ��: 57  =>  ����: 57  ɾ��: 0
+  �ѱ��� -> gzp_farm\����ƺ���������բ_code.geojson.bak
+  ��д����ϴ����ļ� -> gzp_farm\����ƺ���������բ_code.geojson
+
+��ɡ���ˢ��ǰ��ҳ����֤��
+
+2025-09-25 13:45:00,072 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:45:00,072 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:45:00,072 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:45:00,072 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:45:01,877 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:45:01,877 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:45:01,877 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:45:01,878 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:45:01,878 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_134501.json --summary
+2025-09-25 13:45:02,376 - ERROR - [FAIL] 生成灌溉计划 执行失败
+2025-09-25 13:45:02,376 - ERROR - 错误代码: 1
+2025-09-25 13:45:02,376 - ERROR - 错误输出: Traceback (most recent call last):
+  File "f:\irrigation_schedule\farm_irrigation\run_irrigation_plan.py", line 90, in <module>
+    main()
+  File "f:\irrigation_schedule\farm_irrigation\run_irrigation_plan.py", line 85, in main
+    _print_summary(plan_json)
+  File "f:\irrigation_schedule\farm_irrigation\run_irrigation_plan.py", line 39, in _print_summary
+    if q_av  is not None: print(f"��Ч������: {q_av} m\xb3/h")
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\xb3' in position 14: illegal multibyte sequence
+
+2025-09-25 13:45:02,376 - ERROR - 步骤3执行失败，流水线终止
+2025-09-25 13:45:02,376 - ERROR - [FAIL] 自动化流水线执行失败
+2025-09-25 13:46:11,004 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:46:11,011 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:46:11,011 - INFO - 输出目录: ./output
+2025-09-25 13:46:11,011 - INFO - 检查依赖文件...
+2025-09-25 13:46:11,011 - INFO - 依赖文件检查通过
+2025-09-25 13:46:11,011 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:46:11,011 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:46:11,011 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:46:11,011 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:46:11,011 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:46:11,011 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:46:12,621 - INFO - 输出: �ҵ� 3 �� .shp �ļ�
+��ת��: ����ƺˮ·.shp -> ����ƺˮ·_code.geojson
+��ת��: ����ƺ���.shp -> ����ƺ���_code.geojson
+��ת��: ����ƺ���������բ.shp -> ����ƺ���������բ_code.geojson
+ת����ɣ�
+
+2025-09-25 13:46:12,621 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:46:12,621 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:46:12,621 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:46:13,024 - INFO - 输出: �ҵ� 3 �� geojson �ļ�: ['����ƺˮ·_code.geojson', '����ƺ���_code.geojson', '����ƺ���������բ_code.geojson']
+����Ŀ¼: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[����] gzp_farm\����ƺˮ·_code.geojson
+  ��Ҫ��: 9  =>  ����: 9  ɾ��: 0
+  �ѱ��� -> gzp_farm\����ƺˮ·_code.geojson.bak
+  ��д����ϴ����ļ� -> gzp_farm\����ƺˮ·_code.geojson
+
+[����] gzp_farm\����ƺ���_code.geojson
+  ��Ҫ��: 42  =>  ����: 42  ɾ��: 0
+  �ѱ��� -> gzp_farm\����ƺ���_code.geojson.bak
+  ��д����ϴ����ļ� -> gzp_farm\����ƺ���_code.geojson
+
+[����] gzp_farm\����ƺ���������բ_code.geojson
+  ��Ҫ��: 57  =>  ����: 57  ɾ��: 0
+  �ѱ��� -> gzp_farm\����ƺ���������բ_code.geojson.bak
+  ��д����ϴ����ļ� -> gzp_farm\����ƺ���������բ_code.geojson
+
+��ɡ���ˢ��ǰ��ҳ����֤��
+
+2025-09-25 13:46:13,024 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:46:13,024 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:46:13,024 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:46:13,024 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:46:14,692 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:46:14,692 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:46:14,692 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:46:14,692 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:46:14,692 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_134614.json --summary
+2025-09-25 13:46:15,140 - INFO - 输出: ====== ��Ⱦ���ժҪ ======
+�� ETA: 0.00 h
+����ʱ��: 20.0 h
+Ŀ�겹ˮ��: 90.0 mm
+��Ч������: 480.0 m3/h
+�������: 0 ��
+[done] �ƻ���д�룺F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20250925_134614.json
+
+2025-09-25 13:46:15,140 - INFO - [OK] 生成灌溉计划 执行成功
+2025-09-25 13:46:15,140 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.136325
+2025-09-25 13:46:15,140 - INFO - 生成的文件:
+2025-09-25 13:46:15,140 - INFO -   - output\irrigation_plan_20250925_133119.json
+2025-09-25 13:46:15,140 - INFO -   - output\irrigation_plan_20250925_134501.json
+2025-09-25 13:46:15,140 - INFO -   - output\irrigation_plan_20250925_134614.json
+2025-09-25 13:46:15,140 - INFO - [SUCCESS] 自动化流水线执行成功
+2025-09-25 13:48:05,375 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-09-25 13:48:05,376 - INFO - 输入目录: ./gzp_farm
+2025-09-25 13:48:05,376 - INFO - 输出目录: ./output
+2025-09-25 13:48:05,376 - INFO - 检查依赖文件...
+2025-09-25 13:48:05,377 - INFO - 依赖文件检查通过
+2025-09-25 13:48:05,377 - INFO - 检查输入目录: ./gzp_farm
+2025-09-25 13:48:05,379 - INFO - 找到 6 个GIS数据文件
+2025-09-25 13:48:05,379 - INFO - === 步骤1: 数据预处理 ===
+2025-09-25 13:48:05,380 - INFO - 发现Shapefile文件，运行格式转换...
+2025-09-25 13:48:05,380 - INFO - 开始执行: GIS数据格式转换
+2025-09-25 13:48:05,380 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-09-25 13:48:06,983 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-09-25 13:48:06,983 - INFO - [OK] GIS数据格式转换 执行成功
+2025-09-25 13:48:06,983 - INFO - 开始执行: GIS数据修复
+2025-09-25 13:48:06,983 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-09-25 13:48:07,415 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-09-25 13:48:07,415 - INFO - [OK] GIS数据修复 执行成功
+2025-09-25 13:48:07,415 - INFO - === 步骤2: 配置生成 ===
+2025-09-25 13:48:07,415 - INFO - 开始执行: 生成系统配置
+2025-09-25 13:48:07,415 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-09-25 13:48:09,177 - WARNING - 警告: f:\irrigation_schedule\farm_irrigation\auto_to_config.py:89: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-09-25 13:48:09,177 - INFO - [OK] 生成系统配置 执行成功
+2025-09-25 13:48:09,177 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-09-25 13:48:09,177 - INFO - 开始执行: 生成灌溉计划
+2025-09-25 13:48:09,177 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20250925_134809.json --summary
+2025-09-25 13:48:09,612 - INFO - 输出: ====== 灌溉决策摘要 ======
+总 ETA: 0.00 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 0 批
+[done] 计划已写入：F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20250925_134809.json
+
+2025-09-25 13:48:09,612 - INFO - [OK] 生成灌溉计划 执行成功
+2025-09-25 13:48:09,612 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.237714
+2025-09-25 13:48:09,612 - INFO - 生成的文件:
+2025-09-25 13:48:09,612 - INFO -   - output\irrigation_plan_20250925_133119.json
+2025-09-25 13:48:09,612 - INFO -   - output\irrigation_plan_20250925_134501.json
+2025-09-25 13:48:09,612 - INFO -   - output\irrigation_plan_20250925_134614.json
+2025-09-25 13:48:09,612 - INFO -   - output\irrigation_plan_20250925_134809.json
+2025-09-25 13:48:09,612 - INFO - [SUCCESS] 自动化流水线执行成功

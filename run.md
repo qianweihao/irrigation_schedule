@@ -1,8 +1,6 @@
 一、核心运行
 
-cd F:\农场级灌溉设计算法\farm_irrigation
-Get-ChildItem .\gzp_farm
-python .\run_irrigation_plan.py -s
+流水线：C:/Users/00783510/AppData/Local/Programs/Python/Python311/python.exe f:/irrigation_schedule/farm_irrigation/pipeline.py
 
 二、完整步骤
 

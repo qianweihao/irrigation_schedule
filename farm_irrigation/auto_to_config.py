@@ -20,7 +20,8 @@ auto_to_config.py —— 三个(Geo)JSON → 生成 config.json
 from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from pathlib import Path
-import json, os, re, math
+import json, os, re, math, glob
+import yaml
 
 import geopandas as gpd
 import numpy as np
@@ -28,8 +29,38 @@ import pandas as pd
 from shapely.geometry import Point, LineString, Polygon
 from shapely.ops import nearest_points
 
-# 你要求保留的默认农场ID
-DEFAULT_FARM_ID = "13944136728576"
+# 加载配置文件
+def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]:
+    """加载配置文件，返回配置字典"""
+    config_file = Path(config_path)
+    if not config_file.exists():
+        # 如果配置文件不存在，返回默认配置
+        return {
+            "default_farm_id": "13944136728576",
+            "default_time_window_h": 20.0,
+            "default_target_depth_mm": 90.0,
+            "default_canal_id": "C_A",
+            "default_water_levels": {"wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0},
+            "default_field_config": {"has_drain_gate": True, "rel_to_regulator": "downstream"},
+            "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8},
+            "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8}],
+            "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
+            "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
+            "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
+            "output_config": {"config_file": "config.json", "labeled_dir": "labeled_output"},
+            "env_vars": {"farm_id": ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]},
+            "default_distance_rank": 9999
+        }
+    
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except Exception:
+        # 如果读取失败，返回默认配置
+        return _load_config()  # 递归调用返回默认配置
+
+# 全局配置对象
+CONFIG = _load_config()
 
 # ============== 基础工具 ==============
 
@@ -53,7 +84,8 @@ def _utm_crs_for(lon: float, lat: float) -> str:
 def _ensure_crs_metric(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if gdf.crs is None:
         gdf = gdf.set_crs("EPSG:4326", allow_override=True)
-    if str(gdf.crs).upper() in ("EPSG:4326", "EPSG:4490", "WGS84"):
+    geographic_crs = CONFIG.get("crs_config", {}).get("geographic_crs", ["EPSG:4326", "EPSG:4490", "WGS84"])
+    if str(gdf.crs).upper() in geographic_crs:
         c = gdf.unary_union.centroid
         crs = _utm_crs_for(c.x, c.y)
         try:
@@ -63,7 +95,8 @@ def _ensure_crs_metric(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return gdf
 
 def _mu_from_area(poly: Polygon) -> float:
-    return float(poly.area / 666.6667)
+    factor = CONFIG.get("crs_config", {}).get("sqm_to_mu_factor", 666.6667)
+    return float(poly.area / factor)
 
 def _try_float(x, default=None):
     try:
@@ -72,7 +105,9 @@ def _try_float(x, default=None):
     except Exception:
         return default
 
-def _num_tail(x, default=9999):
+def _num_tail(x, default=None):
+    if default is None:
+        default = CONFIG.get("default_distance_rank", 9999)
     if x is None: return default
     m = re.search(r"(\d+)$", str(x).strip())
     return int(m.group(1)) if m else default
@@ -145,7 +180,17 @@ def _nearest_gate_index(points: List[Point], gates: gpd.GeoDataFrame) -> List[in
     return out
 
 def _load_waterlevels(path: Optional[str]) -> Dict[str, float]:
-    if not path: return {}
+    if not path: 
+        # 如果没有指定路径，尝试从配置的搜索路径中查找
+        waterlevels_paths = CONFIG.get("file_search_paths", {}).get("waterlevels_paths", 
+                                       ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"])
+        for wl_path in waterlevels_paths:
+            if Path(wl_path).exists():
+                path = wl_path
+                break
+        if not path:
+            return {}
+    
     p = Path(path)
     if not p.exists(): return {}
     try:
@@ -165,14 +210,26 @@ def convert(
     segments_path: str,
     gates_path: str,
     fields_path: str,
-    cfg_out: str = "config.json",
-    labeled_dir: str = "labeled_output",
+    cfg_out: Optional[str] = None,
+    labeled_dir: Optional[str] = None,
     default_pumps: Optional[List[Dict[str, Any]]] = None,
-    t_win_h: float = 20.0,
-    d_target_mm: float = 90.0,
+    t_win_h: Optional[float] = None,
+    d_target_mm: Optional[float] = None,
     farm_id: Optional[str] = None,
     waterlevels_json: Optional[str] = None
 ) -> Dict[str, Any]:
+    
+    # 从配置文件获取默认值
+    if cfg_out is None:
+        cfg_out = CONFIG.get("output_config", {}).get("config_file", "config.json")
+    if labeled_dir is None:
+        labeled_dir = CONFIG.get("output_config", {}).get("labeled_dir", "labeled_output")
+    if t_win_h is None:
+        t_win_h = CONFIG.get("default_time_window_h", 20.0)
+    if d_target_mm is None:
+        d_target_mm = CONFIG.get("default_target_depth_mm", 90.0)
+    if default_pumps is None:
+        default_pumps = CONFIG.get("default_pumps", [{"name":"P1","q_rated_m3ph":300.0,"efficiency":0.8}])
 
     # 读取
     seg_raw = _read_any(segments_path)
@@ -345,9 +402,10 @@ def convert(
                     return [t.strip() for t in s.split(sep) if t.strip()]
             return [s] if s else []
         feed_raw = _first_non_empty(sr, ["feed_by","FEED_BY","feedBy","Feed_By","feedBY"])
+        canal_id = CONFIG.get("default_canal_id", "C_A")
         seg_rows.append({
             "id": sid,
-            "canal_id": "C_A",
+            "canal_id": canal_id,
             "distance_rank": int(_num_tail(sid, 9999)),
             "regulator_gate_ids": reg_ids,
             "regulator_gate_id": (reg_ids[0] if reg_ids else None),
@@ -379,7 +437,13 @@ def convert(
         wl = _field_row_wl(r)
 
         # 5) 距离 rank：优先 F_id 的数字尾；否则段 id 的数字尾
-        dist_rank = int(_num_tail(r.get("F_id"), _num_tail(r.get("segment_S_id"), 9999)))
+        default_rank = CONFIG.get("default_distance_rank", 9999)
+        dist_rank = int(_num_tail(r.get("F_id"), _num_tail(r.get("segment_S_id"), default_rank)))
+        
+        # 从配置获取默认值
+        canal_id = CONFIG.get("default_canal_id", "C_A")
+        water_levels = CONFIG.get("default_water_levels", {"wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0})
+        field_config = CONFIG.get("default_field_config", {"has_drain_gate": True, "rel_to_regulator": "downstream"})
 
         fld_rows.append({
             "id": str(r["F_id"]),
@@ -387,28 +451,38 @@ def convert(
             "sectionCode": (str(section_code) if section_code else None),
             "name": (str(name) if name else None),
             "area_mu": float(round(_mu_from_area(r.geometry) if r.geometry is not None else 0.0, 3)),
-            "canal_id": "C_A",
+            "canal_id": canal_id,
             "segment_id": str(r["segment_S_id"]),
             "distance_rank": dist_rank,
             "wl_mm": wl,
-            "wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0,
-            "has_drain_gate": True,
-            "rel_to_regulator": "downstream",
+            "wl_low": water_levels.get("wl_low", 80.0),
+            "wl_opt": water_levels.get("wl_opt", 100.0),
+            "wl_high": water_levels.get("wl_high", 140.0),
+            "has_drain_gate": field_config.get("has_drain_gate", True),
+            "rel_to_regulator": field_config.get("rel_to_regulator", "downstream"),
             "inlet_G_id": (str(r["inlet_G_id"]) if not _is_nanlike(r.get("inlet_G_id")) else None)
         })
 
     # 顶层 farm_id（形参 → 环境 → 默认）
-    farm_id = (farm_id
-               or os.environ.get("RICE_IRRIGATION_FARM_ID")
-               or os.environ.get("FARM_ID")
-               or os.environ.get("FARMID")
-               or DEFAULT_FARM_ID)
+    env_vars = CONFIG.get("env_vars", {}).get("farm_id", ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"])
+    default_farm_id = CONFIG.get("default_farm_id", "13944136728576")
+    
+    if not farm_id:
+        for env_var in env_vars:
+            farm_id = os.environ.get(env_var)
+            if farm_id:
+                break
+        if not farm_id:
+            farm_id = default_farm_id
+    
+    # 默认泵配置
+    default_pump_config = CONFIG.get("default_pump", {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8})
 
     data = {
         "farm_id": farm_id,
         "t_win_h": float(t_win_h),
         "d_target_mm": float(d_target_mm),
-        "pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8},
+        "pump": default_pump_config,
         "pumps": pumps_detail,
         "segments": seg_rows,
         "gates": gate_rows,
@@ -432,28 +506,93 @@ def convert(
 
 # ============== 便捷入口 ==============
 
-def _pick_path(name: str) -> str:
-    for p in [Path(name), Path("gzp_farm") / name, Path("/mnt/data") / name]:
-        if p.exists(): return str(p)
+def _pick_path(name: str, file_type: str = None) -> str:
+    # 如果包含通配符，使用glob匹配
+    if '*' in name or '?' in name:
+        # 首先检查当前目录
+        matches = glob.glob(name)
+        if matches:
+            # 如果有多个匹配，尝试根据文件类型选择最合适的
+            if file_type and len(matches) > 1:
+                type_keywords = {
+                    'segments': ['水路', '渠道', 'canal', 'segment'],
+                    'gates': ['阀门', '闸门', 'gate', 'valve'],
+                    'fields': ['田块', '地块', 'field', 'plot']
+                }
+                keywords = type_keywords.get(file_type, [])
+                for keyword in keywords:
+                    for match in matches:
+                        if keyword in Path(match).stem:
+                            return str(Path(match))
+            return str(Path(matches[0]))
+        
+        # 然后检查配置的搜索路径
+        search_paths = CONFIG.get("file_search_paths", {}).get("data_paths", ["gzp_farm", "/mnt/data"])
+        for search_path in search_paths:
+            pattern = str(Path(search_path) / name)
+            matches = glob.glob(pattern)
+            if matches:
+                # 同样的类型匹配逻辑
+                if file_type and len(matches) > 1:
+                    type_keywords = {
+                        'segments': ['水路', '渠道', 'canal', 'segment'],
+                        'gates': ['阀门', '闸门', 'gate', 'valve'],
+                        'fields': ['田块', '地块', 'field', 'plot']
+                    }
+                    keywords = type_keywords.get(file_type, [])
+                    for keyword in keywords:
+                        for match in matches:
+                            if keyword in Path(match).stem:
+                                return str(Path(match))
+                return str(Path(matches[0]))
+    else:
+        # 精确匹配逻辑（原有逻辑）
+        if Path(name).exists():
+            return str(Path(name))
+        
+        search_paths = CONFIG.get("file_search_paths", {}).get("data_paths", ["gzp_farm", "/mnt/data"])
+        for search_path in search_paths:
+            p = Path(search_path) / name
+            if p.exists():
+                return str(p)
+    
+    # 如果都找不到，返回原始路径
     return str(Path(name))
 
 if __name__ == "__main__":
-    segments_path = _pick_path("港中坪水路_code.geojson")
-    gates_path    = _pick_path("港中坪阀门与节制闸_code.geojson")
-    fields_path   = _pick_path("港中坪田块_code.geojson")
-    # 可选水位
+    # 从配置获取默认文件名
+    default_filenames = CONFIG.get("default_filenames", {
+        "segments": "港中坪水路_code.geojson",
+        "gates": "港中坪阀门与节制闸_code.geojson",
+        "fields": "港中坪田块_code.geojson"
+    })
+    
+    segments_path = _pick_path(default_filenames["segments"], "segments")
+    gates_path    = _pick_path(default_filenames["gates"], "gates")
+    fields_path   = _pick_path(default_filenames["fields"], "fields")
+    
+    # 可选水位文件搜索
     wl_json = None
-    for p in ["waterlevels.json","gzp_farm/waterlevels.json","/mnt/data/waterlevels.json"]:
-        if Path(p).exists(): wl_json = p; break
+    waterlevels_paths = CONFIG.get("file_search_paths", {}).get("waterlevels_paths", 
+                                   ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"])
+    for p in waterlevels_paths:
+        if Path(p).exists(): 
+            wl_json = p
+            break
+    
     # 农场ID：优先环境，其次默认
-    farm_id = (os.environ.get("RICE_IRRIGATION_FARM_ID")
-               or os.environ.get("FARM_ID")
-               or os.environ.get("FARMID")
-               or DEFAULT_FARM_ID)
+    env_vars = CONFIG.get("env_vars", {}).get("farm_id", ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"])
+    default_farm_id = CONFIG.get("default_farm_id", "13944136728576")
+    
+    farm_id = None
+    for env_var in env_vars:
+        farm_id = os.environ.get(env_var)
+        if farm_id:
+            break
+    if not farm_id:
+        farm_id = default_farm_id
+    
     convert(
         segments_path, gates_path, fields_path,
-        cfg_out="config.json", labeled_dir="labeled_output",
-        default_pumps=[{"name":"P1","q_rated_m3ph":300.0,"efficiency":0.8}],
-        t_win_h=20.0, d_target_mm=90.0,
         farm_id=farm_id, waterlevels_json=wl_json
     )

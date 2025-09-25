@@ -1,0 +1,77 @@
+# 农场灌溉调度系统自动化流水线配置文件
+# 使用方法: python pipeline.py --config pipeline_config.yaml
+
+# 输入输出目录配置
+input_dir: "./gzp_farm"          # GIS数据输入目录
+output_dir: "./output"           # 输出目录
+
+# 执行选项
+options:
+  # 泵站配置
+  pumps: "1,2"                   # 启用的泵站列表，逗号分隔
+  
+  # 供区配置  
+  zones: "A,B"                   # 启用的供区列表，逗号分隔
+  
+  # 水位数据融合
+  merge_waterlevels: true        # 是否融合实时水位数据
+  
+  # 输出选项
+  print_summary: true            # 是否打印执行摘要
+
+# 高级配置（可选）
+advanced:
+  # 日志配置
+  log_level: "INFO"              # 日志级别: DEBUG, INFO, WARNING, ERROR
+  log_file: "pipeline.log"       # 日志文件名
+  
+  # 超时配置
+  step_timeout: 300              # 每个步骤的超时时间（秒）
+  
+  # 重试配置
+  max_retries: 3                 # 失败时的最大重试次数
+  
+  # 文件检查
+  required_files:                # 必需的输入文件模式
+    - "*水路*.geojson"
+    - "*田块*.geojson" 
+    - "*阀门*.geojson"
+
+# 步骤配置
+steps:
+  # 步骤1: 数据预处理
+  data_preprocessing:
+    enabled: true                # 是否启用此步骤
+    skip_if_no_shp: true        # 如果没有shapefile则跳过
+    
+  # 步骤2: 配置生成
+  config_generation:
+    enabled: true
+    output_labeled: true         # 是否输出标注文件
+    
+  # 步骤3: 计划生成
+  plan_generation:
+    enabled: true
+    output_format: "json"        # 输出格式: json, csv
+    include_timestamp: true      # 文件名是否包含时间戳
+
+# 文件路径映射（可选，用于自定义文件路径）
+file_mapping:
+  segments: "港中坪水路_code.geojson"      # 渠段文件
+  gates: "港中坪阀门与节制闸_code.geojson"   # 节制闸文件  
+  fields: "港中坪田块_code.geojson"        # 田块文件
+  waterlevels: "sectionid_2_code.json"   # 水位映射文件
+
+# 通知配置（可选）
+notifications:
+  enabled: false               # 是否启用通知
+  email:
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    username: "your_email@example.com"
+    password: "your_password"
+    recipients: ["admin@example.com"]
+  
+  webhook:
+    url: "https://hooks.slack.com/services/..."
+    method: "POST"
