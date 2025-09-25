@@ -1,3 +1,4 @@
+#地块id转换
 import pandas as pd, json, os
 
 CSV = os.path.join("gzp_farm", "港中坪地块id.csv")
