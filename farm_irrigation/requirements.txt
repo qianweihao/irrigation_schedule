@@ -1,27 +1,33 @@
-# 农场级灌溉设计算法AI - Python依赖包
-# Web框架
+# Farm-level irrigation design AI - Python dependencies
+# Web framework
 Flask==2.3.3
 Werkzeug==2.3.7
 
-# 地理空间数据处理
+# FastAPI and related dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.0
+
+# Geospatial data processing
 geopandas==0.14.0
 pandas==2.1.1
 shapely==2.0.2
 fiona==1.9.5
 pyproj==3.6.1
 
-# HTTP请求
+# HTTP requests
 requests==2.31.0
 
-# 数学计算
+# Mathematical computation
 numpy==1.24.3
 
-# 其他工具
+# Other tools
 functools32; python_version < '3.2'
 PyYAML==6.0.1
 
-# WSGI服务器（生产环境）
+# WSGI server (production)
 gunicorn==21.2.0
 
-# 系统监控（可选）
+# System monitoring (optional)
 psutil==5.9.6

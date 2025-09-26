@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  irrigation-api:
+    build: .
+    container_name: irrigation-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # 挂载数据目录，确保数据持久化
+      - ./gzp_farm:/app/gzp_farm
+      - ./output:/app/output
+      - ./logs:/app/logs
+      # 挂载配置文件
+      - ./auto_config_params.yaml:/app/auto_config_params.yaml
+      - ./pipeline_config.yaml:/app/pipeline_config.yaml
+      # 如果有sectionid映射文件，也需要挂载
+      - ./sectionid_2_code.json:/app/sectionid_2_code.json
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      # 可以通过环境变量配置API相关参数
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - irrigation-network
+
+  # 可选：添加Nginx反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: irrigation-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # SSL证书目录（如果需要HTTPS）
+      # - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - irrigation-api
+    restart: unless-stopped
+    networks:
+      - irrigation-network
+
+networks:
+  irrigation-network:
+    driver: bridge
+
+volumes:
+  # 如果需要持久化存储，可以定义命名卷
+  irrigation-data:
+    driver: local

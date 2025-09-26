@@ -210,6 +210,8 @@ class IrrigationPipeline:
             cmd.extend(['--zones', kwargs['zones']])
         if kwargs.get('print_summary', True):
             cmd.append('--summary')
+        if kwargs.get('merge_waterlevels', True):
+            cmd.append('--realtime')
             
         return self.run_command(cmd, "生成灌溉计划")
         

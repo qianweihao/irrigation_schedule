@@ -224,6 +224,20 @@ def farmcfg_from_json_select(config: Union[str, Dict[str, Any]],
             q_max_m3ph=_as_float(g.get("q_max_m3ph"), 9999.0) or 9999.0
         )
 
+    def _parse_feed_by(s):
+        if s is None: return []
+        if isinstance(s, list): return [str(x).strip() for x in s if str(x).strip()]
+        s = str(s).strip()
+        try:
+            arr = json.loads(s.replace("(", "[").replace(")", "]"))
+            return [str(x).strip() for x in arr if str(x).strip()]
+        except Exception:
+            pass
+        for sep in [",",";","|","/","&","+","，","；","、"," "]:
+            if sep in s:
+                return [t.strip() for t in s.split(sep) if t.strip()]
+        return [s] if s else []
+
     segments: Dict[str, Segment] = {}
     for s in data.get("segments", []) or []:
         regs = list(s.get("regulator_gate_ids") or [])
@@ -235,7 +249,7 @@ def farmcfg_from_json_select(config: Union[str, Dict[str, Any]],
             distance_rank=int(s.get("distance_rank",1)),
             regulator_gate_ids=regs,
             regulator_gate_id=s.get("regulator_gate_id"),
-            feed_by=list(s.get("feed_by") or []),
+            feed_by=_parse_feed_by(s.get("feed_by")),
             supply_zone=s.get("supply_zone")
         )
 

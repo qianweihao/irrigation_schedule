@@ -54,10 +54,45 @@ def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]
     
     try:
         with open(config_file, 'r', encoding='utf-8') as f:
-            return yaml.safe_load(f)
-    except Exception:
+            config_data = yaml.safe_load(f)
+            if config_data is None:
+                # 如果配置文件为空，返回默认配置
+                return {
+                    "default_farm_id": "13944136728576",
+                    "default_time_window_h": 20.0,
+                    "default_target_depth_mm": 90.0,
+                    "default_canal_id": "C_A",
+                    "default_water_levels": {"wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0},
+                    "default_field_config": {"has_drain_gate": True, "rel_to_regulator": "downstream"},
+                    "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8},
+                    "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8}],
+                    "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
+                    "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
+                    "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
+                    "output_config": {"config_file": "config.json", "labeled_dir": "labeled_output"},
+                    "env_vars": {"farm_id": ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]},
+                    "default_distance_rank": 9999
+                }
+            return config_data
+    except Exception as e:
+        print(f"配置文件读取失败: {e}，使用默认配置")
         # 如果读取失败，返回默认配置
-        return _load_config()  # 递归调用返回默认配置
+        return {
+            "default_farm_id": "13944136728576",
+            "default_time_window_h": 20.0,
+            "default_target_depth_mm": 90.0,
+            "default_canal_id": "C_A",
+            "default_water_levels": {"wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0},
+            "default_field_config": {"has_drain_gate": True, "rel_to_regulator": "downstream"},
+            "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8},
+            "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8}],
+            "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
+            "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
+            "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
+            "output_config": {"config_file": "config.json", "labeled_dir": "labeled_output"},
+            "env_vars": {"farm_id": ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]},
+            "default_distance_rank": 9999
+        }
 
 # 全局配置对象
 CONFIG = _load_config()
@@ -323,10 +358,15 @@ def convert(
 
     # —— 近邻兜底：只给缺失行逐行赋值（避免长度不匹配）
     mask_inlet_nan = fld2["inlet_G_id"].isnull()
-    if mask_inlet_nan.any():
+    if mask_inlet_nan.any() and not gat_attached.empty and len(nearest_gate_idx) > 0:
         for ridx in fld2.index[mask_inlet_nan]:
-            gate_i = nearest_gate_idx[int(fld2.index.get_loc(ridx))]
-            fld2.at[ridx, "inlet_G_id"] = str(gat_attached["code"].iloc[gate_i])
+            try:
+                gate_i = nearest_gate_idx[int(fld2.index.get_loc(ridx))]
+                if gate_i < len(gat_attached) and "code" in gat_attached.columns:
+                    fld2.at[ridx, "inlet_G_id"] = str(gat_attached["code"].iloc[gate_i])
+            except (IndexError, KeyError) as e:
+                # 如果索引超出范围或缺少字段，跳过该行
+                continue
 
     # 面积（亩）
     fld2["area_mu"] = fld2.geometry.apply(lambda g: _mu_from_area(g) if g is not None else 0.0)
