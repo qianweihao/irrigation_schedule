@@ -37,6 +37,7 @@ python api_server.py --reload
 ### 3. 访问API文档
 
 启动服务后，访问以下地址查看交互式API文档：
+
 - Swagger UI: http://127.0.0.1:8000/docs
 - ReDoc: http://127.0.0.1:8000/redoc
 
@@ -50,15 +51,16 @@ python api_server.py --reload
 
 **请求参数：**
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| farm_id | string | 是 | 无 | 农场ID（必填，用于获取实时水位数据） |
-| target_depth_mm | float | 否 | 90.0 | 目标灌溉深度(mm) |
-| pumps | string | 否 | null | 启用的泵站，逗号分隔 |
-| zones | string | 否 | null | 启用的供区，逗号分隔 |
-| merge_waterlevels | boolean | 否 | true | 是否融合实时水位 |
-| print_summary | boolean | 否 | true | 是否返回摘要信息 |
-| files | file[] | 否 | [] | Shapefile文件组合 |
+
+| 参数名            | 类型    | 必填 | 默认值 | 说明                                 |
+| ----------------- | ------- | ---- | ------ | ------------------------------------ |
+| farm_id           | string  | 是   | 无     | 农场ID（必填，用于获取实时水位数据） |
+| target_depth_mm   | float   | 否   | 90.0   | 目标灌溉深度(mm)                     |
+| pumps             | string  | 否   | null   | 启用的泵站，逗号分隔                 |
+| zones             | string  | 否   | null   | 启用的供区，逗号分隔                 |
+| merge_waterlevels | boolean | 否   | true   | 是否融合实时水位                     |
+| print_summary     | boolean | 否   | true   | 是否返回摘要信息                     |
+| files             | file[]  | 否   | []     | Shapefile文件组合                    |
 
 **请求示例：**
 
@@ -114,6 +116,7 @@ curl -X POST "http://127.0.0.1:8000/api/irrigation/plan-with-upload" \
 健康检查接口
 
 **响应示例：**
+
 ```json
 {
   "status": "healthy",
@@ -135,6 +138,7 @@ curl -X POST "http://127.0.0.1:8000/api/irrigation/plan-with-upload" \
 ### 文件命名规范
 
 建议按照以下规范命名文件：
+
 - 水路段：`*水路*.shp`
 - 田块：`*田块*.shp` 或 `*field*.shp`
 - 闸门：`*阀门*.shp` 或 `*gate*.shp`
@@ -150,12 +154,13 @@ curl -X POST "http://127.0.0.1:8000/api/irrigation/plan-with-upload" \
 
 ### 常见错误码
 
-| 状态码 | 说明 | 解决方案 |
-|--------|------|----------|
-| 400 | 请求参数错误 | 检查参数格式和必填项 |
-| 400 | 无效的shapefile文件组合 | 确保上传完整的.shp、.dbf、.shx文件 |
-| 500 | 文件保存失败 | 检查磁盘空间和文件权限 |
-| 500 | 灌溉计划生成失败 | 检查输入数据格式和算法参数 |
+
+| 状态码 | 说明                    | 解决方案                           |
+| ------ | ----------------------- | ---------------------------------- |
+| 400    | 请求参数错误            | 检查参数格式和必填项               |
+| 400    | 无效的shapefile文件组合 | 确保上传完整的.shp、.dbf、.shx文件 |
+| 500    | 文件保存失败            | 检查磁盘空间和文件权限             |
+| 500    | 灌溉计划生成失败        | 检查输入数据格式和算法参数         |
 
 ### 错误响应示例
 
@@ -186,14 +191,14 @@ farm_irrigation/
 3. **自定义验证**：扩展`validate_shp_files`函数
 4. **错误处理**：添加特定的异常处理逻辑
 
-### 部署建议
-
 #### 开发环境
+
 ```bash
 python api_server.py --reload
 ```
 
 #### 生产环境
+
 ```bash
 # 使用Gunicorn
 gunicorn api_server:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
@@ -201,39 +206,3 @@ gunicorn api_server:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:800
 # 使用Uvicorn
 uvicorn api_server:app --host 0.0.0.0 --port 8000 --workers 4
 ```
-
-## 性能优化
-
-### 建议配置
-
-- **并发处理**：根据服务器配置调整worker数量
-- **文件缓存**：考虑实现文件上传缓存机制
-- **异步处理**：对于大文件处理，可考虑异步任务队列
-- **监控日志**：配置详细的访问日志和错误日志
-
-### 资源限制
-
-- **内存使用**：单次请求建议不超过1GB内存
-- **处理时间**：单次计划生成建议控制在60秒内
-- **并发连接**：根据服务器性能调整最大并发数
-
-## 常见问题
-
-### Q: 如何处理中文文件名？
-A: 确保客户端使用UTF-8编码上传文件，服务端已配置UTF-8支持。
-
-### Q: 上传失败后数据会丢失吗？
-A: 不会，服务会自动备份原有数据，上传失败时会自动恢复。
-
-### Q: 为什么farm_id是必填参数？
-A: farm_id用于获取该农场的实时水位数据，这是灌溉计划算法的重要输入。每个农场都有独特的水位监测点和数据，因此必须提供正确的farm_id。
-
-### Q: 可以同时处理多个农场的数据吗？
-A: 当前版本使用单一数据目录，建议为不同农场部署独立的服务实例。
-
-### Q: 如何查看详细的错误信息？
-A: 检查服务器日志，或启用`print_summary`参数获取详细的处理信息。
-
-## 联系支持
-
-如有问题或建议，请联系开发团队或查看项目文档。

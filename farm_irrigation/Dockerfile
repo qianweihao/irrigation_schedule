@@ -17,9 +17,10 @@ ENV GDAL_CONFIG /usr/bin/gdal-config
 ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
-# 复制requirements.txt并安装Python依赖
+# 复制并安装Python依赖
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# 使用清华大学镜像源加速pip安装
+RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r requirements.txt
 
 # 复制应用代码
 COPY . .
