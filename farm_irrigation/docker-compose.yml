@@ -24,7 +24,7 @@ services:
       - API_PORT=8000
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -38,9 +38,8 @@ services:
     container_name: irrigation-nginx
     ports:
       - "80:80"
-      - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./irrigation.conf:/etc/nginx/conf.d/irrigation.conf:ro
       # SSL证书目录（如果需要HTTPS）
       # - ./ssl:/etc/nginx/ssl:ro
     depends_on:
@@ -52,6 +51,7 @@ services:
 networks:
   irrigation-network:
     driver: bridge
+    name: farm_schedule_irrigation-network
 
 volumes:
   # 如果需要持久化存储，可以定义命名卷
