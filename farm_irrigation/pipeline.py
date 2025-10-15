@@ -90,38 +90,61 @@ class IrrigationPipeline:
         logger.info(f"找到 {len(gis_files)} 个GIS数据文件")
         return True
         
-    def run_command(self, command, description, cwd=None):
+    def run_command(self, command, description, cwd=None, timeout=300):
         """执行命令并处理结果"""
         logger.info(f"开始执行: {description}")
         logger.info(f"命令: {' '.join(command)}")
         
+        process = None
         try:
-            result = subprocess.run(
+            # 使用 Popen 以便更好地控制进程
+            process = subprocess.Popen(
                 command,
                 cwd=cwd or self.current_dir,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
                 encoding='utf-8',
-                errors='replace',
-                check=True
+                errors='replace'
             )
             
-            if result.stdout:
-                logger.info(f"输出: {result.stdout}")
-            if result.stderr:
-                logger.warning(f"警告: {result.stderr}")
-                
-            logger.info(f"[OK] {description} 执行成功")
-            return True
+            # 等待进程完成，设置超时
+            stdout, stderr = process.communicate(timeout=timeout)
             
-        except subprocess.CalledProcessError as e:
-            logger.error(f"[FAIL] {description} 执行失败")
-            logger.error(f"错误代码: {e.returncode}")
-            logger.error(f"错误输出: {e.stderr}")
+            if process.returncode == 0:
+                if stdout:
+                    logger.info(f"输出: {stdout}")
+                if stderr:
+                    logger.warning(f"警告: {stderr}")
+                logger.info(f"[OK] {description} 执行成功")
+                return True
+            else:
+                logger.error(f"[FAIL] {description} 执行失败")
+                logger.error(f"错误代码: {process.returncode}")
+                logger.error(f"错误输出: {stderr}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            logger.error(f"[TIMEOUT] {description} 执行超时 ({timeout}秒)")
+            if process:
+                process.kill()
+                process.wait()  # 确保进程完全终止
             return False
         except Exception as e:
             logger.error(f"[ERROR] {description} 执行异常: {str(e)}")
+            if process:
+                process.kill()
+                process.wait()
             return False
+        finally:
+            # 确保进程资源被清理
+            if process and process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
             
     def step1_data_preprocessing(self, input_dir):
         """步骤1: 数据预处理"""

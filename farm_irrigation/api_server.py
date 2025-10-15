@@ -10,8 +10,14 @@ import sys
 import json
 import shutil
 import tempfile
-from typing import List, Optional
+import hashlib
+import time
+import gc
+from typing import List, Optional, Dict, Any
 from pathlib import Path
+from functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse
@@ -23,6 +29,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # 导入现有模块
 from pipeline import IrrigationPipeline
+
+# 全局缓存和线程池
+_cache = {}
+_cache_lock = threading.Lock()
+_executor = ThreadPoolExecutor(max_workers=2)  # 限制并发数
 
 # 设置UTF-8编码（Windows兼容）
 if sys.platform.startswith('win'):
@@ -53,6 +64,41 @@ class IrrigationResponse(BaseModel):
     message: str
     plan: Optional[dict] = None
     summary: Optional[str] = None
+
+def generate_cache_key(farm_id: str, target_depth_mm: float, pumps: str, zones: str, 
+                      merge_waterlevels: bool, print_summary: bool) -> str:
+    """生成缓存键"""
+    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}"
+    return hashlib.md5(key_data.encode()).hexdigest()
+
+def get_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
+    """从缓存获取数据"""
+    with _cache_lock:
+        if cache_key in _cache:
+            cache_data = _cache[cache_key]
+            # 检查缓存是否过期（5分钟）
+            if time.time() - cache_data['timestamp'] < 300:
+                return cache_data['data']
+            else:
+                del _cache[cache_key]
+    return None
+
+def set_cache(cache_key: str, data: Dict[str, Any]):
+    """设置缓存数据"""
+    with _cache_lock:
+        # 限制缓存大小，最多保存10个结果
+        if len(_cache) >= 10:
+            oldest_key = min(_cache.keys(), key=lambda k: _cache[k]['timestamp'])
+            del _cache[oldest_key]
+        
+        _cache[cache_key] = {
+            'data': data,
+            'timestamp': time.time()
+        }
+
+def cleanup_resources():
+    """清理资源"""
+    gc.collect()  # 强制垃圾回收
 
 def validate_shp_files(files: List[UploadFile]) -> bool:
     """验证上传的文件是否为有效的shapefile组合"""
@@ -130,6 +176,20 @@ async def generate_irrigation_plan_with_upload(
     
     try:
         print(f"开始处理灌溉计划请求 - farm_id: {farm_id}, target_depth_mm: {target_depth_mm}")
+        
+        # 生成缓存键
+        cache_key = generate_cache_key(
+            farm_id, target_depth_mm, pumps or "", zones or "", 
+            merge_waterlevels, print_summary
+        )
+        
+        # 如果没有文件上传，尝试从缓存获取结果
+        if not files or all(not f.filename for f in files):
+            cached_result = get_from_cache(cache_key)
+            if cached_result:
+                print(f"从缓存返回结果 - cache_key: {cache_key}")
+                cleanup_resources()  # 清理资源
+                return IrrigationResponse(**cached_result)
         
         # 验证上传的文件
         if files and files[0].filename:  # 检查是否真的有文件上传
@@ -240,12 +300,23 @@ async def generate_irrigation_plan_with_upload(
         if backup_dir:
             shutil.rmtree(backup_dir)
         
-        return IrrigationResponse(
-            success=True,
-            message="灌溉计划生成成功",
-            plan=plan_data,
-            summary="灌溉计划生成成功" if print_summary else None
-        )
+        # 准备响应数据
+        response_data = {
+            "success": True,
+            "message": "灌溉计划生成成功",
+            "plan": plan_data,
+            "summary": "灌溉计划生成成功" if print_summary else None
+        }
+        
+        # 保存到缓存（仅当没有文件上传时）
+        if not files or all(not f.filename for f in files):
+            set_cache(cache_key, response_data)
+            print(f"结果已保存到缓存 - cache_key: {cache_key}")
+        
+        # 清理资源
+        cleanup_resources()
+        
+        return IrrigationResponse(**response_data)
         
     except HTTPException:
         raise
@@ -253,6 +324,9 @@ async def generate_irrigation_plan_with_upload(
         # 恢复备份文件
         if backup_dir:
             restore_files(backup_dir)
+        
+        # 清理资源
+        cleanup_resources()
         
         raise HTTPException(
             status_code=500, 
