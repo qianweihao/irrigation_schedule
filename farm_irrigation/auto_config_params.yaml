@@ -1,0 +1,80 @@
+# 自动配置参数文件
+# 用于配置 auto_to_config.py 的默认参数
+
+# 默认农场ID
+default_farm_id: "13944136728576"
+
+# 默认时间窗口（小时）
+default_time_window_h: 20.0
+
+# 默认目标补水深度（毫米）
+default_target_depth_mm: 90.0
+
+# 默认渠道ID
+default_canal_id: "C_A"
+
+# 默认水位配置
+default_water_levels:
+  wl_low: 80.0
+  wl_opt: 100.0
+  wl_high: 140.0
+
+# 默认田块配置
+default_field_config:
+  has_drain_gate: true
+  rel_to_regulator: "downstream"
+
+# 默认泵配置
+default_pump:
+  name: "AUTO"
+  q_rated_m3ph: 300.0
+  efficiency: 0.8
+  power_kw: 60.0
+  electricity_price: 0.6
+
+# 默认泵列表
+default_pumps:
+  - name: "P1"
+    q_rated_m3ph: 300.0
+    efficiency: 0.8
+    power_kw: 60.0
+    electricity_price: 0.6
+  - name: "P2"
+    q_rated_m3ph: 300.0
+    efficiency: 0.8
+    power_kw: 60.0
+    electricity_price: 0.6
+
+# 默认泵时间约束配置
+default_pump_time_constraints:
+  - pump_name: "P1"
+    start_hour: 0
+    end_hour: 12
+  - pump_name: "P2"
+    start_hour: 6
+    end_hour: 18
+
+# CRS配置
+crs_config:
+  geographic_crs: ["EPSG:4326", "EPSG:4490", "WGS84"]
+  sqm_to_mu_factor: 666.6667
+
+# 文件搜索路径
+file_search_paths:
+  data_paths: ["gzp_farm", "/mnt/data"]
+  waterlevels_paths: ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]
+
+# 默认文件名
+default_filenames:
+  segments: "港中坪水路_code.geojson"
+  gates: "港中坪阀门与节制闸_code.geojson"
+  fields: "港中坪田块_code.geojson"
+
+# 输出配置
+output_config:
+  config_file: "config.json"
+  labeled_dir: "labeled_output"
+
+# 环境变量配置
+env_vars:
+  farm_id: ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]

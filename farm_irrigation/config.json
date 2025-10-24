@@ -25,6 +25,18 @@
       "electricity_price": 0.6
     }
   ],
+  "pump_time_constraints": [
+    {
+      "pump_name": "P1",
+      "start_hour": 0,
+      "end_hour": 12
+    },
+    {
+      "pump_name": "P2",
+      "start_hour": 6,
+      "end_hour": 18
+    }
+  ],
   "segments": [
     {
       "id": "S1",

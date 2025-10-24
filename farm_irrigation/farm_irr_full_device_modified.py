@@ -111,6 +111,14 @@ class Plan:
     steps: List[Step]
 
 @dataclass
+class PumpTimeConstraint:
+    """泵时间约束数据结构"""
+    pump_name: str
+    start_hour: float  # 开始时间（小时）
+    end_hour: float    # 结束时间（小时）
+    flow_rate: float   # 流量 m³/h
+
+@dataclass
 class FarmConfig:
     pump: Pump
     segments: Dict[str, Segment]
@@ -121,6 +129,7 @@ class FarmConfig:
     active_pumps: List[str] = field(default_factory=list)
     allowed_zones: Optional[List[str]] = None
     original_config_data: Optional[Dict[str, Any]] = None
+    pump_time_constraints: Optional[List[PumpTimeConstraint]] = None  # 泵时间约束（可选）
 
 # ===================== 工具 =====================
 
@@ -405,7 +414,249 @@ def _q_avail(cfg: FarmConfig) -> float:
 def _segment_reachable(seg: Segment, active_pumps: List[str]) -> bool:
     return _list_intersects(seg.feed_by, active_pumps)
 
+@dataclass
+class TimeSlot:
+    """时间段数据结构"""
+    start_hour: float
+    end_hour: float
+    active_pumps: List[str]
+    total_flow_rate: float
+
+def _build_time_constrained_plan(cfg: FarmConfig) -> Plan:
+    """基于泵时间约束的批次生成算法"""
+    if not cfg.pump_time_constraints:
+        raise ValueError("pump_time_constraints is required for time-constrained planning")
+    
+    per_mu_m3 = _per_mu_volume_m3(cfg.d_target_mm)
+    
+    # 1) 解析泵时间窗口，生成时间段
+    time_points = set()
+    for constraint in cfg.pump_time_constraints:
+        time_points.add(constraint.start_hour)
+        time_points.add(constraint.end_hour)
+    
+    time_points = sorted(time_points)
+    time_slots: List[TimeSlot] = []
+    
+    for i in range(len(time_points) - 1):
+        start_h = time_points[i]
+        end_h = time_points[i + 1]
+        
+        # 找出在此时间段内活跃的泵
+        active_pumps = []
+        total_flow = 0.0
+        
+        for constraint in cfg.pump_time_constraints:
+            if constraint.start_hour <= start_h and end_h <= constraint.end_hour:
+                active_pumps.append(constraint.pump_name)
+                total_flow += constraint.flow_rate
+        
+        if active_pumps:  # 只有当有泵活跃时才创建时间段
+            time_slots.append(TimeSlot(
+                start_hour=start_h,
+                end_hour=end_h,
+                active_pumps=active_pumps,
+                total_flow_rate=total_flow
+            ))
+    
+    # 2) 可达段过滤（基于所有可能的活跃泵）
+    all_possible_pumps = set()
+    for constraint in cfg.pump_time_constraints:
+        all_possible_pumps.add(constraint.pump_name)
+    
+    reachable_sids: List[str] = []
+    filtered_by_feed_by = 0
+    for sid, s in cfg.segments.items():
+        if cfg.allowed_zones and s.supply_zone and (s.supply_zone not in cfg.allowed_zones):
+            continue
+        if _segment_reachable(s, list(all_possible_pumps)):
+            reachable_sids.append(sid)
+        else:
+            filtered_by_feed_by += 1
+    
+    # 3) 田块过滤和排序
+    eligible_fields: List[FieldPlot] = []
+    skipped_null_wl: List[FieldPlot] = []
+    for f in cfg.fields.values():
+        base = _base_sid(f.segment_id)
+        if base not in reachable_sids:
+            continue
+        if (f.wl_mm is None) or (isinstance(f.wl_mm, float) and math.isnan(f.wl_mm)):
+            skipped_null_wl.append(f)
+            continue
+        eligible_fields.append(f)
+    
+    seg_rank = {sid: cfg.segments[sid].distance_rank for sid in reachable_sids}
+    eligible_fields.sort(
+        key=lambda f: (seg_rank.get(_base_sid(f.segment_id), 9999), f.distance_rank, f.id)
+    )
+    
+    # 4) 按时间段分配田块
+    batches: List[Batch] = []
+    batch_stats: List[BatchStat] = []
+    steps: List[Step] = []
+    
+    remaining_fields = list(eligible_fields)
+    
+    for slot_idx, slot in enumerate(time_slots):
+        if not remaining_fields:
+            break
+            
+        # 计算此时间段的灌溉能力
+        slot_duration = slot.end_hour - slot.start_hour
+        max_volume = slot.total_flow_rate * slot_duration
+        max_area = max_volume / per_mu_m3 if per_mu_m3 > 0 else 0
+        
+        # 分配田块到此时间段
+        batch_fields = []
+        acc_area = 0.0
+        
+        fields_to_remove = []
+        for f in remaining_fields:
+            if acc_area + f.area_mu <= max_area:
+                batch_fields.append(f)
+                acc_area += f.area_mu
+                fields_to_remove.append(f)
+        
+        # 从剩余田块中移除已分配的
+        for f in fields_to_remove:
+            remaining_fields.remove(f)
+        
+        if batch_fields:
+            # 创建批次
+            batch = Batch(index=len(batches) + 1, fields=batch_fields)
+            batches.append(batch)
+            
+            # 计算批次统计
+            need_m3 = batch.area_mu * per_mu_m3
+            eta_h = slot_duration  # 使用时间段的持续时间
+            batch_stats.append(BatchStat(
+                deficit_vol_m3=need_m3,
+                cap_vol_m3=max_volume,
+                eta_hours=eta_h
+            ))
+            
+            # 创建步骤
+            step = _create_time_slot_step(cfg, batch, slot, slot_idx + 1)
+            steps.append(step)
+    
+    # 5) 计算信息
+    calc = {
+        "time_constrained": True,
+        "time_slots_count": len(time_slots),
+        "total_pumps": len(all_possible_pumps),
+        "d_target_mm": cfg.d_target_mm,
+        "filtered_by_feed_by": filtered_by_feed_by,
+        "allowed_zones": list(cfg.allowed_zones) if cfg.allowed_zones else None,
+        "skipped_null_wl_count": len(skipped_null_wl),
+        "skipped_null_wl_fields": [f.id for f in skipped_null_wl],
+        "remaining_fields_count": len(remaining_fields),
+        "pump": cfg.pump,
+    }
+    
+    return Plan(calc=calc,
+                drainage_targets=[],
+                batches=batches,
+                batch_stats=batch_stats,
+                steps=steps)
+
+def _create_time_slot_step(cfg: FarmConfig, batch: Batch, slot: TimeSlot, batch_index: int) -> Step:
+    """为时间段创建执行步骤"""
+    per_mu_m3 = _per_mu_volume_m3(cfg.d_target_mm)
+    
+    # 计算涉及的段
+    seg_to_fields: Dict[str, List[FieldPlot]] = {}
+    for f in batch.fields:
+        seg_to_fields.setdefault(_base_sid(f.segment_id), []).append(f)
+    sids_with_fields = set(seg_to_fields.keys())
+    
+    # 获取段排序
+    seg_rank = {sid: cfg.segments[sid].distance_rank for sid in cfg.segments.keys()}
+    
+    # 额外纳入拥有main-g的段
+    main_sids_with_gates: set[str] = set()
+    for sid, seg in cfg.segments.items():
+        regs = _regulators_for_segment(sid, seg, seg_to_fields.get(sid, []), cfg)
+        if any(((cfg.gates.get(gid).type or "").lower() == "main-g") for gid in regs):
+            main_sids_with_gates.add(sid)
+    
+    all_sids = sorted(sids_with_fields.union(main_sids_with_gates), key=lambda x: seg_rank.get(x, 9999))
+    
+    # 节制闸设定
+    gates_set_all: List[Dict[str, Any]] = []
+    regs_to_open: List[str] = []
+    regs_to_close: List[str] = []
+    
+    for sid in all_sids:
+        seg = cfg.segments.get(sid)
+        flist_same = seg_to_fields.get(sid, [])
+        regs_sorted = _regulators_for_segment(sid, seg, flist_same, cfg)
+        
+        for gid in regs_sorted:
+            gtype = (cfg.gates.get(gid).type if gid in cfg.gates else "regulator") or "regulator"
+            if gtype.lower() == "main-g":
+                cmp_fields = [f for f in batch.fields if _base_sid(f.segment_id) != sid]
+            else:
+                cmp_fields = flist_same
+            
+            pct = _open_pct_for_regulator(gid, gtype, cmp_fields)
+            gates_set_all.append({"id": gid, "open_pct": pct, "type": gtype})
+            (regs_to_open if pct > 0 else regs_to_close).append(gid)
+    
+    # 田块顺序
+    fields_order = [f.id for f in batch.fields]
+    
+    # 结构化顺序
+    seq = {
+        "pumps_on": slot.active_pumps,
+        "gates_open": regs_to_open,
+        "gates_close": regs_to_close,
+        "gates_set": gates_set_all,
+        "fields": fields_order,
+        "pumps_off": list(reversed(slot.active_pumps))
+    }
+    
+    # 完整流程
+    full: List[Dict[str, Any]] = []
+    for pnm in slot.active_pumps:
+        full.append({"type": "pump_on", "id": pnm})
+    for g in gates_set_all:
+        full.append({"type": "regulator_set", "id": g["id"], "open_pct": g["open_pct"]})
+    for f in batch.fields:
+        full.append({"type": "field", "id": f.id, "inlet_G_id": (f.inlet_gid or None)})
+    for pnm in reversed(slot.active_pumps):
+        full.append({"type": "pump_off", "id": pnm})
+    
+    # 指令列表
+    cmds: List[Command] = []
+    for pnm in slot.active_pumps:
+        cmds.append(Command(action="start", target=pnm, t_start_h=slot.start_hour, t_end_h=slot.end_hour))
+    for g in gates_set_all:
+        cmds.append(Command(action="set", target=g["id"], value=float(g["open_pct"]), 
+                          t_start_h=slot.start_hour, t_end_h=slot.end_hour))
+    for pnm in slot.active_pumps:
+        cmds.append(Command(action="stop", target=pnm, t_start_h=slot.start_hour, t_end_h=slot.end_hour))
+    
+    return Step(
+        t_start_h=slot.start_hour,
+        t_end_h=slot.end_hour,
+        commands=cmds,
+        label=f"时间段 {batch_index} ({slot.start_hour:.1f}h-{slot.end_hour:.1f}h)",
+        sequence=seq,
+        full_order=full
+    )
+
 def build_concurrent_plan(cfg: FarmConfig) -> Plan:
+    """
+    构建灌溉计划
+    - 如果cfg.pump_time_constraints存在，使用时间约束的并行批次逻辑
+    - 否则使用传统的顺序批次逻辑
+    """
+    # 检查是否有泵时间约束
+    if cfg.pump_time_constraints:
+        return _build_time_constrained_plan(cfg)
+    
+    # 传统逻辑
     q_av = _q_avail(cfg)
     per_mu_m3 = _per_mu_volume_m3(cfg.d_target_mm)
     A_cover_mu = (q_av * cfg.t_win_h) / (per_mu_m3 if per_mu_m3 > 0 else 1e9)

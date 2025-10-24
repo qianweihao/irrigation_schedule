@@ -60,6 +60,7 @@ def main(argv=None):
     ap.add_argument("--pumps","-p", default="", help="启用的泵，逗号分隔，如 P1,P2")
     ap.add_argument("--zones","-z", default="", help="启用的供区，逗号分隔（可选）")
     ap.add_argument("--multi-pump", action="store_true", help="生成多水泵方案对比")
+    ap.add_argument("--time-constraints", action="store_true", help="启用泵时间约束模式")
     ap.add_argument("--summary","-s", action="store_true", help="打印摘要到控制台")
     ap.add_argument("--realtime", action="store_true", help="融合实时水位（默认否）")
     
@@ -118,6 +119,11 @@ def main(argv=None):
                 print(f"推荐方案: 水泵{best_scenario.get('pumps_used', [])} (电费: {best_scenario.get('total_electricity_cost', 0):.2f}元, 运行时间: {best_scenario.get('total_eta_h', 0):.2f}h)")
     else:
         # 生成单一方案
+        # 检查是否启用时间约束模式
+        if args.time_constraints:
+            # 启用时间约束模式
+            cfg.time_constrained = True
+        
         plan = build_concurrent_plan(cfg)
         plan_json = plan_to_json(plan)  # 已递归清理 NaN/Inf
         Path(args.out).write_text(json.dumps(plan_json, ensure_ascii=False, indent=2), encoding="utf-8")

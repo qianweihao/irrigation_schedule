@@ -233,6 +233,8 @@ class IrrigationPipeline:
             cmd.extend(['--zones', kwargs['zones']])
         if kwargs.get('multi_pump_scenarios', False):
             cmd.append('--multi-pump')
+        if kwargs.get('time_constraints', False):
+            cmd.append('--time-constraints')
         if kwargs.get('print_summary', True):
             cmd.append('--summary')
         if kwargs.get('merge_waterlevels', True):
@@ -340,6 +342,8 @@ def main():
                        help='启用的供区列表，逗号分隔 (例如: A,B,C)')
     parser.add_argument('--multi-pump', action='store_true',
                        help='生成多水泵方案对比')
+    parser.add_argument('--time-constraints', action='store_true',
+                       help='启用泵时间约束模式')
     parser.add_argument('--no-waterlevels', action='store_true',
                        help='不融合实时水位数据')
     parser.add_argument('--no-summary', action='store_true',
@@ -360,7 +364,8 @@ def main():
     kwargs = {
         'merge_waterlevels': not args.no_waterlevels,
         'print_summary': not args.no_summary,
-        'multi_pump_scenarios': args.multi_pump
+        'multi_pump_scenarios': args.multi_pump,
+        'time_constraints': args.time_constraints
     }
     
     if args.pumps:

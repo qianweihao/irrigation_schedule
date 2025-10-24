@@ -518,12 +518,19 @@ def convert(
     # 默认泵配置
     default_pump_config = CONFIG.get("default_pump", {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6})
 
+    # 默认泵时间约束配置
+    default_pump_time_constraints = CONFIG.get("default_pump_time_constraints", [
+        {"pump_name": "P1", "start_hour": 0, "end_hour": 8},
+        {"pump_name": "P2", "start_hour": 8, "end_hour": 16}
+    ])
+
     data = {
         "farm_id": farm_id,
         "t_win_h": float(t_win_h),
         "d_target_mm": float(d_target_mm),
         "pump": default_pump_config,
         "pumps": pumps_detail,
+        "pump_time_constraints": default_pump_time_constraints,
         "segments": seg_rows,
         "gates": gate_rows,
         "fields": fld_rows
