@@ -42,8 +42,8 @@ def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]
             "default_canal_id": "C_A",
             "default_water_levels": {"wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0},
             "default_field_config": {"has_drain_gate": True, "rel_to_regulator": "downstream"},
-            "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8},
-            "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8}],
+            "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6},
+            "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6}, {"name": "P2", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6}],
             "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
             "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
             "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
@@ -64,8 +64,8 @@ def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]
                     "default_canal_id": "C_A",
                     "default_water_levels": {"wl_low": 80.0, "wl_opt": 100.0, "wl_high": 140.0},
                     "default_field_config": {"has_drain_gate": True, "rel_to_regulator": "downstream"},
-                    "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8},
-                    "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8}],
+                    "default_pump": {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6},
+                "default_pumps": [{"name": "P1", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6}, {"name": "P2", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6}],
                     "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
                     "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
                     "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
@@ -410,7 +410,7 @@ def convert(
         for _, r in g.iterrows():
             nm = pick_name(r, f"P{idx}")
             flow = pick_flow(r, 300.0)
-            pumps.append({"name": nm if nm.startswith("P") else f"P{idx}", "q_rated_m3ph": float(flow), "efficiency": 0.8})
+            pumps.append({"name": nm if nm.startswith("P") else f"P{idx}", "q_rated_m3ph": float(flow), "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6})
             idx += 1
         uniq = {}
         for p in pumps: uniq[p["name"]] = p
@@ -418,7 +418,7 @@ def convert(
 
     pumps_detail = _detect_pumps_from_gates(gat2)
     if not pumps_detail:
-        pumps_detail = default_pumps or [{"name":"P1","q_rated_m3ph":300.0,"efficiency":0.8}]
+        pumps_detail = default_pumps or [{"name":"P1","q_rated_m3ph":300.0,"efficiency":0.8,"power_kw":60.0,"electricity_price":0.6}]
 
     # 段输出：把该段所有“节制类”闸门的 properties.code 收集到 regulator_gate_ids
     seg_rows: List[Dict[str, Any]] = []
@@ -516,7 +516,7 @@ def convert(
             farm_id = default_farm_id
     
     # 默认泵配置
-    default_pump_config = CONFIG.get("default_pump", {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8})
+    default_pump_config = CONFIG.get("default_pump", {"name": "AUTO", "q_rated_m3ph": 300.0, "efficiency": 0.8, "power_kw": 60.0, "electricity_price": 0.6})
 
     data = {
         "farm_id": farm_id,

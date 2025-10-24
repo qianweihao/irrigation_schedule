@@ -16,7 +16,7 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from farm_irr_full_device_modified import (
-    build_concurrent_plan, plan_to_json, farmcfg_from_json_select
+    build_concurrent_plan, plan_to_json, farmcfg_from_json_select, generate_multi_pump_scenarios
 )
 
 def _auto_config_path(user_path: Optional[str]) -> Optional[Path]:
@@ -59,6 +59,7 @@ def main(argv=None):
     ap.add_argument("--out","-o", default="plan.json", help="输出计划文件（默认 plan.json）")
     ap.add_argument("--pumps","-p", default="", help="启用的泵，逗号分隔，如 P1,P2")
     ap.add_argument("--zones","-z", default="", help="启用的供区，逗号分隔（可选）")
+    ap.add_argument("--multi-pump", action="store_true", help="生成多水泵方案对比")
     ap.add_argument("--summary","-s", action="store_true", help="打印摘要到控制台")
     ap.add_argument("--realtime", action="store_true", help="融合实时水位（默认否）")
     
@@ -82,12 +83,47 @@ def main(argv=None):
         data, active_pumps=active, zone_ids=zones, use_realtime_wl=args.realtime
     )
 
-    plan = build_concurrent_plan(cfg)
-    plan_json = plan_to_json(plan)  # 已递归清理 NaN/Inf
-    Path(args.out).write_text(json.dumps(plan_json, ensure_ascii=False, indent=2), encoding="utf-8")
+    if args.multi_pump:
+        # 生成多水泵方案对比
+        # 忽略 --pumps 参数，让函数自动分析所有可能的水泵组合
+        cfg_for_multi = farmcfg_from_json_select(
+            data, active_pumps=None, zone_ids=zones, use_realtime_wl=args.realtime
+        )
+        scenarios_result = generate_multi_pump_scenarios(cfg_for_multi)
+        Path(args.out).write_text(json.dumps(scenarios_result, ensure_ascii=False, indent=2), encoding="utf-8")
+        
+        if args.summary:
+            print("====== 多水泵方案对比摘要 ======")
+            scenarios = scenarios_result.get("scenarios", [])
+            analysis = scenarios_result.get("analysis", {})
+            
+            print(f"需要灌溉的地块总数: {analysis.get('total_fields_to_irrigate', 0)}")
+            print(f"需要灌溉的段: {analysis.get('required_segments', [])}")
+            print(f"有效水泵组合: {analysis.get('valid_pump_combinations', [])}")
+            print(f"生成方案数: {len(scenarios)}")
+            
+            for i, scenario in enumerate(scenarios):
+                pump_combo = scenario.get("pumps_used", [])
+                cost = scenario.get("total_electricity_cost", 0)
+                runtime = scenario.get("total_eta_h", 0)
+                coverage_info = scenario.get("coverage_info", {})
+                covered_segments = coverage_info.get("covered_segments", [])
+                total_covered = coverage_info.get("total_covered_segments", 0)
+                
+                print(f"方案 {i+1}: 水泵{pump_combo} - 覆盖段{len(covered_segments)}个{covered_segments} - 电费{cost:.2f}元 - 运行{runtime:.2f}h")
+            
+            # 找出最优方案（电费最低或运行时间最短）
+            if scenarios:
+                best_scenario = min(scenarios, key=lambda x: (x.get("total_electricity_cost", 0), x.get("total_eta_h", 0)))
+                print(f"推荐方案: 水泵{best_scenario.get('pumps_used', [])} (电费: {best_scenario.get('total_electricity_cost', 0):.2f}元, 运行时间: {best_scenario.get('total_eta_h', 0):.2f}h)")
+    else:
+        # 生成单一方案
+        plan = build_concurrent_plan(cfg)
+        plan_json = plan_to_json(plan)  # 已递归清理 NaN/Inf
+        Path(args.out).write_text(json.dumps(plan_json, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    if args.summary:
-        _print_summary(plan_json)
+        if args.summary:
+            _print_summary(plan_json)
 
     print(f"[done] 计划已写入：{Path(args.out).resolve()}")
 

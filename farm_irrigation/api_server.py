@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # 导入现有模块
 from pipeline import IrrigationPipeline
+from farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
 
 # 全局缓存和线程池
 _cache = {}
@@ -65,10 +66,23 @@ class IrrigationResponse(BaseModel):
     plan: Optional[dict] = None
     summary: Optional[str] = None
 
+class MultiPumpRequest(BaseModel):
+    """多水泵方案请求模型"""
+    config_file: str
+    active_pumps: Optional[List[str]] = None
+    zone_ids: Optional[List[str]] = None
+    use_realtime_wl: bool = False
+
+class MultiPumpResponse(BaseModel):
+    """多水泵方案响应模型"""
+    scenarios: List[dict]
+    analysis: dict
+    total_scenarios: int
+
 def generate_cache_key(farm_id: str, target_depth_mm: float, pumps: str, zones: str, 
-                      merge_waterlevels: bool, print_summary: bool) -> str:
+                      merge_waterlevels: bool, print_summary: bool, multi_pump_scenarios: bool = False) -> str:
     """生成缓存键"""
-    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}"
+    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}_{multi_pump_scenarios}"
     return hashlib.md5(key_data.encode()).hexdigest()
 
 def get_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
@@ -169,6 +183,7 @@ async def generate_irrigation_plan_with_upload(
     zones: Optional[str] = Form(None),
     merge_waterlevels: bool = Form(True),
     print_summary: bool = Form(True),
+    multi_pump_scenarios: bool = Form(False),
     files: List[UploadFile] = File(default=[])
 ):
     """生成灌溉计划（支持文件上传）"""
@@ -180,7 +195,7 @@ async def generate_irrigation_plan_with_upload(
         # 生成缓存键
         cache_key = generate_cache_key(
             farm_id, target_depth_mm, pumps or "", zones or "", 
-            merge_waterlevels, print_summary
+            merge_waterlevels, print_summary, multi_pump_scenarios
         )
         
         # 如果没有文件上传，尝试从缓存获取结果
@@ -230,7 +245,8 @@ async def generate_irrigation_plan_with_upload(
             'pumps': pumps,
             'zones': zones,
             'merge_waterlevels': merge_waterlevels,
-            'print_summary': print_summary
+            'print_summary': print_summary,
+            'multi_pump_scenarios': multi_pump_scenarios
         }
         print(f"Pipeline参数: {kwargs}")
         
@@ -333,6 +349,49 @@ async def generate_irrigation_plan_with_upload(
             detail=f"服务器内部错误: {str(e)}"
         )
 
+@app.post("/api/irrigation/multi-pump-scenarios", response_model=MultiPumpResponse)
+async def generate_multi_pump_scenarios_api(request: MultiPumpRequest):
+    """生成多水泵方案对比"""
+    try:
+        print(f"开始处理多水泵方案请求 - config_file: {request.config_file}")
+        
+        # 检查配置文件是否存在
+        config_path = os.path.join(os.path.dirname(__file__), request.config_file)
+        if not os.path.exists(config_path):
+            raise HTTPException(status_code=404, detail=f"配置文件不存在: {request.config_file}")
+        
+        # 加载配置文件
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        # 创建农场配置
+        cfg = farmcfg_from_json_select(
+            config_data,
+            active_pumps=request.active_pumps,
+            zone_ids=request.zone_ids,
+            use_realtime_wl=request.use_realtime_wl
+        )
+        
+        # 生成多水泵方案
+        scenarios_result = generate_multi_pump_scenarios(cfg)
+        
+        print(f"多水泵方案生成成功，共 {scenarios_result.get('total_scenarios', 0)} 个方案")
+        
+        return MultiPumpResponse(
+            scenarios=scenarios_result.get('scenarios', []),
+            analysis=scenarios_result.get('analysis', {}),
+            total_scenarios=scenarios_result.get('total_scenarios', 0)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"多水泵方案生成失败: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"多水泵方案生成失败: {str(e)}"
+        )
+
 @app.get("/api/health")
 async def health_check():
     """健康检查接口"""
@@ -345,7 +404,8 @@ async def root():
         "message": "灌溉计划API服务",
         "version": "1.0.0",
         "endpoints": {
-            "POST /api/irrigation/plan-with-upload": "生成灌溉计划（支持文件上传）",
+            "POST /api/irrigation/plan-with-upload": "生成灌溉计划（支持文件上传和多水泵方案对比）",
+            "POST /api/irrigation/multi-pump-scenarios": "生成多水泵方案对比",
             "GET /api/health": "健康检查",
             "GET /docs": "API文档"
         }

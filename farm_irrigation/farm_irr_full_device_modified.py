@@ -18,9 +18,17 @@ from typing import Dict, List, Optional, Tuple, Any, Union
 
 # 可选：实时水位
 try:
+    # 优先使用真实的实时水位API
     from waterlevel_api import fetch_waterlevels  # 期望签名：fetch_waterlevels(farm_id: str, unit: str = "mm")
+    print("[DEBUG] 使用真实实时水位API")
 except Exception:
-    fetch_waterlevels = None
+    try:
+        # 备选方案：使用模拟API
+        from mock_waterlevel_api import fetch_waterlevels  # 期望签名：fetch_waterlevels(farm_id: str, unit: str = "mm")
+        print("[DEBUG] 真实API不可用，使用模拟实时水位API")
+    except Exception:
+        fetch_waterlevels = None
+        print("[DEBUG] 实时水位API不可用")
 
 # ===================== 数据类 =====================
 
@@ -29,6 +37,8 @@ class Pump:
     name: str
     q_rated_m3ph: float
     efficiency: float = 0.8
+    power_kw: float = 0.0
+    electricity_price: float = 0.0
 
 @dataclass
 class Segment:
@@ -110,6 +120,7 @@ class FarmConfig:
     d_target_mm: float = 90.0
     active_pumps: List[str] = field(default_factory=list)
     allowed_zones: Optional[List[str]] = None
+    original_config_data: Optional[Dict[str, Any]] = None
 
 # ===================== 工具 =====================
 
@@ -207,12 +218,17 @@ def farmcfg_from_json_select(config: Union[str, Dict[str, Any]],
         pump_objs = [{
             "name": "+".join(active_pumps),
             "q_rated_m3ph": sum(_as_float(pp.get("q_rated_m3ph"), 0.0) or 0.0 for pp in (data.get("pumps") or [])),
-            "efficiency": _as_float(data.get("pump", {}).get("efficiency"), 0.8) or 0.8
+            "efficiency": _as_float(data.get("pump", {}).get("efficiency"), 0.8) or 0.8,
+            "power_kw": sum(_as_float(pp.get("power_kw"), 0.0) or 0.0 for pp in (data.get("pumps") or [])),
+            "electricity_price": max(_as_float(pp.get("electricity_price"), 0.0) or 0.0 for pp in (data.get("pumps") or []))
         }]
     q_sum = sum((_as_float(p.get("q_rated_m3ph"), 0.0) or 0.0) * (_as_float(p.get("efficiency"), 0.8) or 0.8)
                 for p in pump_objs)
     eff   = max(_as_float(p.get("efficiency"), 0.8) or 0.8 for p in pump_objs) if pump_objs else 0.8
-    pump  = Pump(name="+".join(active_pumps), q_rated_m3ph=q_sum, efficiency=eff)
+    power_sum = sum(_as_float(p.get("power_kw"), 0.0) or 0.0 for p in pump_objs)
+    price_avg = (sum(_as_float(p.get("electricity_price"), 0.0) or 0.0 for p in pump_objs) / len(pump_objs)) if pump_objs else 0.0
+    pump  = Pump(name="+".join(active_pumps), q_rated_m3ph=q_sum, efficiency=eff, 
+                 power_kw=power_sum, electricity_price=price_avg)
 
     # 闸门/段
     gates: Dict[str, Gate] = {}
@@ -299,7 +315,8 @@ def farmcfg_from_json_select(config: Union[str, Dict[str, Any]],
         t_win_h=_as_float(data.get("t_win_h"), 20.0) or 20.0,
         d_target_mm=_as_float(data.get("d_target_mm"), 90.0) or 90.0,
         active_pumps=list(active_pumps),
-        allowed_zones=(list(zone_ids) if zone_ids else None)
+        allowed_zones=(list(zone_ids) if zone_ids else None),
+        original_config_data=data
     )
 
 # ===================== 规则与排序 =====================
@@ -539,6 +556,7 @@ def build_concurrent_plan(cfg: FarmConfig) -> Plan:
         "allowed_zones": list(cfg.allowed_zones) if cfg.allowed_zones else None,
         "skipped_null_wl_count": len(skipped_null_wl),
         "skipped_null_wl_fields": [f.id for f in skipped_null_wl],
+        "pump": cfg.pump,  # 添加pump对象以支持电费计算
     }
 
     return Plan(calc=calc,
@@ -550,8 +568,21 @@ def build_concurrent_plan(cfg: FarmConfig) -> Plan:
 # ===================== 序列化 =====================
 
 def plan_to_json(plan: Plan) -> Dict[str, Any]:
+    # 处理calc字典，确保pump对象可以序列化
+    calc_serializable = dict(plan.calc)
+    if "pump" in calc_serializable and hasattr(calc_serializable["pump"], "__dict__"):
+        # 将Pump对象转换为字典
+        pump_obj = calc_serializable["pump"]
+        calc_serializable["pump"] = {
+            "name": pump_obj.name,
+            "q_rated_m3ph": pump_obj.q_rated_m3ph,
+            "efficiency": pump_obj.efficiency,
+            "power_kw": getattr(pump_obj, "power_kw", 0.0),
+            "electricity_price": getattr(pump_obj, "electricity_price", 0.0)
+        }
+    
     out: Dict[str, Any] = {
-        "calc": plan.calc,
+        "calc": calc_serializable,
         "drainage_targets": plan.drainage_targets,
         "batches": [],
         "steps": [],
@@ -595,4 +626,215 @@ def plan_to_json(plan: Plan) -> Dict[str, Any]:
         })
     out["total_eta_h"] = total_eta
     out["total_deficit_m3"] = total_deficit
+    
+    # 添加电费计算
+    if "pump" in calc_serializable:
+        pump = calc_serializable["pump"]
+        if isinstance(pump, dict) and "power_kw" in pump and "electricity_price" in pump:
+            power_kw = float(pump.get("power_kw", 0.0))
+            electricity_price = float(pump.get("electricity_price", 0.0))
+            total_electricity_cost = power_kw * total_eta * electricity_price
+            out["total_electricity_cost"] = total_electricity_cost
+            out["total_pump_runtime_hours"] = {pump.get("name", "unknown"): total_eta}
+        else:
+            out["total_electricity_cost"] = 0.0
+            out["total_pump_runtime_hours"] = {}
+    else:
+        out["total_electricity_cost"] = 0.0
+        out["total_pump_runtime_hours"] = {}
+    
     return _sanitize_json(out)
+
+# ===================== 多水泵方案生成 =====================
+
+def _list_intersects(list1: List[str], list2: List[str]) -> bool:
+    """检查两个字符串列表是否有交集"""
+    return bool(set(list1) & set(list2))
+
+def _segment_reachable(segment: Segment, active_pumps: List[str]) -> bool:
+    """检查段是否可以被激活的水泵覆盖"""
+    return _list_intersects(segment.feed_by, active_pumps)
+
+def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
+    """
+    动态生成多水泵灌溉方案
+    
+    根据需要灌溉的地块，智能分析所需的水泵组合，
+    并生成最优的灌溉方案供用户选择。
+    
+    Args:
+        cfg: 农场配置对象
+        
+    Returns:
+        包含多个方案的字典，每个方案包含成本分析和运行时间
+    """
+    try:
+        # 1. 分析需要灌溉的地块
+        fields_to_irrigate = []
+        segments_needed = set()
+        
+        for field_id, field in cfg.fields.items():
+            # 检查是否需要灌溉（wl_mm不为None且不为NaN，且水位低于低水位阈值）
+            if (field.wl_mm is not None) and not (isinstance(field.wl_mm, float) and field.wl_mm != field.wl_mm):
+                # 只有当前水位低于低水位阈值时才需要灌溉
+                if field.wl_mm < field.wl_low:
+                    fields_to_irrigate.append(field)
+                    # 提取基础段ID（去掉子段后缀）
+                    base_sid = field.segment_id.split('-')[0] if '-' in field.segment_id else field.segment_id
+                    segments_needed.add(base_sid)
+        
+        if not fields_to_irrigate:
+            return {
+                "error": "没有找到需要灌溉的地块",
+                "analysis": {
+                    "total_fields_to_irrigate": 0,
+                    "required_segments": [],
+                    "segment_pump_requirements": {},
+                    "valid_pump_combinations": []
+                },
+                "scenarios": []
+            }
+        
+        # 2. 分析每个段的水泵需求
+        segment_pump_requirements = {}
+        for sid in segments_needed:
+            segment = cfg.segments.get(sid)
+            if segment:
+                segment_pump_requirements[sid] = segment.feed_by
+            else:
+                segment_pump_requirements[sid] = []
+        
+        # 3. 找出能够覆盖所有段的水泵组合
+        all_pumps = cfg.active_pumps
+        valid_combinations = []
+        
+        # 首先尝试单个水泵
+        for pump in all_pumps:
+            can_cover_all = True
+            for sid in segments_needed:
+                required_pumps = segment_pump_requirements.get(sid, [])
+                if required_pumps and pump not in required_pumps:
+                    can_cover_all = False
+                    break
+            if can_cover_all:
+                valid_combinations.append([pump])
+        
+        # 如果没有单个水泵能覆盖所有段，尝试多水泵组合
+        if not valid_combinations:
+            from itertools import combinations
+            
+            # 尝试2个水泵的组合
+            for combo in combinations(all_pumps, 2):
+                can_cover_all = True
+                for sid in segments_needed:
+                    required_pumps = segment_pump_requirements.get(sid, [])
+                    if required_pumps and not _list_intersects(list(combo), required_pumps):
+                        can_cover_all = False
+                        break
+                if can_cover_all:
+                    valid_combinations.append(list(combo))
+            
+            # 如果还是没有，使用所有水泵
+            if not valid_combinations:
+                can_cover_all = True
+                for sid in segments_needed:
+                    required_pumps = segment_pump_requirements.get(sid, [])
+                    if required_pumps and not _list_intersects(all_pumps, required_pumps):
+                        can_cover_all = False
+                        break
+                if can_cover_all:
+                    valid_combinations.append(all_pumps)
+        
+        if not valid_combinations:
+            return {
+                "error": "没有找到能够覆盖所有需要灌溉段的水泵组合",
+                "analysis": {
+                    "total_fields_to_irrigate": len(fields_to_irrigate),
+                    "required_segments": sorted(segments_needed),
+                    "segment_pump_requirements": segment_pump_requirements,
+                    "valid_pump_combinations": []
+                },
+                "scenarios": []
+            }
+        
+        # 4. 为每个有效的水泵组合生成灌溉方案
+        scenarios = []
+        
+        for pump_combo in valid_combinations:
+            try:
+                # 创建该水泵组合的配置
+                # 需要传递原始的JSON配置数据，而不是FarmConfig对象
+                if cfg.original_config_data:
+                    combo_cfg = farmcfg_from_json_select(
+                        cfg.original_config_data,  # 使用原始JSON配置数据
+                        active_pumps=pump_combo,
+                        use_realtime_wl=True  # 修复：使用实时水位数据
+                    )
+                else:
+                    # 如果没有原始配置数据，跳过这个组合
+                    print(f"警告: 缺少原始配置数据，跳过水泵组合 {pump_combo}")
+                    continue
+                
+                # 生成灌溉计划
+                plan = build_concurrent_plan(combo_cfg)
+                plan_json = plan_to_json(plan)
+                
+                # 计算覆盖的段
+                covered_segments = []
+                for sid in segments_needed:
+                    segment = cfg.segments.get(sid)
+                    if segment and _segment_reachable(segment, pump_combo):
+                        covered_segments.append(sid)
+                
+                # 创建方案名称
+                if len(pump_combo) == 1:
+                    scenario_name = f"{pump_combo[0]}单独使用"
+                else:
+                    scenario_name = f"{'+'.join(sorted(pump_combo))}组合使用"
+                
+                # 添加方案信息
+                scenario = {
+                    "scenario_name": scenario_name,
+                    "pumps_used": sorted(pump_combo),
+                    "total_electricity_cost": plan_json.get("total_electricity_cost", 0),
+                    "total_eta_h": plan_json.get("total_eta_h", 0),
+                    "total_pump_runtime_hours": plan_json.get("total_pump_runtime_hours", {}),
+                    "coverage_info": {
+                        "covered_segments": sorted(covered_segments),
+                        "total_covered_segments": len(covered_segments)
+                    },
+                    "plan": plan_json
+                }
+                
+                scenarios.append(scenario)
+                
+            except Exception as e:
+                # 如果某个组合生成失败，记录错误但继续处理其他组合
+                print(f"警告: 水泵组合 {pump_combo} 生成方案失败: {e}")
+                continue
+        
+        # 5. 按电费成本排序
+        scenarios.sort(key=lambda x: x.get("total_electricity_cost", float('inf')))
+        
+        return {
+            "analysis": {
+                "total_fields_to_irrigate": len(fields_to_irrigate),
+                "required_segments": sorted(segments_needed),
+                "segment_pump_requirements": segment_pump_requirements,
+                "valid_pump_combinations": [sorted(combo) for combo in valid_combinations]
+            },
+            "scenarios": scenarios,
+            "total_scenarios": len(scenarios)
+        }
+        
+    except Exception as e:
+        return {
+            "error": f"生成多水泵方案时发生错误: {str(e)}",
+            "analysis": {
+                "total_fields_to_irrigate": 0,
+                "required_segments": [],
+                "segment_pump_requirements": {},
+                "valid_pump_combinations": []
+            },
+            "scenarios": []
+        }

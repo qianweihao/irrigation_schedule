@@ -36,11 +36,12 @@ LABELED_SEGMENT = os.path.join(LABELED_DIR, "segments_labeled.geojson")
 # 配置文件（由 auto_to_config.py 生成）
 CONFIG_JSON = os.path.join(ROOT, "config.json")
 
-# 计划计算：使用你提供的“多节制闸”版本
+# 计划计算：使用你提供的"多节制闸"版本
 from farm_irr_full_device_modified import (
     farmcfg_from_json_select,
     build_concurrent_plan,
     plan_to_json,
+    generate_multi_pump_scenarios,
 )
 
 # ====== Geo 工具 ======
@@ -139,6 +140,53 @@ def api_plan():
     )
     plan = build_concurrent_plan(cfg)
     return make_response(jsonify(plan_to_json(plan)))
+
+@app.route("/v1/multi-pump-scenarios")
+def api_multi_pump_scenarios():
+    """
+    生成多水泵方案对比（内存返回，不落盘）
+    可选 Query:
+      - zones=A,B    仅启用指定供区（如果 config 里配置了 supply_zone）
+      - no_realtime=1  不拉实时水位（默认融合）
+    
+    返回格式：
+    {
+        "scenarios": [
+            {
+                "pump_combination": ["P1"],
+                "coverage": {"covered_segments": [...], "total_segments": N},
+                "plan": {...},
+                "electricity_cost": 123.45,
+                "pump_runtime_hours": 8.5
+            },
+            ...
+        ],
+        "analysis": {
+            "total_segments_requiring_irrigation": N,
+            "pump_combinations_tested": [["P1"], ["P2"], ["P1", "P2"]],
+            "optimal_scenario": {...}
+        }
+    }
+    """
+    if not os.path.isfile(CONFIG_JSON):
+        abort(404, description="缺少 config.json，请先运行 auto_to_config.py 生成。")
+
+    data = json.loads(open(CONFIG_JSON, "r", encoding="utf-8").read())
+    zones = request.args.get("zones", "").strip()
+    zone_ids = [s.strip() for s in zones.split(",") if s.strip()] or None
+    use_realtime = not (request.args.get("no_realtime") in ("1", "true", "True"))
+
+    # 创建基础配置（不指定 active_pumps，让 generate_multi_pump_scenarios 动态决定）
+    cfg = farmcfg_from_json_select(
+        data,
+        active_pumps=None,  # 不限制水泵，让函数自动分析
+        zone_ids=zone_ids,
+        use_realtime_wl=use_realtime
+    )
+    
+    # 生成多水泵方案
+    scenarios_result = generate_multi_pump_scenarios(cfg)
+    return make_response(jsonify(scenarios_result))
 
 @app.route("/config.json")
 def api_config_json():

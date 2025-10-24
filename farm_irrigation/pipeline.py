@@ -231,6 +231,8 @@ class IrrigationPipeline:
             cmd.extend(['--pumps', kwargs['pumps']])
         if kwargs.get('zones'):
             cmd.extend(['--zones', kwargs['zones']])
+        if kwargs.get('multi_pump_scenarios', False):
+            cmd.append('--multi-pump')
         if kwargs.get('print_summary', True):
             cmd.append('--summary')
         if kwargs.get('merge_waterlevels', True):
@@ -322,6 +324,7 @@ def main():
   python pipeline.py --input-dir ./gzp_farm --output-dir ./output
   python pipeline.py --config pipeline_config.yaml
   python pipeline.py --input-dir ./data --pumps 1,2 --zones A,B --no-waterlevels
+  python pipeline.py --input-dir ./data --multi-pump --output-dir ./output
         """
     )
     
@@ -335,6 +338,8 @@ def main():
                        help='启用的泵站列表，逗号分隔 (例如: 1,2,3)')
     parser.add_argument('--zones',
                        help='启用的供区列表，逗号分隔 (例如: A,B,C)')
+    parser.add_argument('--multi-pump', action='store_true',
+                       help='生成多水泵方案对比')
     parser.add_argument('--no-waterlevels', action='store_true',
                        help='不融合实时水位数据')
     parser.add_argument('--no-summary', action='store_true',
@@ -354,7 +359,8 @@ def main():
     # 准备参数
     kwargs = {
         'merge_waterlevels': not args.no_waterlevels,
-        'print_summary': not args.no_summary
+        'print_summary': not args.no_summary,
+        'multi_pump_scenarios': args.multi_pump
     }
     
     if args.pumps:
