@@ -63,6 +63,7 @@ def main(argv=None):
     ap.add_argument("--time-constraints", action="store_true", help="启用泵时间约束模式")
     ap.add_argument("--summary","-s", action="store_true", help="打印摘要到控制台")
     ap.add_argument("--realtime", action="store_true", help="融合实时水位（默认否）")
+    ap.add_argument("--custom-waterlevels", default="", help="自定义水位数据，JSON格式，如 '{\"field1\": 85.5, \"field2\": 92.0}'")
     
     # 过滤掉 Jupyter notebook 的内核参数
     if argv is None:
@@ -81,14 +82,16 @@ def main(argv=None):
     zones  = [s.strip() for s in args.zones.split(",") if s.strip()] or None
 
     cfg = farmcfg_from_json_select(
-        data, active_pumps=active, zone_ids=zones, use_realtime_wl=args.realtime
+        data, active_pumps=active, zone_ids=zones, use_realtime_wl=args.realtime,
+        custom_waterlevels=args.custom_waterlevels if args.custom_waterlevels else None
     )
 
     if args.multi_pump:
         # 生成多水泵方案对比
         # 忽略 --pumps 参数，让函数自动分析所有可能的水泵组合
         cfg_for_multi = farmcfg_from_json_select(
-            data, active_pumps=None, zone_ids=zones, use_realtime_wl=args.realtime
+            data, active_pumps=None, zone_ids=zones, use_realtime_wl=args.realtime,
+            custom_waterlevels=args.custom_waterlevels if args.custom_waterlevels else None
         )
         scenarios_result = generate_multi_pump_scenarios(cfg_for_multi)
         Path(args.out).write_text(json.dumps(scenarios_result, ensure_ascii=False, indent=2), encoding="utf-8")

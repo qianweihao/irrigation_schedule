@@ -30,6 +30,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # 导入现有模块
 from pipeline import IrrigationPipeline
 from farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
+from batch_regeneration_api import (
+    BatchModificationRequest, 
+    BatchRegenerationResponse, 
+    PumpAssignment,
+    TimeModification,
+    create_batch_regeneration_endpoint,
+    create_batch_info_endpoint,
+    generate_batch_cache_key
+)
 
 # 全局缓存和线程池
 _cache = {}
@@ -80,9 +89,10 @@ class MultiPumpResponse(BaseModel):
     total_scenarios: int
 
 def generate_cache_key(farm_id: str, target_depth_mm: float, pumps: str, zones: str, 
-                      merge_waterlevels: bool, print_summary: bool, multi_pump_scenarios: bool = False) -> str:
+                      merge_waterlevels: bool, print_summary: bool, multi_pump_scenarios: bool = False, 
+                      custom_waterlevels: str = "") -> str:
     """生成缓存键"""
-    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}_{multi_pump_scenarios}"
+    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}_{multi_pump_scenarios}_{custom_waterlevels}"
     return hashlib.md5(key_data.encode()).hexdigest()
 
 def get_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
@@ -184,6 +194,7 @@ async def generate_irrigation_plan_with_upload(
     merge_waterlevels: bool = Form(True),
     print_summary: bool = Form(True),
     multi_pump_scenarios: bool = Form(False),
+    custom_waterlevels: Optional[str] = Form(None),
     files: List[UploadFile] = File(default=[])
 ):
     """生成灌溉计划（支持文件上传）"""
@@ -195,7 +206,7 @@ async def generate_irrigation_plan_with_upload(
         # 生成缓存键
         cache_key = generate_cache_key(
             farm_id, target_depth_mm, pumps or "", zones or "", 
-            merge_waterlevels, print_summary, multi_pump_scenarios
+            merge_waterlevels, print_summary, multi_pump_scenarios, custom_waterlevels or ""
         )
         
         # 如果没有文件上传，尝试从缓存获取结果
@@ -246,7 +257,8 @@ async def generate_irrigation_plan_with_upload(
             'zones': zones,
             'merge_waterlevels': merge_waterlevels,
             'print_summary': print_summary,
-            'multi_pump_scenarios': multi_pump_scenarios
+            'multi_pump_scenarios': multi_pump_scenarios,
+            'custom_waterlevels': custom_waterlevels
         }
         print(f"Pipeline参数: {kwargs}")
         
@@ -406,10 +418,77 @@ async def root():
         "endpoints": {
             "POST /api/irrigation/plan-with-upload": "生成灌溉计划（支持文件上传和多水泵方案对比）",
             "POST /api/irrigation/multi-pump-scenarios": "生成多水泵方案对比",
+            "POST /api/irrigation/regenerate-batch": "批次重新生成（支持田块、水泵和时间修改）",
+            "GET /api/irrigation/batch-info/{plan_id}": "获取批次详细信息",
             "GET /api/health": "健康检查",
             "GET /docs": "API文档"
         }
     }
+
+# 创建批次重新生成端点
+regenerate_batch_plan_func = create_batch_regeneration_endpoint()
+
+# 创建批次信息查询端点
+get_batch_info_func = create_batch_info_endpoint()
+
+@app.post("/api/irrigation/regenerate-batch", response_model=BatchRegenerationResponse)
+async def regenerate_batch_plan(request: BatchModificationRequest):
+    """
+    批次重新生成端点
+    
+    根据前端的田块修改请求（添加或移除田块），重新生成灌溉批次计划。
+    支持田块修改、水泵分配和时间调整。
+    
+    - **original_plan_id**: 原始计划ID或文件路径
+    - **field_modifications**: 田块修改列表，每项包含field_id、action（add/remove）、可选的custom_water_level
+    - **pump_assignments**: 水泵分配列表，每项包含batch_index和pumps
+    - **time_modifications**: 时间修改列表，每项包含batch_index、start_time和duration
+    - **regeneration_params**: 可选的重新生成参数
+    
+    返回包含原始计划、修改后计划和修改摘要的响应。
+    """
+    # 生成缓存键
+    cache_key = generate_batch_cache_key(request)
+    
+    # 尝试从缓存获取结果
+    cached_result = get_from_cache(cache_key)
+    if cached_result:
+        print(f"从缓存返回批次重新生成结果 - cache_key: {cache_key}")
+        return BatchRegenerationResponse(**cached_result)
+    
+    # 执行批次重新生成
+    try:
+        result = await regenerate_batch_plan_func(request)
+        
+        # 将结果保存到缓存
+        response_data = result.dict()
+        set_cache(cache_key, response_data)
+        print(f"批次重新生成结果已保存到缓存 - cache_key: {cache_key}")
+        
+        return result
+        
+    except Exception as e:
+        print(f"批次重新生成失败: {str(e)}")
+        raise
+
+@app.get("/api/irrigation/batch-info/{plan_id}")
+async def get_batch_info(plan_id: str):
+    """
+    获取批次详细信息端点
+    
+    根据计划ID获取批次的详细信息，包括每个批次的水泵配置和时间信息。
+    
+    - **plan_id**: 计划ID或文件路径
+    
+    返回包含所有批次详细信息的响应。
+    """
+    try:
+        result = await get_batch_info_func(plan_id)
+        return result
+        
+    except Exception as e:
+        print(f"获取批次信息失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取批次信息失败: {str(e)}")
 
 if __name__ == "__main__":
     import argparse

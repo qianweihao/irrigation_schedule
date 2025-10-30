@@ -203,7 +203,8 @@ def farmcfg_from_json_select(config: Union[str, Dict[str, Any]],
                              active_pumps: Optional[List[str]] = None,
                              zone_ids: Optional[List[str]] = None,
                              use_realtime_wl: bool = False,
-                             realtime_rows: Optional[List[dict]] = None) -> FarmConfig:
+                             realtime_rows: Optional[List[dict]] = None,
+                             custom_waterlevels: Optional[str] = None) -> FarmConfig:
     if isinstance(config, str):
         data = json.loads(open(config, "r", encoding="utf-8").read())
     else:
@@ -288,12 +289,30 @@ def farmcfg_from_json_select(config: Union[str, Dict[str, Any]],
     if realtime_rows:
         wl_by_sid, wl_by_code = _rows_to_wl_maps(realtime_rows)
 
+    # 解析自定义水位数据
+    custom_wl_by_field = {}
+    if custom_waterlevels:
+        try:
+            custom_data = json.loads(custom_waterlevels)
+            if isinstance(custom_data, dict):
+                for field_id, wl_value in custom_data.items():
+                    try:
+                        custom_wl_by_field[str(field_id)] = float(wl_value)
+                    except (ValueError, TypeError):
+                        pass  # 忽略无效的水位值
+        except (json.JSONDecodeError, TypeError):
+            pass  # 忽略无效的JSON格式
+
     # 田块
     fields: Dict[str, FieldPlot] = {}
     for f in data.get("fields", []) or []:
         fid = str(f["id"])
         wl = _as_float(f.get("wl_mm"), None)   # 默认 None，不造 NaN
-        if use_realtime_wl and (wl_by_sid or wl_by_code):
+        
+        # 优先级：1. 自定义水位 > 2. 实时水位 > 3. 配置文件中的水位
+        if fid in custom_wl_by_field:
+            wl = custom_wl_by_field[fid]
+        elif use_realtime_wl and (wl_by_sid or wl_by_code):
             sid = _norm_id(f.get("sectionID"))
             if (sid and (sid in wl_by_sid)):
                 wl = wl_by_sid[sid]

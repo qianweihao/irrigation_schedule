@@ -29,12 +29,12 @@
     {
       "pump_name": "P1",
       "start_hour": 0,
-      "end_hour": 12
+      "end_hour": 8
     },
     {
       "pump_name": "P2",
-      "start_hour": 6,
-      "end_hour": 18
+      "start_hour": 8,
+      "end_hour": 16
     }
   ],
   "segments": [
