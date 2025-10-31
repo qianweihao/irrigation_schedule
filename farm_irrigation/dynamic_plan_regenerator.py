@@ -150,63 +150,51 @@ class DynamicPlanRegenerator:
             if field_id:
                 self.field_configs[field_id] = field
     
-    async def regenerate_batch(self, 
-                              batch_index: int,
-                              original_plan: Dict[str, Any],
-                              new_water_levels: Dict[str, WaterLevelReading],
-                              execution_context: Optional[Dict[str, Any]] = None) -> BatchRegenerationResult:
+    async def regenerate_batch_plan(self, 
+                                   batch_index: int,
+                                   original_plan: Dict[str, Any],
+                                   new_water_levels: Dict[str, WaterLevelReading],
+                                   execution_context: Optional[Dict[str, Any]] = None) -> BatchRegenerationResult:
         """
         重新生成批次计划
         
         Args:
             batch_index: 批次索引
-            original_plan: 原始灌溉计划
+            original_plan: 原始计划
             new_water_levels: 新的水位数据
             execution_context: 执行上下文
             
         Returns:
             BatchRegenerationResult: 重新生成结果
         """
-        logger.info(f"开始重新生成批次 {batch_index} 的计划")
-        
         try:
-            # 提取原始批次命令
-            original_commands = self._extract_batch_commands(original_plan, batch_index)
-            if not original_commands:
-                return BatchRegenerationResult(
-                    batch_index=batch_index,
-                    success=False,
-                    original_commands=[],
-                    regenerated_commands=[],
-                    changes=[],
-                    water_level_changes={},
-                    error_message=f"批次 {batch_index} 不存在或无命令"
-                )
+            logger.info(f"开始重新生成批次 {batch_index} 的计划")
             
-            # 提取批次田块数据
-            batch_fields = self._extract_batch_fields(original_plan, batch_index)
+            # 提取原始命令
+            logger.debug("提取原始命令...")
+            original_commands = self._extract_batch_commands(original_plan, batch_index)
+            logger.debug(f"提取到 {len(original_commands)} 个原始命令: {original_commands}")
             
             # 分析水位变化
-            water_level_changes = self._analyze_water_level_changes(
-                original_commands, new_water_levels, batch_fields
-            )
-            
-            # 判断是否需要重新生成
-            if not self._should_regenerate(water_level_changes):
-                logger.info(f"批次 {batch_index} 水位变化不大，无需重新生成")
-                return BatchRegenerationResult(
-                    batch_index=batch_index,
-                    success=True,
-                    original_commands=original_commands,
-                    regenerated_commands=original_commands,
-                    changes=[],
-                    water_level_changes=water_level_changes
-                )
+            logger.debug("分析水位变化...")
+            water_level_changes = self._analyze_water_level_changes(original_commands, new_water_levels)
+            logger.debug(f"水位变化: {water_level_changes}")
             
             # 重新生成命令
-            regenerated_commands, changes = await self._regenerate_commands(
-                original_commands, new_water_levels, water_level_changes, execution_context
+            logger.debug("重新生成命令...")
+            regenerated_commands, regeneration_changes = await self._regenerate_commands(
+                original_commands, 
+                new_water_levels, 
+                water_level_changes
             )
+            logger.debug(f"重新生成的命令: {regenerated_commands}")
+            
+            # 分析变更
+            logger.debug("分析计划变更...")
+            changes = self._analyze_plan_changes(original_commands, regenerated_commands)
+            
+            # 合并重新生成过程中的变更
+            changes.extend(regeneration_changes)
             
             # 计算调整量
             time_adjustment = self._calculate_time_adjustment(original_commands, regenerated_commands)
@@ -223,15 +211,19 @@ class DynamicPlanRegenerator:
                 total_water_adjustment=water_adjustment
             )
             
-            logger.info(f"批次 {batch_index} 重新生成完成，共 {len(changes)} 项变更")
+            logger.info(f"批次 {batch_index} 计划重新生成完成，共 {len(changes)} 项变更")
+            
             return result
             
         except Exception as e:
-            logger.error(f"重新生成批次 {batch_index} 失败: {e}")
+            import traceback
+            logger.error(f"重新生成批次 {batch_index} 计划失败: {e}")
+            logger.error(f"错误堆栈: {traceback.format_exc()}")
+            
             return BatchRegenerationResult(
                 batch_index=batch_index,
                 success=False,
-                original_commands=[],
+                original_commands=original_commands if 'original_commands' in locals() else [],
                 regenerated_commands=[],
                 changes=[],
                 water_level_changes={},
@@ -240,98 +232,317 @@ class DynamicPlanRegenerator:
     
     def _extract_batch_commands(self, plan: Dict[str, Any], batch_index: int) -> List[Dict[str, Any]]:
         """提取指定批次的命令"""
-        batch_commands = []
+        commands = []
         
-        # 首先尝试从steps中提取（适用于output文件）
-        steps = plan.get("steps", [])
-        for step in steps:
-            step_label = step.get("label", "")
-            if f"批次 {batch_index}" in step_label:
-                commands = step.get("commands", [])
-                batch_commands.extend(commands)
-                logger.info(f"从步骤 '{step_label}' 中提取到 {len(commands)} 个命令")
+        try:
+            # 从计划中提取批次相关的命令
+            batches = plan.get("batches", [])
+            steps = plan.get("steps", [])
+            
+            # 找到对应批次
+            target_batch = None
+            for batch in batches:
+                if batch.get("index") == batch_index:
+                    target_batch = batch
+                    break
+            
+            if target_batch:
+                # 提取批次中的田块和命令
+                field_plots = target_batch.get("field_plots", [])
+                
+                for field_plot in field_plots:
+                    field_id = field_plot.get("id")
+                    commands_list = field_plot.get("commands", [])
+                    
+                    for cmd in commands_list:
+                        command = {
+                            "field_id": field_id,
+                            "batch_index": batch_index,
+                            "command_type": cmd.get("type", "irrigation"),
+                            "duration_minutes": cmd.get("duration_minutes", 0),
+                            "flow_rate_lps": cmd.get("flow_rate_lps", 0),
+                            "water_amount_m3": cmd.get("water_amount_m3", 0),
+                            "start_time_h": cmd.get("start_time_h", 0),
+                            "end_time_h": cmd.get("end_time_h", 0),
+                            "original_data": cmd
+                        }
+                        commands.append(command)
+            
+            logger.debug(f"从批次 {batch_index} 提取了 {len(commands)} 个命令")
+            
+        except Exception as e:
+            logger.error(f"提取批次命令失败: {e}")
         
-        # 如果没有找到，尝试从顶级commands中提取（适用于原始计划文件）
-        if not batch_commands:
-            commands = plan.get("commands", [])
-            for cmd in commands:
-                if cmd.get("batch") == batch_index:
-                    batch_commands.append(cmd)
-        
-        logger.info(f"批次 {batch_index} 总共提取到 {len(batch_commands)} 个命令")
-        return batch_commands
-    
-    def _extract_batch_fields(self, plan: Dict[str, Any], batch_index: int) -> List[Dict[str, Any]]:
-        """提取指定批次的田块数据"""
-        batches = plan.get("batches", [])
-        
-        for batch in batches:
-            if batch.get("index") == batch_index:
-                fields = batch.get("fields", [])
-                logger.info(f"批次 {batch_index} 包含 {len(fields)} 个田块")
-                return fields
-        
-        logger.warning(f"未找到批次 {batch_index} 的田块数据")
-        return []
+        return commands
     
     def _analyze_water_level_changes(self, 
                                    commands: List[Dict[str, Any]], 
-                                   new_water_levels: Dict[str, WaterLevelReading],
-                                   batch_fields: List[Dict[str, Any]] = None) -> Dict[str, Tuple[float, float]]:
+                                   new_water_levels: Dict[str, WaterLevelReading]) -> Dict[str, Tuple[float, float]]:
         """分析水位变化"""
-        water_level_changes = {}
+        changes = {}
         
-        # 如果提供了批次田块数据，使用田块信息分析水位变化
-        if batch_fields:
-            for field in batch_fields:
-                field_id = field.get("id")
-                if field_id and field_id in new_water_levels:
-                    # 获取原始水位（从批次数据中）
-                    old_wl = field.get("wl_mm")
-                    
-                    # 获取新水位
-                    new_wl = new_water_levels[field_id].water_level_mm
-                    
-                    if old_wl is not None:
-                        water_level_changes[field_id] = (float(old_wl), new_wl)
-                        logger.info(f"田块 {field_id}: {old_wl:.1f}mm -> {new_wl:.1f}mm")
-        else:
-            # 回退到原来的逻辑（从命令中查找sectionID）
-            for cmd in commands:
-                field_id = cmd.get("sectionID")
-                if field_id and field_id in new_water_levels:
-                    # 获取原始水位（从命令或配置中）
-                    old_wl = cmd.get("waterlevel_mm")
-                    if old_wl is None and field_id in self.field_configs:
-                        old_wl = self.field_configs[field_id].get("wl_mm")
-                    
-                    # 获取新水位
-                    new_wl = new_water_levels[field_id].water_level_mm
-                    
-                    if old_wl is not None:
-                        water_level_changes[field_id] = (float(old_wl), new_wl)
+        for command in commands:
+            field_id = str(command.get("field_id", ""))
+            
+            if field_id in new_water_levels:
+                new_level = new_water_levels[field_id].water_level_mm
+                
+                # 从田块配置获取原始水位（如果有的话）
+                original_level = 0.0
+                if field_id in self.field_configs:
+                    field_config = self.field_configs[field_id]
+                    if isinstance(field_config, dict):
+                        original_level = field_config.get("wl_mm", 0.0)
+                
+                changes[field_id] = (original_level, new_level)
         
-        return water_level_changes
+        return changes
     
-    def _should_regenerate(self, water_level_changes: Dict[str, Tuple[float, float]]) -> bool:
-        """判断是否需要重新生成"""
+    async def _regenerate_commands(self, 
+                                 original_commands: List[Dict[str, Any]],
+                                 new_water_levels: Dict[str, WaterLevelReading],
+                                 water_level_changes: Dict[str, Tuple[float, float]]) -> List[Dict[str, Any]]:
+        """重新生成命令"""
+        regenerated_commands = []
+        
+        logger.debug(f"开始重新生成命令，原始命令数: {len(original_commands)}")
+        
+        for i, command in enumerate(original_commands):
+            logger.debug(f"处理命令 {i}: {command}")
+            field_id = str(command.get("field_id", ""))
+            
+            # 复制原始命令
+            new_command = command.copy()
+            
+            # 如果有新的水位数据，调整灌溉参数
+            if field_id in new_water_levels and field_id in water_level_changes:
+                old_level, new_level = water_level_changes[field_id]
+                level_diff = new_level - old_level
+                
+                # 根据水位差异调整灌溉参数
+                adjustment_factor = self._calculate_adjustment_factor(level_diff)
+                
+                # 调整持续时间
+                original_duration = command.get("duration_minutes", 0)
+                new_duration = max(
+                    self.regeneration_rules["min_irrigation_duration_minutes"],
+                    min(
+                        self.regeneration_rules["max_irrigation_duration_minutes"],
+                        original_duration * adjustment_factor
+                    )
+                )
+                new_command["duration_minutes"] = new_duration
+                
+                # 调整流量（如果启用）
+                if self.regeneration_rules["enable_flow_optimization"]:
+                    original_flow = command.get("flow_rate_lps", 0)
+                    flow_adjustment = min(
+                        self.regeneration_rules["max_flow_rate_adjustment_ratio"],
+                        abs(level_diff) / 100  # 基于水位差异调整流量
+                    )
+                    
+                    if level_diff < 0:  # 水位下降，增加流量
+                        new_flow = original_flow * (1 + flow_adjustment)
+                    else:  # 水位上升，减少流量
+                        new_flow = original_flow * (1 - flow_adjustment)
+                    
+                    new_command["flow_rate_lps"] = max(0.1, new_flow)
+                
+                # 重新计算用水量
+                new_water_amount = (new_command["duration_minutes"] / 60) * new_command["flow_rate_lps"] / 1000
+                new_command["water_amount_m3"] = new_water_amount
+                
+                # 更新时间（如果启用时间优化）
+                if self.regeneration_rules["enable_timing_optimization"]:
+                    # 这里可以添加更复杂的时间优化逻辑
+                    pass
+            
+            regenerated_commands.append(new_command)
+            logger.debug(f"添加重新生成的命令 {i}: {new_command}")
+        
+        logger.debug(f"重新生成完成，命令数: {len(regenerated_commands)}")
+        return regenerated_commands
+    
+    def _calculate_adjustment_factor(self, level_diff_mm: float) -> float:
+        """计算调整因子"""
         threshold = self.regeneration_rules["water_level_threshold_mm"]
-        logger.info(f"检查是否需要重新生成，阈值: {threshold}mm")
-        print(f"[DEBUG] 检查是否需要重新生成，阈值: {threshold}mm")
+        target_level = self.regeneration_rules["water_level_target_mm"]
         
-        for field_id, (old_wl, new_wl) in water_level_changes.items():
-            change = abs(new_wl - old_wl)
-            logger.info(f"田块 {field_id}: {old_wl:.1f}mm -> {new_wl:.1f}mm, 变化: {change:.1f}mm")
-            print(f"[DEBUG] 田块 {field_id}: {old_wl:.1f}mm -> {new_wl:.1f}mm, 变化: {change:.1f}mm")
-            if change >= threshold:
-                logger.info(f"田块 {field_id} 水位变化 {change:.1f}mm 超过阈值 {threshold}mm，需要重新生成")
-                print(f"[DEBUG] 田块 {field_id} 水位变化 {change:.1f}mm 超过阈值 {threshold}mm，需要重新生成")
-                return True
+        if abs(level_diff_mm) < threshold:
+            return 1.0  # 变化不大，不调整
         
-        logger.info("所有田块水位变化都未超过阈值，无需重新生成")
-        print("[DEBUG] 所有田块水位变化都未超过阈值，无需重新生成")
-        return False
+        # 基于水位差异计算调整因子
+        if level_diff_mm < -threshold:  # 水位下降较多
+            # 需要增加灌溉
+            adjustment = 1 + min(0.5, abs(level_diff_mm) / target_level)
+        elif level_diff_mm > threshold:  # 水位上升较多
+            # 需要减少灌溉
+            adjustment = 1 - min(0.3, level_diff_mm / target_level)
+        else:
+            adjustment = 1.0
+        
+        # 限制调整范围
+        max_adjustment = self.regeneration_rules["max_duration_adjustment_ratio"]
+        return max(1 - max_adjustment, min(1 + max_adjustment, adjustment))
     
+    def _analyze_plan_changes(self, 
+                            original_commands: List[Dict[str, Any]], 
+                            regenerated_commands: List[Dict[str, Any]]) -> List[PlanChange]:
+        """分析计划变更"""
+        changes = []
+        
+        for i, (orig_cmd, new_cmd) in enumerate(zip(original_commands, regenerated_commands)):
+            field_id = str(orig_cmd.get("field_id", ""))
+            batch_index = orig_cmd.get("batch_index", 0)
+            
+            # 检查持续时间变化
+            orig_duration = orig_cmd.get("duration_minutes", 0)
+            new_duration = new_cmd.get("duration_minutes", 0)
+            
+            if abs(orig_duration - new_duration) > 1:  # 超过1分钟的变化
+                impact = self._assess_change_impact(abs(orig_duration - new_duration) / orig_duration if orig_duration > 0 else 0)
+                
+                change = PlanChange(
+                    change_type=PlanChangeType.DURATION_ADJUSTED,
+                    impact_level=impact,
+                    field_id=field_id,
+                    batch_index=batch_index,
+                    old_value=orig_duration,
+                    new_value=new_duration,
+                    reason=f"基于水位变化调整灌溉持续时间"
+                )
+                changes.append(change)
+            
+            # 检查流量变化
+            orig_flow = orig_cmd.get("flow_rate_lps", 0)
+            new_flow = new_cmd.get("flow_rate_lps", 0)
+            
+            if abs(orig_flow - new_flow) > 0.1:  # 超过0.1L/s的变化
+                impact = self._assess_change_impact(abs(orig_flow - new_flow) / orig_flow if orig_flow > 0 else 0)
+                
+                change = PlanChange(
+                    change_type=PlanChangeType.FLOW_RATE_ADJUSTED,
+                    impact_level=impact,
+                    field_id=field_id,
+                    batch_index=batch_index,
+                    old_value=orig_flow,
+                    new_value=new_flow,
+                    reason=f"基于水位变化调整流量"
+                )
+                changes.append(change)
+        
+        return changes
+    
+    def _assess_change_impact(self, change_ratio: float) -> PlanChangeImpact:
+        """评估变更影响级别"""
+        if change_ratio < 0.1:
+            return PlanChangeImpact.MINIMAL
+        elif change_ratio < 0.3:
+            return PlanChangeImpact.MODERATE
+        elif change_ratio < 0.5:
+            return PlanChangeImpact.SIGNIFICANT
+        else:
+            return PlanChangeImpact.CRITICAL
+    
+    def _calculate_time_adjustment(self, 
+                                 original_commands: List[Dict[str, Any]], 
+                                 regenerated_commands: List[Dict[str, Any]]) -> float:
+        """计算总执行时间调整（秒）"""
+        orig_total_minutes = sum(cmd.get("duration_minutes", 0) for cmd in original_commands)
+        new_total_minutes = sum(cmd.get("duration_minutes", 0) for cmd in regenerated_commands)
+        
+        return (new_total_minutes - orig_total_minutes) * 60  # 转换为秒
+    
+    def _calculate_water_adjustment(self, 
+                                  original_commands: List[Dict[str, Any]], 
+                                  regenerated_commands: List[Dict[str, Any]]) -> float:
+        """计算总用水量调整（立方米）"""
+        orig_total_water = sum(cmd.get("water_amount_m3", 0) for cmd in original_commands)
+        new_total_water = sum(cmd.get("water_amount_m3", 0) for cmd in regenerated_commands)
+        
+        return new_total_water - orig_total_water
+    
+    def validate_regenerated_plan(self, result: BatchRegenerationResult) -> bool:
+        """验证重新生成的计划"""
+        try:
+            # 检查基本有效性
+            if not result.success or not result.regenerated_commands:
+                return False
+            
+            # 检查命令完整性
+            for command in result.regenerated_commands:
+                if not self._validate_command(command):
+                    return False
+            
+            # 检查调整是否在合理范围内
+            if abs(result.execution_time_adjustment) > 3600:  # 超过1小时
+                logger.warning(f"批次 {result.batch_index} 执行时间调整过大: {result.execution_time_adjustment}秒")
+                return False
+            
+            if abs(result.total_water_adjustment) > 100:  # 超过100立方米
+                logger.warning(f"批次 {result.batch_index} 用水量调整过大: {result.total_water_adjustment}m³")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"验证重新生成计划失败: {e}")
+            return False
+    
+    def _validate_command(self, command: Dict[str, Any]) -> bool:
+        """验证单个命令"""
+        try:
+            # 检查必要字段
+            required_fields = ["field_id", "duration_minutes", "flow_rate_lps"]
+            for field in required_fields:
+                if field not in command or command[field] is None:
+                    return False
+            
+            # 检查数值范围
+            duration = command.get("duration_minutes", 0)
+            if duration < 0 or duration > self.regeneration_rules["max_irrigation_duration_minutes"]:
+                return False
+            
+            flow_rate = command.get("flow_rate_lps", 0)
+            if flow_rate < 0 or flow_rate > 100:  # 假设最大流量100L/s
+                return False
+            
+            return True
+            
+        except Exception:
+            return False
+    
+    def get_regeneration_summary(self, result: BatchRegenerationResult) -> str:
+        """获取重新生成摘要"""
+        if not result.success:
+            return f"批次 {result.batch_index} 重新生成失败: {result.error_message}"
+        
+        summary_parts = []
+        
+        # 基本信息
+        summary_parts.append(f"批次 {result.batch_index} 重新生成完成")
+        
+        # 变更统计
+        if result.changes:
+            change_counts = {}
+            for change in result.changes:
+                change_type = change.change_type.value
+                change_counts[change_type] = change_counts.get(change_type, 0) + 1
+            
+            change_desc = ", ".join([f"{k}: {v}" for k, v in change_counts.items()])
+            summary_parts.append(f"变更: {change_desc}")
+        
+        # 时间调整
+        if abs(result.execution_time_adjustment) > 60:
+            time_adj_min = result.execution_time_adjustment / 60
+            summary_parts.append(f"执行时间调整: {time_adj_min:.1f}分钟")
+        
+        # 用水量调整
+        if abs(result.total_water_adjustment) > 0.1:
+            summary_parts.append(f"用水量调整: {result.total_water_adjustment:.2f}m³")
+        
+        return "; ".join(summary_parts)
+
     def _build_field_to_valve_mapping(self, batch_fields: List[Dict[str, Any]]) -> Dict[str, str]:
         """构建田块ID到阀门ID的映射"""
         field_to_valve = {}

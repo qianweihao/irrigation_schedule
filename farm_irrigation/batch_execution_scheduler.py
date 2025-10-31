@@ -519,23 +519,182 @@ class BatchExecutionScheduler:
         """
         return self.current_plan
 
+    async def update_batch_plan(self, batch_index: int, new_commands: List[Dict[str, Any]]) -> bool:
+        """
+        更新指定批次的执行计划
+        
+        Args:
+            batch_index: 批次索引
+            new_commands: 新的执行命令列表
+            
+        Returns:
+            bool: 更新是否成功
+        """
+        try:
+            if batch_index < 0 or batch_index >= len(self.batch_executions):
+                logger.error(f"批次索引 {batch_index} 超出范围")
+                return False
+            
+            batch_exec = self.batch_executions[batch_index]
+            
+            # 只允许更新未开始或准备中的批次
+            if batch_exec.status not in [BatchStatus.PENDING, BatchStatus.PREPARING]:
+                logger.error(f"批次 {batch_index} 状态为 {batch_exec.status.value}，无法更新")
+                return False
+            
+            # 更新批次的执行命令
+            batch_exec.regenerated_commands = new_commands
+            batch_exec.execution_log.append(f"批次计划已更新，新命令数量: {len(new_commands)}")
+            
+            # 更新状态管理器
+            await self.status_manager.update_execution_status(
+                farm_id=self.farm_id,
+                batch_id=f"batch_{batch_index}",
+                status="plan_updated",
+                progress=0,
+                message=f"批次 {batch_index} 计划已更新"
+            )
+            
+            logger.info(f"批次 {batch_index} 计划更新成功")
+            return True
+            
+        except Exception as e:
+            logger.error(f"更新批次 {batch_index} 计划失败: {e}")
+            return False
+
     def get_execution_history(self, limit: int = 10) -> List[Dict[str, Any]]:
-        """获取执行历史"""
-        return self.status_manager.get_execution_history(limit=limit)
+        """
+        获取执行历史
+        
+        Args:
+            limit: 返回记录数限制
+            
+        Returns:
+            List[Dict[str, Any]]: 执行历史列表
+        """
+        try:
+            # 从状态管理器获取执行历史
+            logs = self.status_manager.get_execution_logs(
+                farm_id=self.farm_id,
+                limit=limit
+            )
+            
+            # 转换为API响应格式
+            history = []
+            for log in logs:
+                history_item = {
+                    "execution_id": log.get("batch_id", ""),
+                    "farm_id": self.farm_id,
+                    "status": log.get("status", "unknown"),
+                    "start_time": log.get("timestamp", ""),
+                    "end_time": log.get("end_time", ""),
+                    "total_batches": len(self.batch_executions) if self.batch_executions else 0,
+                    "completed_batches": log.get("progress", 0),
+                    "error_message": log.get("error_message", ""),
+                    "message": log.get("message", "")
+                }
+                history.append(history_item)
+            
+            return history
+            
+        except Exception as e:
+            logger.error(f"获取执行历史失败: {e}")
+            return []
     
-    def get_field_trend_analysis(self, field_id: int, days: int = 7) -> Dict[str, Any]:
-        """获取田块水位趋势分析"""
-        # 这里应该实现具体的趋势分析逻辑
-        # 目前返回一个基本的响应
-        return {
-            "field_id": field_id,
-            "days": days,
-            "trend": "stable",
-            "average_level": 0.0,
-            "min_level": 0.0,
-            "max_level": 0.0,
-            "data_points": []
-        }
+    def get_field_trend_analysis(self, field_id: str, days: int = 7) -> Dict[str, Any]:
+        """
+        获取田块水位趋势分析
+        
+        Args:
+            field_id: 田块ID
+            days: 分析天数
+            
+        Returns:
+            Dict[str, Any]: 趋势分析结果
+        """
+        try:
+            # 从水位管理器获取趋势分析
+            if hasattr(self, 'waterlevel_manager') and self.waterlevel_manager:
+                analysis = self.waterlevel_manager.get_field_trend_analysis(field_id, days * 24)  # 转换为小时
+                return analysis
+            else:
+                # 返回基本的响应
+                return {
+                    "field_id": field_id,
+                    "analysis_period_days": days,
+                    "trend_direction": "stable",
+                    "average_level_mm": 0.0,
+                    "min_level_mm": 0.0,
+                    "max_level_mm": 0.0,
+                    "data_points_count": 0,
+                    "confidence": 0.0,
+                    "last_update": datetime.now().isoformat(),
+                    "message": "水位管理器未初始化，返回默认数据"
+                }
+                
+        except Exception as e:
+            logger.error(f"获取田块 {field_id} 趋势分析失败: {e}")
+            return {
+                "field_id": field_id,
+                "analysis_period_days": days,
+                "error": str(e),
+                "message": "趋势分析失败"
+            }
+
+    async def get_batch_details(self, batch_index: int) -> Optional[Dict[str, Any]]:
+        """
+        获取批次详细信息
+        
+        Args:
+            batch_index: 批次索引
+            
+        Returns:
+            Optional[Dict[str, Any]]: 批次详细信息
+        """
+        try:
+            if batch_index < 0 or batch_index >= len(self.batch_executions):
+                return None
+            
+            batch_exec = self.batch_executions[batch_index]
+            
+            # 获取批次详细信息
+            details = await self.status_manager.get_batch_details(f"batch_{batch_index}")
+            
+            # 构建响应
+            batch_details = {
+                "batch_index": batch_index,
+                "status": batch_exec.status.value,
+                "start_time": batch_exec.start_time.isoformat() if batch_exec.start_time else None,
+                "duration_minutes": batch_exec.duration_minutes,
+                "original_commands_count": len(batch_exec.original_commands) if batch_exec.original_commands else 0,
+                "regenerated_commands_count": len(batch_exec.regenerated_commands) if batch_exec.regenerated_commands else 0,
+                "water_levels_count": len(batch_exec.water_levels) if batch_exec.water_levels else 0,
+                "execution_log": batch_exec.execution_log,
+                "database_details": details
+            }
+            
+            return batch_details
+            
+        except Exception as e:
+            logger.error(f"获取批次 {batch_index} 详细信息失败: {e}")
+            return None
+
+    def get_farm_id(self) -> str:
+        """获取农场ID"""
+        return self.farm_id
+
+    async def cleanup_old_data(self, retention_days: int = 30):
+        """
+        清理旧数据
+        
+        Args:
+            retention_days: 数据保留天数
+        """
+        try:
+            await self.status_manager.cleanup_old_data(retention_days)
+            logger.info(f"清理 {retention_days} 天前的旧数据完成")
+        except Exception as e:
+            logger.error(f"清理旧数据失败: {e}")
 
 # 示例设备控制回调函数
 async def example_device_control_callback(batch_exec: BatchExecution, plan: Dict[str, Any]):

@@ -1,5 +1,6 @@
 {
 "type": "FeatureCollection",
+"name": "segments_labeled",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32649" } },
 "features": [
 { "type": "Feature", "properties": { "S_id": "S1", "S_type": "branch-S", "distance_rank": 1 }, "geometry": { "type": "LineString", "coordinates": [ [ 576654.052206685068086, 3190450.388059886638075 ], [ 577143.806803117389791, 3190947.177967083174735 ] ] } },

@@ -392,7 +392,7 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             )
         
         # 重新生成批次
-        result = await regenerator.regenerate_batch(
+        result = await regenerator.regenerate_batch_plan(
             batch_index=request.batch_index,
             original_plan=current_plan,
             new_water_levels=water_levels

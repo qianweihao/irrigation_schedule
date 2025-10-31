@@ -154,25 +154,11 @@ class DynamicWaterLevelManager:
         
         # 数据存储
         self.field_histories: Dict[str, FieldWaterLevelHistory] = {}
-        self.config_data: Dict[str, Any] = {}
+        self.last_api_call: Optional[datetime] = None
+        self.api_call_interval_minutes = 5  # API调用间隔
         
-        # 加载配置和缓存
-        self._load_config()
+        # 加载缓存数据
         self._load_cache()
-    
-    def _load_config(self):
-        """加载配置文件"""
-        try:
-            if self.config_path.exists():
-                with open(self.config_path, 'r', encoding='utf-8') as f:
-                    self.config_data = json.load(f)
-                logger.info(f"配置文件加载成功: {self.config_path}")
-            else:
-                logger.warning(f"配置文件不存在: {self.config_path}")
-                self.config_data = {}
-        except Exception as e:
-            logger.error(f"加载配置文件失败: {e}")
-            self.config_data = {}
     
     def _load_cache(self):
         """加载缓存数据"""
@@ -181,17 +167,17 @@ class DynamicWaterLevelManager:
                 with open(self.cache_file, 'r', encoding='utf-8') as f:
                     cache_data = json.load(f)
                 
-                # 重建历史数据
-                for field_id, field_data in cache_data.get("fields", {}).items():
+                # 恢复田块历史数据
+                for field_id, history_data in cache_data.get("field_histories", {}).items():
                     history = FieldWaterLevelHistory(field_id=field_id)
                     
-                    for reading_data in field_data.get("readings", []):
+                    for reading_data in history_data.get("readings", []):
                         reading = WaterLevelReading(
-                            field_id=field_id,
+                            field_id=reading_data["field_id"],
                             water_level_mm=reading_data["water_level_mm"],
                             timestamp=datetime.fromisoformat(reading_data["timestamp"]),
                             source=WaterLevelSource(reading_data["source"]),
-                            quality=WaterLevelQuality(reading_data.get("quality", "good")),
+                            quality=WaterLevelQuality(reading_data["quality"]),
                             confidence=reading_data.get("confidence", 1.0),
                             metadata=reading_data.get("metadata", {})
                         )
@@ -199,44 +185,43 @@ class DynamicWaterLevelManager:
                     
                     self.field_histories[field_id] = history
                 
-                logger.info(f"缓存数据加载成功: {len(self.field_histories)} 个田块")
-            else:
-                logger.info("缓存文件不存在，将创建新的缓存")
+                logger.info(f"从缓存加载了 {len(self.field_histories)} 个田块的水位历史")
+                
         except Exception as e:
             logger.error(f"加载缓存失败: {e}")
-            self.field_histories = {}
     
     def _save_cache(self):
         """保存缓存数据"""
         try:
             cache_data = {
-                "last_updated": datetime.now().isoformat(),
-                "fields": {}
+                "field_histories": {},
+                "last_updated": datetime.now().isoformat()
             }
             
+            # 保存田块历史数据
             for field_id, history in self.field_histories.items():
-                field_data = {
-                    "last_updated": history.last_updated.isoformat() if history.last_updated else None,
-                    "readings": []
+                cache_data["field_histories"][field_id] = {
+                    "field_id": field_id,
+                    "readings": [
+                        {
+                            "field_id": reading.field_id,
+                            "water_level_mm": reading.water_level_mm,
+                            "timestamp": reading.timestamp.isoformat(),
+                            "source": reading.source.value,
+                            "quality": reading.quality.value,
+                            "confidence": reading.confidence,
+                            "metadata": reading.metadata
+                        }
+                        for reading in history.readings[:50]  # 只保存最近50条
+                    ],
+                    "last_updated": history.last_updated.isoformat() if history.last_updated else None
                 }
-                
-                for reading in history.readings:
-                    reading_data = {
-                        "water_level_mm": reading.water_level_mm,
-                        "timestamp": reading.timestamp.isoformat(),
-                        "source": reading.source.value,
-                        "quality": reading.quality.value,
-                        "confidence": reading.confidence,
-                        "metadata": reading.metadata
-                    }
-                    field_data["readings"].append(reading_data)
-                
-                cache_data["fields"][field_id] = field_data
             
             with open(self.cache_file, 'w', encoding='utf-8') as f:
-                json.dump(cache_data, f, ensure_ascii=False, indent=2)
+                json.dump(cache_data, f, indent=2, ensure_ascii=False)
+                
+            logger.debug(f"缓存已保存到 {self.cache_file}")
             
-            logger.debug("缓存数据保存成功")
         except Exception as e:
             logger.error(f"保存缓存失败: {e}")
     
@@ -246,259 +231,162 @@ class DynamicWaterLevelManager:
         
         Args:
             farm_id: 农场ID
-            field_ids: 指定田块ID列表，None表示获取所有田块
+            field_ids: 指定田块ID列表，如果为None则获取所有田块
             
         Returns:
             Dict[str, WaterLevelReading]: 田块ID到水位读数的映射
         """
-        logger.info(f"开始获取农场 {farm_id} 的最新水位数据")
-        
-        latest_readings = {}
-        
-        # 1. 尝试从API获取实时数据
-        api_readings = await self._fetch_from_api(farm_id, field_ids)
-        latest_readings.update(api_readings)
-        
-        # 2. 对于API未获取到的田块，尝试使用缓存数据
-        if field_ids:
-            missing_fields = set(field_ids) - set(latest_readings.keys())
-        else:
-            # 从配置文件获取所有田块ID
-            all_field_ids = self._get_all_field_ids()
-            missing_fields = set(all_field_ids) - set(latest_readings.keys())
-        
-        for field_id in missing_fields:
-            cached_reading = self._get_cached_reading(field_id)
-            if cached_reading and cached_reading.is_valid():
-                latest_readings[field_id] = cached_reading
-        
-        # 3. 对于仍然缺失的田块，使用配置文件默认值
-        still_missing = missing_fields - set(latest_readings.keys())
-        for field_id in still_missing:
-            config_reading = self._get_config_reading(field_id)
-            if config_reading:
-                latest_readings[field_id] = config_reading
-        
-        # 4. 更新历史记录
-        for field_id, reading in latest_readings.items():
-            self._add_reading_to_history(field_id, reading)
-        
-        # 5. 保存缓存
-        self._save_cache()
-        
-        logger.info(f"获取到 {len(latest_readings)} 个田块的水位数据")
-        
-        return latest_readings
-    
-    async def _fetch_from_api(self, farm_id: str, field_ids: Optional[List[str]] = None) -> Dict[str, WaterLevelReading]:
-        """从API获取水位数据"""
-        api_readings = {}
+        readings = {}
         
         try:
-            if not callable(fetch_waterlevels):
-                logger.warning("水位API不可用")
-                return api_readings
+            # 检查API调用间隔
+            now = datetime.now()
+            if (self.last_api_call and 
+                (now - self.last_api_call).total_seconds() < self.api_call_interval_minutes * 60):
+                logger.debug("API调用间隔未到，使用缓存数据")
+                return self._get_cached_readings(field_ids)
             
-            # 调用API
-            realtime_rows = fetch_waterlevels(farm_id)
-            
-            if not realtime_rows:
-                logger.warning("API返回空数据")
-                return api_readings
-            
-            current_time = datetime.now()
-            
-            for row in realtime_rows:
-                field_id = self._extract_field_id(row)
-                water_level = self._extract_water_level(row)
+            # 调用水位API
+            if callable(fetch_waterlevels):
+                api_data = fetch_waterlevels(farm_id)
+                self.last_api_call = now
                 
-                if field_id and water_level is not None:
-                    # 如果指定了田块列表，只处理指定的田块
-                    if field_ids and field_id not in field_ids:
-                        continue
-                    
-                    # 创建读数对象
-                    reading = WaterLevelReading(
-                        field_id=field_id,
-                        water_level_mm=water_level,
-                        timestamp=current_time,
-                        source=WaterLevelSource.API,
-                        quality=self._assess_quality(water_level, current_time, WaterLevelSource.API),
-                        confidence=0.9,  # API数据置信度较高
-                        metadata={"raw_data": row}
-                    )
-                    
-                    if reading.is_valid():
-                        api_readings[field_id] = reading
-                    else:
-                        logger.warning(f"田块 {field_id} 的API数据无效: {water_level}")
-            
-            logger.info(f"从API获取到 {len(api_readings)} 个有效水位数据")
-            
+                if api_data:
+                    for row in api_data:
+                        field_id = str(row.get("field_id") or row.get("sectionID") or row.get("id", ""))
+                        water_level = row.get("waterlevel_mm") or row.get("water_level")
+                        
+                        if field_id and water_level is not None:
+                            # 过滤指定田块
+                            if field_ids and field_id not in field_ids:
+                                continue
+                            
+                            try:
+                                water_level_mm = float(water_level)
+                                
+                                # 创建水位读数
+                                reading = WaterLevelReading(
+                                    field_id=field_id,
+                                    water_level_mm=water_level_mm,
+                                    timestamp=now,
+                                    source=WaterLevelSource.API,
+                                    quality=self._assess_quality(water_level_mm, now),
+                                    confidence=self._calculate_confidence(row),
+                                    metadata=row
+                                )
+                                
+                                # 验证读数
+                                if reading.is_valid():
+                                    readings[field_id] = reading
+                                    
+                                    # 添加到历史记录
+                                    if field_id not in self.field_histories:
+                                        self.field_histories[field_id] = FieldWaterLevelHistory(field_id)
+                                    
+                                    self.field_histories[field_id].add_reading(reading)
+                                
+                            except (ValueError, TypeError) as e:
+                                logger.warning(f"田块 {field_id} 水位数据无效: {water_level}, 错误: {e}")
+                
+                logger.info(f"从API获取到 {len(readings)} 个有效水位读数")
+                
+                # 保存缓存
+                self._save_cache()
+                
+            else:
+                logger.warning("水位API不可用")
+                return self._get_cached_readings(field_ids)
+                
         except Exception as e:
-            logger.error(f"从API获取水位数据失败: {e}")
+            logger.error(f"获取水位数据失败: {e}")
+            return self._get_cached_readings(field_ids)
         
-        return api_readings
+        return readings
     
-    def _extract_field_id(self, row: Dict[str, Any]) -> Optional[str]:
-        """从API返回的行数据中提取田块ID"""
-        for key in ["field_id", "sectionID", "id", "F_id"]:
-            if key in row and row[key]:
-                return str(row[key])
-        return None
-    
-    def _extract_water_level(self, row: Dict[str, Any]) -> Optional[float]:
-        """从API返回的行数据中提取水位值"""
-        for key in ["waterlevel_mm", "water_level", "wl_mm", "level"]:
-            if key in row and row[key] is not None:
-                try:
-                    return float(row[key])
-                except (ValueError, TypeError):
-                    continue
-        return None
-    
-    def _get_all_field_ids(self) -> List[str]:
-        """从配置文件获取所有田块ID"""
-        field_ids = []
-        
-        fields = self.config_data.get("fields", [])
-        for field in fields:
-            field_id = field.get("id")
-            if field_id:
-                field_ids.append(str(field_id))
-        
-        return field_ids
-    
-    def _get_cached_reading(self, field_id: str) -> Optional[WaterLevelReading]:
+    def _get_cached_readings(self, field_ids: Optional[List[str]] = None) -> Dict[str, WaterLevelReading]:
         """获取缓存的水位读数"""
-        if field_id in self.field_histories:
-            history = self.field_histories[field_id]
-            latest = history.get_latest_reading()
+        readings = {}
+        
+        for field_id, history in self.field_histories.items():
+            if field_ids and field_id not in field_ids:
+                continue
             
-            if latest and latest.age_hours() <= self.max_cache_age_hours:
-                # 更新质量评估（基于年龄）
-                latest.quality = self._assess_quality(
-                    latest.water_level_mm, 
-                    latest.timestamp, 
-                    WaterLevelSource.CACHED
-                )
-                return latest
+            latest_reading = history.get_latest_reading()
+            if latest_reading and latest_reading.is_valid():
+                # 检查数据年龄
+                age_hours = latest_reading.age_hours()
+                if age_hours <= self.max_cache_age_hours:
+                    readings[field_id] = latest_reading
         
-        return None
+        return readings
     
-    def _get_config_reading(self, field_id: str) -> Optional[WaterLevelReading]:
-        """从配置文件获取默认水位读数"""
-        fields = self.config_data.get("fields", [])
-        
-        for field in fields:
-            if str(field.get("id")) == field_id:
-                wl_mm = field.get("wl_mm")
-                if wl_mm is not None:
-                    try:
-                        water_level = float(wl_mm)
-                        reading = WaterLevelReading(
-                            field_id=field_id,
-                            water_level_mm=water_level,
-                            timestamp=datetime.now(),
-                            source=WaterLevelSource.CONFIG,
-                            quality=WaterLevelQuality.FAIR,
-                            confidence=0.5,  # 配置文件数据置信度较低
-                            metadata={"from_config": True}
-                        )
-                        return reading
-                    except (ValueError, TypeError):
-                        pass
-        
-        return None
-    
-    def _assess_quality(self, water_level: float, timestamp: datetime, source: WaterLevelSource) -> WaterLevelQuality:
+    def _assess_quality(self, water_level_mm: float, timestamp: datetime) -> WaterLevelQuality:
         """评估水位数据质量"""
         age_hours = (datetime.now() - timestamp).total_seconds() / 3600
         
-        # 检查水位范围
-        if (water_level < self.quality_thresholds["min_water_level"] or 
-            water_level > self.quality_thresholds["max_water_level"]):
-            return WaterLevelQuality.INVALID
-        
-        # 基于数据源和年龄评估质量
-        if source == WaterLevelSource.API:
-            if age_hours <= self.quality_thresholds["excellent_max_age_hours"]:
-                return WaterLevelQuality.EXCELLENT
-            elif age_hours <= self.quality_thresholds["good_max_age_hours"]:
-                return WaterLevelQuality.GOOD
-            elif age_hours <= self.quality_thresholds["fair_max_age_hours"]:
-                return WaterLevelQuality.FAIR
-            else:
-                return WaterLevelQuality.POOR
-        
-        elif source == WaterLevelSource.CACHED:
-            if age_hours <= self.quality_thresholds["good_max_age_hours"]:
-                return WaterLevelQuality.GOOD
-            elif age_hours <= self.quality_thresholds["fair_max_age_hours"]:
-                return WaterLevelQuality.FAIR
-            else:
-                return WaterLevelQuality.POOR
-        
-        elif source == WaterLevelSource.CONFIG:
-            return WaterLevelQuality.FAIR
-        
-        else:
+        # 基于数据年龄评估质量
+        if age_hours <= self.quality_thresholds["excellent_max_age_hours"]:
+            return WaterLevelQuality.EXCELLENT
+        elif age_hours <= self.quality_thresholds["good_max_age_hours"]:
             return WaterLevelQuality.GOOD
+        elif age_hours <= self.quality_thresholds["fair_max_age_hours"]:
+            return WaterLevelQuality.FAIR
+        else:
+            return WaterLevelQuality.POOR
     
-    def _add_reading_to_history(self, field_id: str, reading: WaterLevelReading):
-        """添加读数到历史记录"""
-        if field_id not in self.field_histories:
-            self.field_histories[field_id] = FieldWaterLevelHistory(field_id=field_id)
+    def _calculate_confidence(self, api_row: Dict[str, Any]) -> float:
+        """计算数据置信度"""
+        confidence = 1.0
         
-        self.field_histories[field_id].add_reading(reading)
+        # 基于数据完整性调整置信度
+        if not api_row.get("timestamp"):
+            confidence *= 0.8
+        
+        if not api_row.get("sensor_id"):
+            confidence *= 0.9
+        
+        # 基于数据范围调整置信度
+        water_level = api_row.get("waterlevel_mm") or api_row.get("water_level", 0)
+        try:
+            wl = float(water_level)
+            if wl < 0 or wl > 500:  # 异常范围
+                confidence *= 0.5
+        except (ValueError, TypeError):
+            confidence *= 0.3
+        
+        return max(confidence, 0.1)  # 最小置信度0.1
     
-    def get_water_level_summary(self, field_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+    def get_field_water_level(self, field_id: str) -> Optional[WaterLevelReading]:
         """
-        获取水位数据摘要
+        获取指定田块的最新水位
         
         Args:
-            field_ids: 指定田块ID列表
+            field_id: 田块ID
             
         Returns:
-            Dict[str, Any]: 水位摘要信息
+            Optional[WaterLevelReading]: 水位读数，如果没有则返回None
         """
-        summary = {
-            "total_fields": 0,
-            "fields_with_data": 0,
-            "quality_distribution": {q.value: 0 for q in WaterLevelQuality},
-            "source_distribution": {s.value: 0 for s in WaterLevelSource},
-            "fields": {}
-        }
-        
-        target_fields = field_ids or list(self.field_histories.keys())
-        summary["total_fields"] = len(target_fields)
-        
-        for field_id in target_fields:
-            if field_id in self.field_histories:
-                history = self.field_histories[field_id]
-                latest = history.get_latest_reading()
-                
-                if latest:
-                    summary["fields_with_data"] += 1
-                    summary["quality_distribution"][latest.quality.value] += 1
-                    summary["source_distribution"][latest.source.value] += 1
-                    
-                    # 获取趋势
-                    trend = history.get_trend(hours=24)
-                    
-                    summary["fields"][field_id] = {
-                        "water_level_mm": latest.water_level_mm,
-                        "age_hours": latest.age_hours(),
-                        "quality": latest.quality.value,
-                        "source": latest.source.value,
-                        "confidence": latest.confidence,
-                        "trend_mm_per_hour": trend,
-                        "readings_count": len(history.readings)
-                    }
-        
-        return summary
+        if field_id in self.field_histories:
+            return self.field_histories[field_id].get_latest_reading()
+        return None
     
-    def add_manual_reading(self, field_id: str, water_level_mm: float, confidence: float = 0.8) -> bool:
+    def get_water_level_trend(self, field_id: str, hours: int = 24) -> Optional[float]:
+        """
+        获取田块水位变化趋势
+        
+        Args:
+            field_id: 田块ID
+            hours: 分析时间窗口（小时）
+            
+        Returns:
+            Optional[float]: 变化趋势（mm/h），正值表示上升，负值表示下降
+        """
+        if field_id in self.field_histories:
+            return self.field_histories[field_id].get_trend(hours)
+        return None
+    
+    def add_manual_reading(self, field_id: str, water_level_mm: float, 
+                          confidence: float = 1.0, metadata: Optional[Dict[str, Any]] = None) -> bool:
         """
         添加手动水位读数
         
@@ -506,6 +394,7 @@ class DynamicWaterLevelManager:
             field_id: 田块ID
             water_level_mm: 水位（毫米）
             confidence: 置信度
+            metadata: 元数据
             
         Returns:
             bool: 是否添加成功
@@ -516,79 +405,62 @@ class DynamicWaterLevelManager:
                 water_level_mm=water_level_mm,
                 timestamp=datetime.now(),
                 source=WaterLevelSource.MANUAL,
-                quality=self._assess_quality(water_level_mm, datetime.now(), WaterLevelSource.MANUAL),
+                quality=WaterLevelQuality.GOOD,
                 confidence=confidence,
-                metadata={"manual_input": True}
+                metadata=metadata or {}
             )
             
             if reading.is_valid():
-                self._add_reading_to_history(field_id, reading)
+                if field_id not in self.field_histories:
+                    self.field_histories[field_id] = FieldWaterLevelHistory(field_id)
+                
+                self.field_histories[field_id].add_reading(reading)
                 self._save_cache()
+                
                 logger.info(f"手动添加田块 {field_id} 水位读数: {water_level_mm}mm")
                 return True
             else:
-                logger.warning(f"手动水位读数无效: 田块 {field_id}, 水位 {water_level_mm}mm")
+                logger.warning(f"无效的水位读数: 田块 {field_id}, 水位 {water_level_mm}mm")
                 return False
                 
         except Exception as e:
             logger.error(f"添加手动水位读数失败: {e}")
             return False
     
-    def get_field_trend_analysis(self, field_id: str, hours: int = 48) -> Optional[Dict[str, Any]]:
+    def get_quality_summary(self) -> Dict[str, int]:
         """
-        获取田块水位趋势分析
+        获取数据质量摘要
+        
+        Returns:
+            Dict[str, int]: 各质量等级的数据数量
+        """
+        summary = {quality.value: 0 for quality in WaterLevelQuality}
+        
+        for history in self.field_histories.values():
+            latest_reading = history.get_latest_reading()
+            if latest_reading:
+                summary[latest_reading.quality.value] += 1
+        
+        return summary
+    
+    def cleanup_old_data(self, max_age_days: int = 30):
+        """
+        清理过期数据
         
         Args:
-            field_id: 田块ID
-            hours: 分析时间窗口（小时）
-            
-        Returns:
-            Dict[str, Any]: 趋势分析结果
+            max_age_days: 最大保留天数
         """
-        if field_id not in self.field_histories:
-            return None
+        cutoff_time = datetime.now() - timedelta(days=max_age_days)
+        cleaned_count = 0
         
-        history = self.field_histories[field_id]
-        cutoff_time = datetime.now() - timedelta(hours=hours)
-        recent_readings = [r for r in history.readings if r.timestamp >= cutoff_time and r.is_valid()]
+        for history in self.field_histories.values():
+            original_count = len(history.readings)
+            history.readings = [r for r in history.readings if r.timestamp >= cutoff_time]
+            cleaned_count += original_count - len(history.readings)
         
-        if len(recent_readings) < 2:
-            return None
-        
-        # 计算统计信息
-        levels = [r.water_level_mm for r in recent_readings]
-        
-        analysis = {
-            "field_id": field_id,
-            "analysis_period_hours": hours,
-            "readings_count": len(recent_readings),
-            "latest_level_mm": levels[0],
-            "min_level_mm": min(levels),
-            "max_level_mm": max(levels),
-            "avg_level_mm": sum(levels) / len(levels),
-            "level_range_mm": max(levels) - min(levels),
-            "trend_mm_per_hour": history.get_trend(hours),
-            "data_quality": recent_readings[0].quality.value,
-            "last_updated": recent_readings[0].timestamp.isoformat()
-        }
-        
-        # 趋势判断
-        trend = analysis["trend_mm_per_hour"]
-        if trend is not None:
-            if trend > 1.0:
-                analysis["trend_description"] = "快速上升"
-            elif trend > 0.1:
-                analysis["trend_description"] = "缓慢上升"
-            elif trend > -0.1:
-                analysis["trend_description"] = "基本稳定"
-            elif trend > -1.0:
-                analysis["trend_description"] = "缓慢下降"
-            else:
-                analysis["trend_description"] = "快速下降"
-        else:
-            analysis["trend_description"] = "数据不足"
-        
-        return analysis
+        if cleaned_count > 0:
+            logger.info(f"清理了 {cleaned_count} 条过期水位数据")
+            self._save_cache()
 
 if __name__ == "__main__":
     # 示例用法
