@@ -1,0 +1,7 @@
+2025-10-31 16:43:22,744 - execution_status - INFO - [status_update] 执行状态更新: {'batch_id': 'batch_20251031_164322', 'status': <ExecutionStatus.RUNNING: 'running'>, 'start_time': datetime.datetime(2025, 10, 31, 16, 43, 22, 613777), 'end_time': None, 'progress': 0.0, 'total_fields': 1, 'completed_fields': 0, 'error_message': None}
+2025-10-31 16:43:22,798 - execution_status - INFO - [scheduler] 开始执行灌溉计划
+2025-10-31 16:43:22,875 - execution_status - INFO - [scheduler] 执行开始时间: 2025-10-31 16:43:22.613777
+2025-10-31 16:47:24,343 - execution_status - INFO - [status_update] 执行状态更新: {'batch_id': 'batch_20251031_164724', 'status': <ExecutionStatus.RUNNING: 'running'>, 'start_time': datetime.datetime(2025, 10, 31, 16, 47, 24, 210113), 'end_time': None, 'progress': 0.0, 'total_fields': 1, 'completed_fields': 0, 'error_message': None}
+2025-10-31 16:47:24,425 - execution_status - INFO - [scheduler] 开始执行灌溉计划
+2025-10-31 16:47:24,484 - execution_status - INFO - [scheduler] 执行开始时间: 2025-10-31 16:47:24.210113
+2025-10-31 17:05:41,944 - execution_status - ERROR - [scheduler] 没有可执行的灌溉计划

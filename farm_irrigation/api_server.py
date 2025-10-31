@@ -13,6 +13,7 @@ import tempfile
 import hashlib
 import time
 import gc
+import logging
 from typing import List, Optional, Dict, Any
 from pathlib import Path
 from functools import lru_cache
@@ -23,6 +24,13 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # 添加当前目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +46,19 @@ from batch_regeneration_api import (
     create_batch_regeneration_endpoint,
     create_batch_info_endpoint,
     generate_batch_cache_key
+)
+
+# 导入动态执行模块
+from dynamic_execution_api import (
+    DynamicExecutionRequest,
+    DynamicExecutionResponse,
+    ExecutionStatusResponse,
+    WaterLevelUpdateRequest,
+    WaterLevelUpdateResponse,
+    ManualRegenerationRequest,
+    ManualRegenerationResponse,
+    ExecutionHistoryResponse,
+    create_dynamic_execution_endpoints
 )
 
 # 全局缓存和线程池
@@ -420,6 +441,14 @@ async def root():
             "POST /api/irrigation/multi-pump-scenarios": "生成多水泵方案对比",
             "POST /api/irrigation/regenerate-batch": "批次重新生成（支持田块、水泵和时间修改）",
             "GET /api/irrigation/batch-info/{plan_id}": "获取批次详细信息",
+            "POST /api/irrigation/dynamic-execution/start": "启动动态批次执行",
+            "POST /api/irrigation/dynamic-execution/stop": "停止动态批次执行",
+            "GET /api/irrigation/dynamic-execution/status": "获取动态执行状态",
+            "POST /api/irrigation/dynamic-execution/update-waterlevels": "手动更新水位数据",
+            "POST /api/irrigation/dynamic-execution/regenerate-batch": "手动重新生成批次",
+            "GET /api/irrigation/dynamic-execution/history": "获取执行历史",
+            "GET /api/irrigation/dynamic-execution/waterlevel-summary": "获取水位数据摘要",
+            "GET /api/irrigation/dynamic-execution/field-trend/{field_id}": "获取田块水位趋势分析",
             "GET /api/health": "健康检查",
             "GET /docs": "API文档"
         }
@@ -430,6 +459,9 @@ regenerate_batch_plan_func = create_batch_regeneration_endpoint()
 
 # 创建批次信息查询端点
 get_batch_info_func = create_batch_info_endpoint()
+
+# 创建动态执行端点
+dynamic_execution_endpoints = create_dynamic_execution_endpoints()
 
 @app.post("/api/irrigation/regenerate-batch", response_model=BatchRegenerationResponse)
 async def regenerate_batch_plan(request: BatchModificationRequest):
@@ -489,6 +521,65 @@ async def get_batch_info(plan_id: str):
     except Exception as e:
         print(f"获取批次信息失败: {str(e)}")
         raise HTTPException(status_code=500, detail=f"获取批次信息失败: {str(e)}")
+
+# 动态执行端点
+@app.post("/api/irrigation/dynamic-execution/start", response_model=DynamicExecutionResponse)
+async def start_dynamic_execution(request: DynamicExecutionRequest):
+    """启动动态批次执行"""
+    return await dynamic_execution_endpoints["start_dynamic_execution"](request)
+
+@app.post("/api/irrigation/dynamic-execution/stop", response_model=DynamicExecutionResponse)
+async def stop_dynamic_execution():
+    """停止动态批次执行"""
+    return await dynamic_execution_endpoints["stop_dynamic_execution"]()
+
+@app.get("/api/irrigation/dynamic-execution/status", response_model=ExecutionStatusResponse)
+async def get_execution_status():
+    """获取动态执行状态"""
+    return await dynamic_execution_endpoints["get_execution_status"]()
+
+@app.post("/api/irrigation/dynamic-execution/update-waterlevels", response_model=WaterLevelUpdateResponse)
+async def update_waterlevels(request: WaterLevelUpdateRequest):
+    """手动更新水位数据"""
+    return await dynamic_execution_endpoints["update_water_levels"](request)
+
+@app.post("/api/irrigation/dynamic-execution/regenerate-batch", response_model=ManualRegenerationResponse)
+async def regenerate_batch_manual(request: ManualRegenerationRequest):
+    """手动重新生成批次"""
+    return await dynamic_execution_endpoints["manual_regenerate_batch"](request)
+
+@app.get("/api/irrigation/dynamic-execution/history", response_model=ExecutionHistoryResponse)
+async def get_execution_history(
+    limit: int = 10,
+    offset: int = 0,
+    field_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+) -> ExecutionHistoryResponse:
+    """获取执行历史"""
+    try:
+        return await dynamic_execution_endpoints["get_execution_history"](limit)
+    except Exception as e:
+        logger.error(f"获取执行历史失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/irrigation/dynamic-execution/waterlevel-summary")
+async def get_water_level_summary(farm_id: str = "default", field_ids: Optional[List[str]] = None):
+    """获取水位数据摘要"""
+    try:
+        return await dynamic_execution_endpoints["get_water_level_summary"](farm_id, field_ids)
+    except Exception as e:
+        logger.error(f"获取水位摘要失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/irrigation/dynamic-execution/field-trend/{field_id}")
+async def get_field_trend_analysis(field_id: str, hours: int = 48):
+    """获取田块水位趋势分析"""
+    try:
+        return await dynamic_execution_endpoints["get_field_trend_analysis"](field_id, hours)
+    except Exception as e:
+        logger.error(f"获取田块趋势分析失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import argparse

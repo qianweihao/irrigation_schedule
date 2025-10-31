@@ -3420,3 +3420,275 @@ AttributeError: 'NoneType' object has no attribute 'get'
 2025-10-30 10:50:40,237 - INFO -   - F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251030_103322.json
 2025-10-30 10:50:40,237 - INFO -   - F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251030_105033.json
 2025-10-30 10:50:40,238 - INFO -   - F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251030_105039.json
+2025-10-31 16:25:01,674 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:25:01,674 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:25:01,706 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:25:01,707 - INFO - 缓存文件不存在，将创建新的缓存
+2025-10-31 16:25:01,724 - INFO - 启动动态执行 - 计划文件: irrigation_plan_modified_20241230_143028.json
+2025-10-31 16:25:01,724 - ERROR - 启动动态执行失败: 
+2025-10-31 16:25:03,729 - INFO - 手动更新水位数据 - 农场: test_farm_001
+2025-10-31 16:25:03,729 - INFO - 开始获取农场 test_farm_001 的最新水位数据
+2025-10-31 16:25:04,132 - WARNING - API返回空数据
+2025-10-31 16:25:04,132 - INFO - 获取到 0 个田块的水位数据
+2025-10-31 16:25:04,132 - INFO - 手动重新生成批次 0
+2025-10-31 16:25:04,132 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:25:04,132 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:25:04,132 - ERROR - 手动重新生成批次失败: 'BatchExecutionScheduler' object has no attribute 'get_current_plan'
+2025-10-31 16:25:05,139 - ERROR - 停止动态执行失败: 'bool' object is not callable
+2025-10-31 16:27:30,334 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:27:30,338 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:27:30,353 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:27:30,353 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:27:30,376 - INFO - 启动动态执行 - 计划文件: irrigation_plan_modified_20241230_143028.json
+2025-10-31 16:27:30,376 - ERROR - 启动动态执行失败: 
+2025-10-31 16:27:32,378 - INFO - 手动更新水位数据 - 农场: test_farm_001
+2025-10-31 16:27:32,378 - INFO - 开始获取农场 test_farm_001 的最新水位数据
+2025-10-31 16:27:32,784 - WARNING - API返回空数据
+2025-10-31 16:27:32,784 - INFO - 获取到 0 个田块的水位数据
+2025-10-31 16:27:32,784 - INFO - 手动重新生成批次 0
+2025-10-31 16:27:32,784 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:27:32,784 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:28:12,677 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:28:12,677 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:28:45,056 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:28:45,056 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:29:28,335 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:29:28,336 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:29:28,351 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:29:28,363 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:30:53,009 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:30:53,009 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:30:53,009 - ERROR - 获取执行历史失败: 
+2025-10-31 16:30:53,029 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:30:53,030 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:30:53,031 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:30:53,035 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:30:53,036 - ERROR - 启动动态执行失败: 'BatchExecutionScheduler' object has no attribute 'load_config'
+2025-10-31 16:30:53,040 - INFO - 手动重新生成批次 1
+2025-10-31 16:30:53,041 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:30:53,042 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:31:46,133 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:31:46,139 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:31:46,139 - ERROR - 获取执行历史失败: 
+2025-10-31 16:31:46,151 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:31:46,152 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:31:46,163 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:31:46,169 - INFO - 启动动态执行 - 计划文件: irrigation_plan_modified_20241230_143028.json
+2025-10-31 16:31:46,169 - ERROR - 启动动态执行失败: 
+2025-10-31 16:31:48,178 - INFO - 手动更新水位数据 - 农场: test_farm_001
+2025-10-31 16:31:48,178 - INFO - 开始获取农场 test_farm_001 的最新水位数据
+2025-10-31 16:31:48,591 - WARNING - API返回空数据
+2025-10-31 16:31:48,591 - INFO - 获取到 0 个田块的水位数据
+2025-10-31 16:31:48,591 - INFO - 手动重新生成批次 0
+2025-10-31 16:31:48,591 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:31:48,591 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:32:03,863 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:32:03,863 - ERROR - 获取执行历史失败: 
+2025-10-31 16:32:03,867 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:32:03,870 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:32:03,872 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:32:03,872 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:32:03,872 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:32:03,873 - INFO - 共有 1 个批次
+2025-10-31 16:32:03,873 - ERROR - 启动动态执行失败: object bool can't be used in 'await' expression
+2025-10-31 16:32:03,876 - INFO - 手动重新生成批次 1
+2025-10-31 16:32:03,876 - ERROR - 手动重新生成批次失败: 'BatchExecutionScheduler' object has no attribute 'get_farm_id'
+2025-10-31 16:34:33,210 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:34:33,210 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:34:33,210 - ERROR - 获取执行历史失败: 
+2025-10-31 16:34:33,215 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:34:33,215 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:34:33,216 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:34:33,219 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:34:33,220 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:34:33,221 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:34:33,221 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:34:33,222 - INFO - 共有 1 个批次
+2025-10-31 16:34:33,222 - ERROR - 启动动态执行失败: object bool can't be used in 'await' expression
+2025-10-31 16:34:33,226 - INFO - 手动重新生成批次 1
+2025-10-31 16:34:33,227 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:34:33,228 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:34:33,228 - INFO - 开始获取农场 default_farm 的最新水位数据
+2025-10-31 16:34:33,656 - WARNING - API返回空数据
+2025-10-31 16:34:33,657 - INFO - 获取到 0 个田块的水位数据
+2025-10-31 16:34:33,657 - INFO - 开始重新生成批次 1 的计划
+2025-10-31 16:35:55,659 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:35:55,692 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:35:55,693 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:35:55,699 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:35:55,700 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:35:55,700 - INFO - 共有 1 个批次
+2025-10-31 16:35:55,700 - ERROR - 启动动态执行失败: object bool can't be used in 'await' expression
+2025-10-31 16:37:36,149 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:37:36,153 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:37:36,154 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:37:36,157 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:37:36,157 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:37:36,157 - INFO - 共有 1 个批次
+2025-10-31 16:37:36,231 - ERROR - 启动动态执行失败: Object of type ExecutionStatus is not JSON serializable
+2025-10-31 16:38:59,450 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:38:59,461 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:38:59,462 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:38:59,463 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:38:59,463 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:38:59,463 - INFO - 共有 1 个批次
+2025-10-31 16:38:59,531 - ERROR - 启动动态执行失败: Object of type ExecutionStatus is not JSON serializable
+2025-10-31 16:41:17,482 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:41:17,488 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:41:17,489 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:41:17,490 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:41:17,490 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:41:17,490 - INFO - 共有 1 个批次
+2025-10-31 16:41:17,554 - ERROR - 启动动态执行失败: Object of type ExecutionStatus is not JSON serializable
+2025-10-31 16:41:17,562 - ERROR - 错误堆栈: Traceback (most recent call last):
+  File "F:\irrigation_schedule\farm_irrigation\dynamic_execution_api.py", line 184, in start_dynamic_execution
+    success = await scheduler.start_execution()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\irrigation_schedule\farm_irrigation\batch_execution_scheduler.py", line 231, in start_execution
+    self.status_manager.start_execution(batch_id, len(self.batch_executions))
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 248, in start_execution
+    self.update_status(
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 207, in update_status
+    self.log_info(
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 337, in log_info
+    self.log_entry(LogLevel.INFO, category, message, **kwargs)
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 321, in log_entry
+    json.dumps(entry.details) if entry.details else None,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 231, in dumps
+    return _default_encoder.encode(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type ExecutionStatus is not JSON serializable
+
+2025-10-31 16:42:41,870 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:42:41,877 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:42:41,878 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:42:41,879 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:42:41,879 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:42:41,879 - INFO - 共有 1 个批次
+2025-10-31 16:42:41,948 - ERROR - 启动动态执行失败: Object of type datetime is not JSON serializable
+2025-10-31 16:42:41,948 - ERROR - 错误堆栈: Traceback (most recent call last):
+  File "F:\irrigation_schedule\farm_irrigation\dynamic_execution_api.py", line 184, in start_dynamic_execution
+    success = await scheduler.start_execution()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\irrigation_schedule\farm_irrigation\batch_execution_scheduler.py", line 231, in start_execution
+    self.status_manager.start_execution(batch_id, len(self.batch_executions))
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 248, in start_execution
+    self.update_status(
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 207, in update_status
+    self.log_info(
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 357, in log_info
+    self.log_entry(LogLevel.INFO, category, message, **kwargs)
+  File "F:\irrigation_schedule\farm_irrigation\execution_status_manager.py", line 321, in log_entry
+    json.dumps(self._serialize_details(entry.details)) if entry.details else None,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 231, in dumps
+    return _default_encoder.encode(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\00783510\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type datetime is not JSON serializable
+
+2025-10-31 16:43:22,603 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:43:22,611 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:43:22,612 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:43:22,613 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:43:22,613 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:43:22,613 - INFO - 共有 1 个批次
+2025-10-31 16:43:22,744 - INFO - [status_update] 执行状态更新: {'batch_id': 'batch_20251031_164322', 'status': <ExecutionStatus.RUNNING: 'running'>, 'start_time': datetime.datetime(2025, 10, 31, 16, 43, 22, 613777), 'end_time': None, 'progress': 0.0, 'total_fields': 1, 'completed_fields': 0, 'error_message': None}
+2025-10-31 16:43:22,798 - INFO - [scheduler] 开始执行灌溉计划
+2025-10-31 16:43:22,875 - INFO - [scheduler] 执行开始时间: 2025-10-31 16:43:22.613777
+2025-10-31 16:43:22,876 - INFO - 开始准备批次 1
+2025-10-31 16:43:23,258 - INFO - 从API获取到 0 个水位数据
+2025-10-31 16:43:23,794 - INFO - 批次 1 计划重新生成完成
+2025-10-31 16:43:23,794 - INFO - 开始执行批次 1
+2025-10-31 16:43:23,794 - INFO - 批次 1 开始执行
+2025-10-31 16:44:02,729 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:44:13,245 - ERROR - 获取执行历史失败: 'BatchExecutionScheduler' object has no attribute 'get_execution_history'
+2025-10-31 16:44:13,246 - ERROR - 获取执行历史失败: 
+2025-10-31 16:44:13,250 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:44:13,251 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:44:13,252 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:44:13,255 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:44:13,260 - INFO - 手动重新生成批次 1
+2025-10-31 16:44:13,261 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:44:13,261 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:44:13,261 - INFO - 开始获取农场 default_farm 的最新水位数据
+2025-10-31 16:44:13,626 - WARNING - API返回空数据
+2025-10-31 16:44:13,627 - INFO - 获取到 0 个田块的水位数据
+2025-10-31 16:44:13,627 - INFO - 开始重新生成批次 1 的计划
+2025-10-31 16:47:24,170 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:47:24,201 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:47:24,202 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:47:24,202 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:47:24,206 - INFO - 启动动态执行 - 计划文件: export/20250820_151007/plan.json
+2025-10-31 16:47:24,209 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:47:24,210 - INFO - 批次 1: 开始时间 0.00h, 持续时间 6.50h
+2025-10-31 16:47:24,210 - INFO - 灌溉计划加载成功: export/20250820_151007/plan.json
+2025-10-31 16:47:24,210 - INFO - 共有 1 个批次
+2025-10-31 16:47:24,343 - INFO - [status_update] 执行状态更新: {'batch_id': 'batch_20251031_164724', 'status': <ExecutionStatus.RUNNING: 'running'>, 'start_time': datetime.datetime(2025, 10, 31, 16, 47, 24, 210113), 'end_time': None, 'progress': 0.0, 'total_fields': 1, 'completed_fields': 0, 'error_message': None}
+2025-10-31 16:47:24,425 - INFO - [scheduler] 开始执行灌溉计划
+2025-10-31 16:47:24,484 - INFO - [scheduler] 执行开始时间: 2025-10-31 16:47:24.210113
+2025-10-31 16:47:24,485 - INFO - 开始准备批次 1
+2025-10-31 16:47:24,916 - INFO - 从API获取到 0 个水位数据
+2025-10-31 16:47:25,325 - INFO - 批次 1 计划重新生成完成
+2025-10-31 16:47:25,325 - INFO - 开始执行批次 1
+2025-10-31 16:47:25,325 - INFO - 批次 1 开始执行
+2025-10-31 16:51:54,171 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:51:54,173 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:51:54,173 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:55:28,212 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:55:28,213 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:55:28,214 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:55:56,371 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:55:56,372 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:55:56,372 - ERROR - 获取田块趋势分析失败: 
+2025-10-31 16:57:13,308 - INFO - 开始获取田块 1 的趋势分析，时间窗口: 48小时
+2025-10-31 16:57:13,308 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:57:13,308 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 16:57:13,308 - INFO - 水位管理器获取成功，field_histories数量: 0
+2025-10-31 16:57:13,308 - WARNING - 田块 1 没有历史数据，尝试初始化...
+2025-10-31 16:57:13,308 - INFO - 为田块 1 创建了 10 条模拟历史数据
+2025-10-31 16:57:13,308 - INFO - 田块 1 趋势分析成功: {'field_id': '1', 'analysis_period_hours': 48, 'readings_count': 10, 'latest_level_mm': 95.0, 'min_level_mm': 95.0, 'max_level_mm': 109.0, 'avg_level_mm': 101.75, 'level_range_mm': 14.0, 'trend_mm_per_hour': -0.25, 'data_quality': 'good', 'last_updated': '2025-10-31T16:57:13.308698', 'trend_description': '缓慢下降'}
+2025-10-31 16:58:28,432 - INFO - 手动重新生成批次 1
+2025-10-31 16:58:28,448 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:58:28,448 - INFO - 配置文件加载成功: config.json
+2025-10-31 16:58:28,448 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 16:59:27,891 - INFO - 启动动态执行 - 计划文件: irrigation_plan.json
+2025-10-31 16:59:27,891 - ERROR - 启动动态执行失败: 
+2025-10-31 16:59:27,891 - ERROR - 错误堆栈: Traceback (most recent call last):
+  File "F:\irrigation_schedule\farm_irrigation\dynamic_execution_api.py", line 146, in start_dynamic_execution
+    raise HTTPException(
+fastapi.exceptions.HTTPException
+
+2025-10-31 17:00:41,135 - INFO - 手动重新生成批次 1
+2025-10-31 17:00:41,139 - INFO - 配置文件加载成功: config.json
+2025-10-31 17:00:41,140 - INFO - 配置文件加载成功: config.json
+2025-10-31 17:00:41,141 - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-10-31 17:00:41,150 - INFO - 配置文件加载成功: config.json
+2025-10-31 17:00:41,151 - INFO - 缓存数据加载成功: 0 个田块
+2025-10-31 17:05:41,853 - INFO - 启动动态执行 - 计划文件: plan.json
+2025-10-31 17:05:41,857 - INFO - 配置文件加载成功: config.json
+2025-10-31 17:05:41,858 - INFO - 灌溉计划加载成功: plan.json
+2025-10-31 17:05:41,858 - INFO - 共有 0 个批次
+2025-10-31 17:05:41,944 - ERROR - [scheduler] 没有可执行的灌溉计划
+2025-10-31 17:05:41,944 - ERROR - 启动动态执行失败: 
+2025-10-31 17:05:41,945 - ERROR - 错误堆栈: Traceback (most recent call last):
+  File "F:\irrigation_schedule\farm_irrigation\dynamic_execution_api.py", line 187, in start_dynamic_execution
+    raise HTTPException(
+fastapi.exceptions.HTTPException
+
