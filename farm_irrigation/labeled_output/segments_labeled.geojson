@@ -3,7 +3,7 @@
 "name": "segments_labeled",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32649" } },
 "features": [
-{ "type": "Feature", "properties": { "S_id": "S1", "S_type": "branch-S", "distance_rank": 1 }, "geometry": { "type": "LineString", "coordinates": [ [ 576654.052206685068086, 3190450.388059886638075 ], [ 577143.806803117389791, 3190947.177967083174735 ] ] } },
+{ "type": "Feature", "properties": { "S_id": "S1", "S_type": "main-S", "distance_rank": 1 }, "geometry": { "type": "LineString", "coordinates": [ [ 576654.052206685068086, 3190450.388059886638075 ], [ 577143.806803117389791, 3190947.177967083174735 ] ] } },
 { "type": "Feature", "properties": { "S_id": "S9", "S_type": "branch-S", "distance_rank": 9 }, "geometry": { "type": "LineString", "coordinates": [ [ 576645.218929894734174, 3190417.110672988463193 ], [ 576695.075971774524078, 3190354.957304629962891 ] ] } },
 { "type": "Feature", "properties": { "S_id": "S8", "S_type": "branch-S", "distance_rank": 8 }, "geometry": { "type": "LineString", "coordinates": [ [ 576773.741328008472919, 3190559.221233353484422 ], [ 576841.672509385389276, 3190481.000599545892328 ] ] } },
 { "type": "Feature", "properties": { "S_id": "S7", "S_type": "branch-S", "distance_rank": 7 }, "geometry": { "type": "LineString", "coordinates": [ [ 576848.711471482762136, 3190632.463850922416896 ], [ 577058.122508593834937, 3190454.15582601679489 ] ] } },

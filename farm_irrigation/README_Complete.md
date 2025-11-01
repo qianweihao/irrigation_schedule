@@ -140,6 +140,72 @@ python pipeline.py --no-waterlevels --input-dir ./data
 
 # 详细输出
 python pipeline.py --verbose --input-dir ./data
+
+# 多泵方案生成
+python pipeline.py --multi-pump --realtime --input-dir ./data
+```
+
+### 多泵方案功能
+
+#### 概述
+
+多泵方案功能可以分析不同水泵组合的灌溉效果，帮助用户选择最优的水泵使用策略。系统会自动分析哪些水泵组合可以覆盖所有需要灌溉的田块，并生成对比方案。
+
+#### 使用方法
+
+```bash
+# 命令行方式
+python pipeline.py --multi-pump --realtime
+
+# 或使用run_irrigation_plan.py
+python run_irrigation_plan.py --multi-pump --realtime --summary
+```
+
+#### 方案生成逻辑
+
+系统按以下优先级生成多泵方案：
+
+1. **单泵方案优先**：首先检查是否有单个水泵能覆盖所有需要灌溉的段
+2. **双泵组合**：如果单泵无法覆盖，尝试两个水泵的组合
+3. **全泵组合**：如果双泵组合仍无法覆盖，使用所有可用水泵
+
+#### 方案选择原则
+
+- **覆盖性**：方案必须能覆盖所有需要灌溉的田块
+- **经济性**：按电费成本从低到高排序
+- **效率性**：考虑总运行时间和泵站利用率
+
+#### 输出说明
+
+多泵方案输出包含：
+
+- **分析信息**：需要灌溉的田块数量、涉及的段、各段的水泵需求
+- **有效组合**：所有能够覆盖全部灌溉需求的水泵组合
+- **方案对比**：每个组合的详细成本和时间分析
+- **推荐方案**：基于成本效益的最优选择
+
+#### 示例输出
+
+```json
+{
+  "analysis": {
+    "total_fields_to_irrigate": 36,
+    "required_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+    "valid_pump_combinations": [["P1"], ["P2"]]
+  },
+  "scenarios": [
+    {
+      "scenario_name": "P1单独使用",
+      "pumps_used": ["P1"],
+      "total_electricity_cost": 2217.71,
+      "total_eta_h": 61.6,
+      "coverage_info": {
+        "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+        "total_covered_segments": 6
+      }
+    }
+  ]
+}
 ```
 
 #### 方式3：配置文件（推荐生产环境）
@@ -175,6 +241,8 @@ python pipeline.py --config pipeline_config.yaml
 | `--no-waterlevels` | 不融合实时水位 | false        | `--no-waterlevels`       |
 | `--no-summary`     | 不打印摘要     | false        | `--no-summary`           |
 | `--verbose`        | 详细输出       | false        | `--verbose`              |
+| `--multi-pump`     | 生成多泵方案   | false        | `--multi-pump`           |
+| `--realtime`       | 使用实时水位   | false        | `--realtime`             |
 
 ---
 
@@ -217,6 +285,57 @@ python api_server.py --reload
 #### POST `/api/irrigation/multi-pump-scenarios`
 
 生成多水泵方案
+
+**请求参数：**
+
+| 参数名           | 类型    | 必填 | 默认值           | 说明                           |
+| ---------------- | ------- | ---- | ---------------- | ------------------------------ |
+| config_file      | string  | 是   | -                | 配置文件路径                   |
+| active_pumps     | array   | 否   | null             | 指定活跃水泵列表               |
+| zone_ids         | array   | 否   | null             | 指定供区ID列表                 |
+| use_realtime_wl  | boolean | 否   | false            | 是否使用实时水位数据           |
+
+**请求示例：**
+
+```bash
+curl --location 'http://127.0.0.1:8000/api/irrigation/multi-pump-scenarios' \
+--header 'Content-Type: application/json' \
+--data '{
+    "config_file": "config.json",
+    "use_realtime_wl": true
+}'
+```
+
+**响应格式：**
+
+```json
+{
+    "success": true,
+    "message": "多泵方案生成成功",
+    "analysis": {
+        "total_fields_to_irrigate": 36,
+        "required_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+        "segment_pump_requirements": {
+            "S3": ["P1", "P2"],
+            "S4": ["P1", "P2"]
+        },
+        "valid_pump_combinations": [["P1"], ["P2"]]
+    },
+    "scenarios": [
+        {
+            "scenario_name": "P1单独使用",
+            "pumps_used": ["P1"],
+            "total_electricity_cost": 2217.71,
+            "total_eta_h": 61.6,
+            "coverage_info": {
+                "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+                "total_covered_segments": 6
+            }
+        }
+    ],
+    "total_scenarios": 2
+}
+```
 
 #### POST `/api/irrigation/regenerate-batch`
 

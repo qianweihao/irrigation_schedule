@@ -187,7 +187,8 @@ def _first_non_empty(row: dict, keys: List[str]) -> Optional[str]:
 
 def _norm_seg_type(v: Any) -> str:
     s = str(v).strip().lower()
-    if s in {"main-s", "main", "主渠", "主干"}: return "main-S"
+    # 处理拼写错误：mian-S -> main-S
+    if s in {"main-s", "mian-s", "main", "主渠", "主干"}: return "main-S"
     return "branch-S"
 
 def _is_regulator_type(v: Any) -> bool:
@@ -474,6 +475,10 @@ def convert(
     # field 输出（这里落实你的强约束：sectionID = properties.id）
     fld_rows: List[Dict[str, Any]] = []
     for _, r in fld2.iterrows():
+        # 只处理符合 S-G-F 格式的田块
+        if not _is_sgf_format(str(r["F_id"])):
+            continue
+            
         # 1) sectionID = 源 properties.id（严格按你的要求）
         section_id = str(r["id"]) if "id" in fld2.columns and not _is_nanlike(r.get("id")) else None
 

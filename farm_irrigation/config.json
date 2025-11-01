@@ -520,23 +520,6 @@
       "inlet_G_id": "S3-G10"
     },
     {
-      "id": "5",
-      "sectionID": "1901478357028446208",
-      "sectionCode": "5",
-      "name": "5",
-      "area_mu": 1.819,
-      "canal_id": "C_A",
-      "segment_id": "S3",
-      "distance_rank": 5,
-      "wl_mm": null,
-      "wl_low": 80.0,
-      "wl_opt": 100.0,
-      "wl_high": 140.0,
-      "has_drain_gate": true,
-      "rel_to_regulator": "downstream",
-      "inlet_G_id": "S3-G12"
-    },
-    {
       "id": "S3-G3-F2",
       "sectionID": "1901478465031774208",
       "sectionCode": "S3-G3-F2",
@@ -552,23 +535,6 @@
       "has_drain_gate": true,
       "rel_to_regulator": "downstream",
       "inlet_G_id": "S3-G3"
-    },
-    {
-      "id": "16",
-      "sectionID": "1901508509087178752",
-      "sectionCode": "16",
-      "name": "16",
-      "area_mu": 5.676,
-      "canal_id": "C_A",
-      "segment_id": "S4",
-      "distance_rank": 16,
-      "wl_mm": null,
-      "wl_low": 80.0,
-      "wl_opt": 100.0,
-      "wl_high": 140.0,
-      "has_drain_gate": true,
-      "rel_to_regulator": "downstream",
-      "inlet_G_id": "S4-G25"
     },
     {
       "id": "S3-G8-F6",
@@ -654,40 +620,6 @@
       "has_drain_gate": true,
       "rel_to_regulator": "downstream",
       "inlet_G_id": "S8-G53"
-    },
-    {
-      "id": "42",
-      "sectionID": "1891824245924077568",
-      "sectionCode": "42",
-      "name": "42",
-      "area_mu": 6.424,
-      "canal_id": "C_A",
-      "segment_id": "S9",
-      "distance_rank": 42,
-      "wl_mm": null,
-      "wl_low": 80.0,
-      "wl_opt": 100.0,
-      "wl_high": 140.0,
-      "has_drain_gate": true,
-      "rel_to_regulator": "downstream",
-      "inlet_G_id": "P1"
-    },
-    {
-      "id": "43",
-      "sectionID": "1891824556982050816",
-      "sectionCode": "43",
-      "name": "43",
-      "area_mu": 3.843,
-      "canal_id": "C_A",
-      "segment_id": "S9",
-      "distance_rank": 43,
-      "wl_mm": null,
-      "wl_low": 80.0,
-      "wl_opt": 100.0,
-      "wl_high": 140.0,
-      "has_drain_gate": true,
-      "rel_to_regulator": "downstream",
-      "inlet_G_id": "P1"
     },
     {
       "id": "S6-G37-F25",
@@ -860,23 +792,6 @@
       "inlet_G_id": "S4-G24"
     },
     {
-      "id": "23",
-      "sectionID": "1901480554692747264",
-      "sectionCode": "23",
-      "name": "23",
-      "area_mu": 1.983,
-      "canal_id": "C_A",
-      "segment_id": "S2",
-      "distance_rank": 23,
-      "wl_mm": null,
-      "wl_low": 80.0,
-      "wl_opt": 100.0,
-      "wl_high": 140.0,
-      "has_drain_gate": true,
-      "rel_to_regulator": "downstream",
-      "inlet_G_id": "P2"
-    },
-    {
       "id": "S5-G27-F19",
       "sectionID": "1901480688168083456",
       "sectionCode": "S5-G27-F19",
@@ -1011,23 +926,6 @@
       "has_drain_gate": true,
       "rel_to_regulator": "downstream",
       "inlet_G_id": "S3-G6"
-    },
-    {
-      "id": "10",
-      "sectionID": "1901478962346205184",
-      "sectionCode": "10",
-      "name": "10",
-      "area_mu": 1.752,
-      "canal_id": "C_A",
-      "segment_id": "S3",
-      "distance_rank": 10,
-      "wl_mm": null,
-      "wl_low": 80.0,
-      "wl_opt": 100.0,
-      "wl_high": 140.0,
-      "has_drain_gate": true,
-      "rel_to_regulator": "downstream",
-      "inlet_G_id": "S3-G12"
     },
     {
       "id": "S4-G14-F9",
