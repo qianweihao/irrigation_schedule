@@ -271,11 +271,17 @@ class BatchRegenerationService:
             batch_index = assignment.batch_index
             pump_ids = assignment.pump_ids
             
-            # 验证批次是否存在
+            # 验证批次是否存在（从scenarios中查找）
             batch_found = False
-            for batch in modified_plan.get('batches', []):
-                if batch.get('index') == batch_index:
-                    batch_found = True
+            scenarios = modified_plan.get('scenarios', [])
+            for scenario in scenarios:
+                scenario_plan = scenario.get('plan', {})
+                batches = scenario_plan.get('batches', [])
+                for batch in batches:
+                    if batch.get('index') == batch_index:
+                        batch_found = True
+                        break
+                if batch_found:
                     break
             
             if not batch_found:
@@ -284,46 +290,10 @@ class BatchRegenerationService:
                     detail=f"未找到批次 {batch_index}"
                 )
             
-            # 查找并更新计划级别的steps中对应批次的水泵信息
-            batch_label = f"批次 {batch_index}"
-            step_found = False
-            for step in modified_plan.get('steps', []):
-                if step.get('label') == batch_label:
-                    step_found = True
-                    
-                    # 分离水泵命令和非水泵命令
-                    non_pump_commands = []
-                    original_pump_commands = []
-                    for command in step.get('commands', []):
-                        # 保留非水泵命令（如阀门设置等）
-                        if command.get('action') != 'start' or not command.get('target', '').startswith('P'):
-                            non_pump_commands.append(command)
-                        else:
-                            original_pump_commands.append(command)
-                    
-                    # 创建新的水泵启动命令
-                    new_pump_commands = []
-                    for pump_id in pump_ids:
-                        new_pump_commands.append({
-                            "action": "start",
-                            "target": pump_id,
-                            "value": None,
-                            "t_start_h": step.get('t_start_h', 0),
-                            "t_end_h": step.get('t_end_h', 0)
-                        })
-                    
-                    # 重新组合命令：先是水泵命令，然后是其他命令
-                    step['commands'] = new_pump_commands + non_pump_commands
-                    modified_batches.append(batch_index)
-                    break
-        
-        # 更新全局水泵配置
-        if modified_batches and 'calc' in modified_plan:
-            # 收集所有使用的水泵
-            all_pumps = set()
-            for assignment in pump_assignments:
-                all_pumps.update(assignment.pump_ids)
-            modified_plan['calc']['active_pumps'] = list(all_pumps)
+            # 更新所有scenarios中的水泵配置
+            for scenario in modified_plan.get('scenarios', []):
+                scenario['pumps_used'] = pump_ids
+                modified_batches.append(batch_index)
         
         return modified_plan
     
@@ -338,11 +308,17 @@ class BatchRegenerationService:
         for time_mod in time_modifications:
             batch_index = time_mod.batch_index
             
-            # 验证批次是否存在
+            # 验证批次是否存在（从scenarios中查找）
             batch_found = False
-            for batch in modified_plan.get('batches', []):
-                if batch.get('index') == batch_index:
-                    batch_found = True
+            scenarios = modified_plan.get('scenarios', [])
+            for scenario in scenarios:
+                scenario_plan = scenario.get('plan', {})
+                batches = scenario_plan.get('batches', [])
+                for batch in batches:
+                    if batch.get('index') == batch_index:
+                        batch_found = True
+                        break
+                if batch_found:
                     break
             
             if not batch_found:
@@ -351,26 +327,14 @@ class BatchRegenerationService:
                     detail=f"未找到批次 {batch_index}"
                 )
             
-            # 查找并更新计划级别的steps中对应批次的时间信息
-            batch_label = f"批次 {batch_index}"
-            for step in modified_plan.get('steps', []):
-                if step.get('label') == batch_label:
-                    # 更新开始时间
-                    if time_mod.start_time_h is not None:
-                        step['t_start_h'] = time_mod.start_time_h
-                    
-                    # 更新持续时间和结束时间
-                    if time_mod.duration_h is not None:
-                        start_time = step.get('t_start_h', 0)
-                        step['t_end_h'] = start_time + time_mod.duration_h
-                        
-                        # 更新所有命令的时间
-                        for command in step.get('commands', []):
-                            command['t_start_h'] = start_time
-                            command['t_end_h'] = start_time + time_mod.duration_h
-                    
-                    modified_batches.append(batch_index)
-                    break
+            # 更新scenarios中的时间信息
+            for scenario in modified_plan.get('scenarios', []):
+                if time_mod.start_time_h is not None:
+                    scenario['start_time_h'] = time_mod.start_time_h
+                if time_mod.duration_h is not None:
+                    scenario['duration_h'] = time_mod.duration_h
+                    scenario['total_eta_h'] = time_mod.duration_h
+                modified_batches.append(batch_index)
         
         return modified_plan
     
@@ -378,45 +342,34 @@ class BatchRegenerationService:
         """获取现有计划的批次详细信息"""
         plan_data = self.load_original_plan(plan_id)
         
+        # 从scenarios中提取批次信息
+        all_batches = []
+        scenarios = plan_data.get('scenarios', [])
+        
+        if scenarios:
+            # 使用第一个scenario的批次数据（通常所有scenario的批次结构相同）
+            first_scenario = scenarios[0]
+            scenario_name = first_scenario.get('name', 'Unknown')
+            scenario_plan = first_scenario.get('plan', {})
+            batches = scenario_plan.get('batches', [])
+            
+            for batch in batches:
+                batch_detail = {
+                    'scenario_name': scenario_name,
+                    'index': batch.get('index'),
+                    'area_mu': batch.get('area_mu', 0),
+                    'pumps_used': first_scenario.get('pumps_used', []),
+                    'total_electricity_cost': first_scenario.get('total_electricity_cost', 0),
+                    'total_eta_h': first_scenario.get('total_eta_h', 0),
+                    'calc_info': scenario_plan.get('calc', {})
+                }
+                all_batches.append(batch_detail)
+        
         batch_info = {
             'plan_id': plan_id,
-            'total_batches': len(plan_data.get('batches', [])),
-            'batches': []
+            'total_batches': len(all_batches),
+            'batches': all_batches
         }
-        
-        # 获取计划级别的steps信息
-        steps = plan_data.get('steps', [])
-        
-        for batch in plan_data.get('batches', []):
-            batch_detail = {
-                'index': batch.get('index'),
-                'field_count': len(batch.get('fields', [])),
-                'total_area_mu': sum(f.get('area_mu', 0) for f in batch.get('fields', [])),
-                'fields': [f.get('id') for f in batch.get('fields', [])],
-                'current_pumps': [],
-                'time_info': {}
-            }
-            
-            # 查找对应批次的step信息
-            batch_label = f"批次 {batch.get('index')}"
-            for step in steps:
-                if step.get('label') == batch_label:
-                    # 提取时间信息
-                    batch_detail['time_info'] = {
-                        'start_time_h': step.get('t_start_h', 0),
-                        'end_time_h': step.get('t_end_h', 0),
-                        'duration_h': step.get('t_end_h', 0) - step.get('t_start_h', 0)
-                    }
-                    
-                    # 提取水泵信息
-                    pumps = set()
-                    for command in step.get('commands', []):
-                        if command.get('action') == 'start' and command.get('target', '').startswith('P'):
-                            pumps.add(command.get('target'))
-                    batch_detail['current_pumps'] = list(pumps)
-                    break
-            
-            batch_info['batches'].append(batch_detail)
         
         return batch_info
 

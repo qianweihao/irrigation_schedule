@@ -33,7 +33,7 @@
 1. **安装依赖**
 
 ```bash
-cd f:/irrigation_schedule/farm_irrigation
+cd e:/irrigation_schedule/farm_irrigation
 pip install -r requirements.txt
 ```
 
@@ -80,49 +80,15 @@ python api_server.py
 
 自动化流水线将原本需要手动执行的多个步骤整合为一键执行，大大简化了使用流程。
 
-#### 原始流程 vs 自动化流程
-
-**原始流程（手动执行）：**
-
-```bash
-# 1. 数据预处理
-python farmgis_convert.py
-python fix_farmgis_convert.py
-
-# 2. 配置生成
-python auto_to_config.py
-
-# 3. 计划生成
-python run_irrigation_plan.py --config config.json --output plan.json
-```
-
-**自动化流程（一键执行）：**
-
-```bash
-# 方式1: 命令行
-python pipeline.py --input-dir ./gzp_farm --output-dir ./output
-
-# 方式2: 配置文件
-python pipeline.py --config pipeline_config.yaml
-
-# 方式3: Windows批处理（双击运行）
-run_pipeline.bat
-```
-
 ### 执行方式
 
 #### 方式1：快速执行（推荐新手）
 
-**Windows用户：**
-
 ```bash
-# 双击运行批处理文件
+# Windows用户：双击运行批处理文件
 run_pipeline.bat
-```
 
-**Linux/Mac用户：**
-
-```bash
+# Linux/Mac用户
 python pipeline.py
 ```
 
@@ -135,77 +101,8 @@ python pipeline.py --input-dir ./data --output-dir ./results
 # 指定泵站和供区
 python pipeline.py --pumps 1,2,3 --zones A,B --input-dir ./data
 
-# 不融合实时水位数据
-python pipeline.py --no-waterlevels --input-dir ./data
-
-# 详细输出
-python pipeline.py --verbose --input-dir ./data
-
 # 多泵方案生成
 python pipeline.py --multi-pump --realtime --input-dir ./data
-```
-
-### 多泵方案功能
-
-#### 概述
-
-多泵方案功能可以分析不同水泵组合的灌溉效果，帮助用户选择最优的水泵使用策略。系统会自动分析哪些水泵组合可以覆盖所有需要灌溉的田块，并生成对比方案。
-
-#### 使用方法
-
-```bash
-# 命令行方式
-python pipeline.py --multi-pump --realtime
-
-# 或使用run_irrigation_plan.py
-python run_irrigation_plan.py --multi-pump --realtime --summary
-```
-
-#### 方案生成逻辑
-
-系统按以下优先级生成多泵方案：
-
-1. **单泵方案优先**：首先检查是否有单个水泵能覆盖所有需要灌溉的段
-2. **双泵组合**：如果单泵无法覆盖，尝试两个水泵的组合
-3. **全泵组合**：如果双泵组合仍无法覆盖，使用所有可用水泵
-
-#### 方案选择原则
-
-- **覆盖性**：方案必须能覆盖所有需要灌溉的田块
-- **经济性**：按电费成本从低到高排序
-- **效率性**：考虑总运行时间和泵站利用率
-
-#### 输出说明
-
-多泵方案输出包含：
-
-- **分析信息**：需要灌溉的田块数量、涉及的段、各段的水泵需求
-- **有效组合**：所有能够覆盖全部灌溉需求的水泵组合
-- **方案对比**：每个组合的详细成本和时间分析
-- **推荐方案**：基于成本效益的最优选择
-
-#### 示例输出
-
-```json
-{
-  "analysis": {
-    "total_fields_to_irrigate": 36,
-    "required_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
-    "valid_pump_combinations": [["P1"], ["P2"]]
-  },
-  "scenarios": [
-    {
-      "scenario_name": "P1单独使用",
-      "pumps_used": ["P1"],
-      "total_electricity_cost": 2217.71,
-      "total_eta_h": 61.6,
-      "coverage_info": {
-        "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
-        "total_covered_segments": 6
-      }
-    }
-  ]
-}
 ```
 
 #### 方式3：配置文件（推荐生产环境）
@@ -230,7 +127,6 @@ python pipeline.py --config pipeline_config.yaml
 
 ### 命令行参数
 
-
 | 参数               | 说明           | 默认值       | 示例                     |
 | ------------------ | -------------- | ------------ | ------------------------ |
 | `--input-dir`      | 输入数据目录   | `./gzp_farm` | `--input-dir ./data`     |
@@ -239,10 +135,30 @@ python pipeline.py --config pipeline_config.yaml
 | `--pumps`          | 启用的泵站列表 | -            | `--pumps 1,2,3`          |
 | `--zones`          | 启用的供区列表 | -            | `--zones A,B,C`          |
 | `--no-waterlevels` | 不融合实时水位 | false        | `--no-waterlevels`       |
-| `--no-summary`     | 不打印摘要     | false        | `--no-summary`           |
-| `--verbose`        | 详细输出       | false        | `--verbose`              |
 | `--multi-pump`     | 生成多泵方案   | false        | `--multi-pump`           |
 | `--realtime`       | 使用实时水位   | false        | `--realtime`             |
+
+### 多泵方案功能
+
+多泵方案功能可以分析不同水泵组合的灌溉效果，帮助用户选择最优的水泵使用策略。
+
+#### 使用方法
+
+```bash
+# 命令行方式
+python pipeline.py --multi-pump --realtime
+
+# 或使用run_irrigation_plan.py
+python run_irrigation_plan.py --multi-pump --realtime --summary
+```
+
+#### 方案生成逻辑
+
+系统按以下优先级生成多泵方案：
+
+1. **单泵方案优先**：首先检查是否有单个水泵能覆盖所有需要灌溉的段
+2. **双泵组合**：如果单泵无法覆盖，尝试两个水泵的组合
+3. **全泵组合**：如果双泵组合仍无法覆盖，使用所有可用水泵
 
 ---
 
@@ -261,14 +177,13 @@ python api_server.py --host 0.0.0.0 --port 8080
 python api_server.py --reload
 ```
 
-### API端点
+### 核心API端点
 
-#### POST `/api/irrigation/plan-with-upload`
+#### 1. POST `/api/irrigation/plan-with-upload`
 
 生成灌溉计划（支持文件上传）
 
-**请求参数：**
-
+**主要参数：**
 
 | 参数名               | 类型    | 必填 | 默认值           | 说明                           |
 | -------------------- | ------- | ---- | ---------------- | ------------------------------ |
@@ -277,127 +192,92 @@ python api_server.py --reload
 | pumps                | string  | 否   | null             | 启用的泵站，逗号分隔           |
 | zones                | string  | 否   | null             | 启用的供区，逗号分隔           |
 | merge_waterlevels    | boolean | 否   | true             | 是否融合实时水位               |
-| print_summary        | boolean | 否   | true             | 是否返回摘要信息               |
 | multi_pump_scenarios | boolean | 否   | false            | 是否生成多泵方案               |
-| custom_waterlevels   | string  | 否   | null             | 自定义水位数据                 |
-| files                | file[]  | 否   | []               | Shapefile文件组合              |
+| custom_waterlevels   | string  | 否   | null             | 自定义水位数据，格式：field_id:water_level_mm,field_id:water_level_mm |
 
-#### POST `/api/irrigation/multi-pump-scenarios`
+**请求示例：**
+
+```bash
+curl -X POST "http://127.0.0.1:8000/api/irrigation/plan-with-upload" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-d "farm_id=13944136728576&target_depth_mm=90&merge_waterlevels=true"
+```
+
+#### 2. POST `/api/irrigation/multi-pump-scenarios`
 
 生成多水泵方案
 
-**请求参数：**
+**主要参数：**
 
-| 参数名           | 类型    | 必填 | 默认值           | 说明                           |
-| ---------------- | ------- | ---- | ---------------- | ------------------------------ |
-| config_file      | string  | 是   | -                | 配置文件路径                   |
-| active_pumps     | array   | 否   | null             | 指定活跃水泵列表               |
-| zone_ids         | array   | 否   | null             | 指定供区ID列表                 |
-| use_realtime_wl  | boolean | 否   | false            | 是否使用实时水位数据           |
+| 参数名           | 类型    | 必填 | 说明                           |
+| ---------------- | ------- | ---- | ------------------------------ |
+| config_file      | string  | 是   | 配置文件路径                   |
+| active_pumps     | array   | 否   | 指定活跃水泵列表               |
+| zone_ids         | array   | 否   | 指定供区ID列表                 |
+| use_realtime_wl  | boolean | 否   | 是否使用实时水位数据           |
 
 **请求示例：**
 
 ```bash
-curl --location 'http://127.0.0.1:8000/api/irrigation/multi-pump-scenarios' \
---header 'Content-Type: application/json' \
---data '{
-    "config_file": "config.json",
-    "use_realtime_wl": true
-}'
+curl -X POST "http://127.0.0.1:8000/api/irrigation/multi-pump-scenarios" \
+-H "Content-Type: application/json" \
+-d '{"config_file":"config.json","use_realtime_wl":true}'
 ```
 
-**响应格式：**
+#### 3. GET `/api/irrigation/batch-info/{plan_id}`
 
-```json
-{
-    "success": true,
-    "message": "多泵方案生成成功",
-    "analysis": {
-        "total_fields_to_irrigate": 36,
-        "required_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
-        "segment_pump_requirements": {
-            "S3": ["P1", "P2"],
-            "S4": ["P1", "P2"]
-        },
-        "valid_pump_combinations": [["P1"], ["P2"]]
-    },
-    "scenarios": [
-        {
-            "scenario_name": "P1单独使用",
-            "pumps_used": ["P1"],
-            "total_electricity_cost": 2217.71,
-            "total_eta_h": 61.6,
-            "coverage_info": {
-                "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
-                "total_covered_segments": 6
-            }
-        }
-    ],
-    "total_scenarios": 2
-}
+获取指定灌溉计划的批次信息
+
+**路径参数：**
+
+| 参数名  | 类型   | 必填 | 说明                                    |
+| ------- | ------ | ---- | --------------------------------------- |
+| plan_id | string | 是   | 计划ID或文件名（如：plan.json）         |
+
+**请求示例：**
+
+```bash
+curl -X GET "http://127.0.0.1:8000/api/irrigation/batch-info/plan.json"
 ```
 
-#### POST `/api/irrigation/regenerate-batch`
+#### 4. POST `/api/irrigation/regenerate-batch`
 
 批次重新生成（详见批次重新生成功能章节）
 
-#### GET `/api/irrigation/batch-info/{plan_id}`
+#### 5. 动态执行API
 
-获取批次信息
+系统还提供动态执行相关的API端点：
 
-#### GET `/api/health`
+- `POST /api/irrigation/dynamic-execution/start` - 启动动态执行
+- `POST /api/irrigation/dynamic-execution/stop` - 停止动态执行
+- `GET /api/irrigation/dynamic-execution/status` - 获取执行状态
+- `POST /api/irrigation/dynamic-execution/update-waterlevels` - 更新水位数据
+- `GET /api/irrigation/dynamic-execution/history` - 获取执行历史
 
-健康检查
+#### 6. 系统API
 
-#### GET `/`
+- `GET /api/health` - 健康检查
+- `GET /` - 服务根路径，返回API服务信息
 
-服务根路径
+### 响应格式
 
-**请求示例：**
+所有API接口都遵循统一的响应格式：
 
-```bash
-# 使用现有数据生成计划
-curl --location 'http://127.0.0.1:8000/api/irrigation/plan-with-upload' \
---header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'farm_id=13944136728576' \
---data-urlencode 'target_depth_mm=90' \
---data-urlencode 'merge_waterlevels=true' \
---data-urlencode 'print_summary=true'
-```
-
-**响应格式：**
-
+**成功响应：**
 ```json
 {
     "success": true,
-    "message": "灌溉计划生成成功",
-    "plan": {
-        "calc": {
-            "A_cover_mu": 159.99992000004,
-            "q_avail_m3ph": 480.0,
-            "t_win_h": 20.0,
-            "d_target_mm": 90.0,
-            "active_pumps": ["P1", "P2"],
-            "filtered_by_feed_by": 0,
-            "allowed_zones": null,
-            "skipped_null_wl_count": 2,
-            "skipped_null_wl_fields": ["42", "43"]
-        },
-        "drainage_targets": [],
-        "batches": [
-            {
-                "index": 1,
-                "area_mu": 155.06,
-                "fields": [...],
-                "stats": {
-                    "deficit_vol_m3": 9303.6046518,
-                    "cap_vol_m3": 9600.0,
-                    "eta_hours": 19.38250969125
-                }
-            }
-        ],
-        "steps": [...]
-    }
+    "message": "操作成功",
+    "data": { ... }
+}
+```
+
+**错误响应：**
+```json
+{
+    "success": false,
+    "message": "错误描述信息",
+    "error_code": "ERROR_CODE"
 }
 ```
 
@@ -431,9 +311,15 @@ curl --location 'http://127.0.0.1:8000/api/irrigation/plan-with-upload' \
       "custom_water_level": 5.0
     }
   ],
-  "regeneration_params": {
-    "batch_size_limit": 10,
-    "priority_segments": ["S4", "S5"]
+  "pump_assignments": [
+    {
+      "batch_id": 1,
+      "pumps_used": ["P1", "P2"]
+    }
+  ],
+  "custom_water_levels": {
+    "S3-G1-F1": 75.0,
+    "S4-G2-F5": 80.0
   }
 }
 ```
@@ -441,55 +327,37 @@ curl --location 'http://127.0.0.1:8000/api/irrigation/plan-with-upload' \
 #### 参数说明
 
 - **original_plan_id** (string): 原始计划ID或文件路径
-- **field_modifications** (array): 田块修改列表
+- **field_modifications** (array, 可选): 田块修改列表
   - **field_id** (string): 田块ID
   - **action** (string): 操作类型，`"add"` 或 `"remove"`
   - **custom_water_level** (number, 可选): 自定义水位(mm)
-- **regeneration_params** (object, 可选): 重新生成参数
-
-#### 响应格式
-
-```json
-{
-  "success": true,
-  "message": "批次计划重新生成成功，已保存到 irrigation_plan_modified_1640995200.json",
-  "original_plan": {...},
-  "modified_plan": {...},
-  "modifications_summary": {
-    "added_fields": ["S5-G35-F24"],
-    "removed_fields": ["S5-G33-F23"],
-    "total_modifications": 2,
-    "regeneration_timestamp": 1640995200
-  }
-}
-```
+- **pump_assignments** (array, 可选): 泵站分配修改
+- **custom_water_levels** (object, 可选): 自定义水位设置
 
 ### 功能特性
 
 1. **智能田块管理**
-
    - 添加田块：将新田块添加到灌溉计划中
    - 移除田块：从现有计划中移除指定田块
    - 自定义水位：支持为添加的田块设置自定义水位
-2. **批次重新生成**
 
+2. **批次重新生成**
    - 自动重排：根据段ID和距离重新排列田块
    - 批次优化：按照配置的批次大小限制重新分组
    - 统计更新：自动更新面积、缺水量等统计信息
-3. **缓存机制**
 
+3. **缓存机制**
    - 智能缓存：基于请求参数生成缓存键
    - 性能优化：相同请求直接返回缓存结果
    - 过期管理：5分钟缓存过期时间
 
 ### 使用示例
 
-#### 基本用法
+#### 基本用法：田块修改
 
 ```python
 import requests
 
-# 移除一个田块，添加另一个田块
 request_data = {
     "original_plan_id": "irrigation_plan_20250926_134301.json",
     "field_modifications": [
@@ -512,7 +380,22 @@ response = requests.post(
 
 result = response.json()
 print(f"修改成功: {result['success']}")
-print(f"新计划包含 {len(result['modified_plan']['batches'])} 个批次")
+```
+
+#### curl命令示例
+
+```bash
+curl -X POST "http://127.0.0.1:8000/api/irrigation/regenerate-batch" \
+-H "Content-Type: application/json" \
+-d '{
+  "original_plan_id": "plan.json",
+  "field_modifications": [
+    {
+      "field_id": "S3-G1-F37",
+      "action": "add"
+    }
+  ]
+}'
 ```
 
 ---
@@ -521,7 +404,7 @@ print(f"新计划包含 {len(result['modified_plan']['batches'])} 个批次")
 
 ### pipeline_config.yaml
 
-自动化流水线的配置文件，包含以下主要配置项：
+自动化流水线的配置文件：
 
 ```yaml
 # 输入输出目录配置
@@ -544,7 +427,7 @@ advanced:
 
 ### auto_to_config.py 配置
 
-`auto_to_config.py` 使用硬编码的默认配置参数，主要包括：
+`auto_to_config.py` 使用的默认配置参数：
 
 - **默认农场ID**: "13944136728576"
 - **默认时间窗口**: 20.0小时
@@ -554,12 +437,7 @@ advanced:
 
 ### config.json
 
-由 `auto_to_config.py` 生成的主配置文件，包含：
-
-- 农场基本信息
-- 渠段、闸门、田块数据
-- 泵站配置
-- 灌溉参数
+由 `auto_to_config.py` 生成的主配置文件，包含农场基本信息、渠段、闸门、田块数据、泵站配置和灌溉参数。
 
 ---
 
@@ -571,12 +449,7 @@ advanced:
 
 **问题：** 找不到Python或版本不兼容
 
-```
-[错误] 未找到Python，请先安装Python 3.7+
-```
-
 **解决方案：**
-
 - 安装Python 3.7+
 - 确保Python添加到系统PATH
 - 使用虚拟环境：
@@ -591,10 +464,6 @@ venv\Scripts\activate     # Windows
 
 **问题：** 缺少必要的Python包
 
-```
-ModuleNotFoundError: No module named 'fastapi'
-```
-
 **解决方案：**
 
 ```bash
@@ -605,12 +474,7 @@ pip install -r requirements.txt
 
 **问题：** 找不到GIS数据文件
 
-```
-[错误] 输入目录不存在: ./gzp_farm
-```
-
 **解决方案：**
-
 - 检查数据文件路径
 - 确保文件格式正确（GeoJSON）
 - 验证文件权限
@@ -618,10 +482,6 @@ pip install -r requirements.txt
 #### 4. API服务问题
 
 **问题：** API服务启动失败
-
-```
-[ERROR] Address already in use
-```
 
 **解决方案：**
 
@@ -665,4 +525,4 @@ curl -X GET http://localhost:8000/api/health
 
 ---
 
-*最后更新时间：2025年10月*
+*最后更新时间：2025年1月*
