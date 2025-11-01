@@ -978,23 +978,12 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
         all_pumps = cfg.active_pumps
         valid_combinations = []
         
-        # 首先尝试单个水泵
-        for pump in all_pumps:
-            can_cover_all = True
-            for sid in segments_needed:
-                required_pumps = segment_pump_requirements.get(sid, [])
-                if required_pumps and pump not in required_pumps:
-                    can_cover_all = False
-                    break
-            if can_cover_all:
-                valid_combinations.append([pump])
+        # 生成所有可能的水泵组合（从单个到全部）
+        from itertools import combinations
         
-        # 如果没有单个水泵能覆盖所有段，尝试多水泵组合
-        if not valid_combinations:
-            from itertools import combinations
-            
-            # 尝试2个水泵的组合
-            for combo in combinations(all_pumps, 2):
+        # 尝试所有可能的组合大小（1到全部水泵数量）
+        for combo_size in range(1, len(all_pumps) + 1):
+            for combo in combinations(all_pumps, combo_size):
                 can_cover_all = True
                 for sid in segments_needed:
                     required_pumps = segment_pump_requirements.get(sid, [])
@@ -1003,17 +992,6 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
                         break
                 if can_cover_all:
                     valid_combinations.append(list(combo))
-            
-            # 如果还是没有，使用所有水泵
-            if not valid_combinations:
-                can_cover_all = True
-                for sid in segments_needed:
-                    required_pumps = segment_pump_requirements.get(sid, [])
-                    if required_pumps and not _list_intersects(all_pumps, required_pumps):
-                        can_cover_all = False
-                        break
-                if can_cover_all:
-                    valid_combinations.append(all_pumps)
         
         if not valid_combinations:
             return {
@@ -1059,6 +1037,8 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
                 # 创建方案名称
                 if len(pump_combo) == 1:
                     scenario_name = f"{pump_combo[0]}单独使用"
+                elif len(pump_combo) == len(all_pumps):
+                    scenario_name = f"全部水泵({'+'.join(sorted(pump_combo))})组合使用"
                 else:
                     scenario_name = f"{'+'.join(sorted(pump_combo))}组合使用"
                 
