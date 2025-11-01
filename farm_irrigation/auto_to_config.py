@@ -168,6 +168,16 @@ def _sid_from_code(code: Optional[str]) -> Optional[str]:
 def _is_nanlike(v) -> bool:
     return v is None or (isinstance(v, float) and math.isnan(v)) or (isinstance(v, str) and v.strip().lower() in {"nan","none","null",""})
 
+def _is_sgf_format(f_id: str) -> bool:
+    """检查 F_id 是否符合 S-G-F 格式 (如 S3-G2-F1)"""
+    if not f_id or _is_nanlike(f_id):
+        return False
+    
+    f_id_str = str(f_id).strip()
+    # 使用正则表达式匹配 S数字-G数字-F数字 格式
+    pattern = r'^S\d+-G\d+-F\d+$'
+    return bool(re.match(pattern, f_id_str))
+
 def _first_non_empty(row: dict, keys: List[str]) -> Optional[str]:
     for k in keys:
         if k in row and not _is_nanlike(row.get(k)):
@@ -545,9 +555,11 @@ def convert(
     # 闸门（按口径：code/type/S_id）
     (gat2[["code","type","S_id","geometry"]]).to_file(out_dir / "gates_labeled.geojson", driver="GeoJSON")
     # 田块（便于核查：F_id, properties.id → sectionID, inlet_G_id, segment_S_id）
+    # 只保留符合 S-G-F 格式的田块
+    fld2_filtered = fld2[fld2["F_id"].apply(_is_sgf_format)].copy()
     cols = ["F_id","id","inlet_G_id","segment_S_id","geometry"]
-    cols = [c for c in cols if c in fld2.columns] + [c for c in ["F_id","inlet_G_id","segment_S_id","geometry"] if c not in cols]
-    (fld2[cols]).to_file(out_dir / "fields_labeled.geojson", driver="GeoJSON")
+    cols = [c for c in cols if c in fld2_filtered.columns] + [c for c in ["F_id","inlet_G_id","segment_S_id","geometry"] if c not in cols]
+    (fld2_filtered[cols]).to_file(out_dir / "fields_labeled.geojson", driver="GeoJSON")
 
     return data
 

@@ -3775,3 +3775,83 @@ You can install "python-multipart" with:
 
 pip install python-multipart
 
+2025-11-01 13:02:48,221 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-01 13:02:48,221 - INFO - 输入目录: ./gzp_farm
+2025-11-01 13:02:48,221 - INFO - 输出目录: ./output
+2025-11-01 13:02:48,221 - INFO - 检查依赖文件...
+2025-11-01 13:02:48,221 - INFO - 依赖文件检查通过
+2025-11-01 13:02:48,221 - INFO - 检查输入目录: ./gzp_farm
+2025-11-01 13:02:48,222 - INFO - 找到 6 个GIS数据文件
+2025-11-01 13:02:48,222 - INFO - === 步骤1: 数据预处理 ===
+2025-11-01 13:02:48,223 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-01 13:02:48,223 - INFO - 开始执行: GIS数据格式转换
+2025-11-01 13:02:48,223 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe farmgis_convert.py
+2025-11-01 13:02:50,579 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-11-01 13:02:50,580 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-01 13:02:50,580 - INFO - 开始执行: GIS数据修复
+2025-11-01 13:02:50,580 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe fix_farmgis_convert.py
+2025-11-01 13:02:50,767 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: e:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-01 13:02:50,768 - INFO - [OK] GIS数据修复 执行成功
+2025-11-01 13:02:50,768 - INFO - === 步骤2: 配置生成 ===
+2025-11-01 13:02:50,768 - INFO - 开始执行: 生成系统配置
+2025-11-01 13:02:50,768 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe auto_to_config.py
+2025-11-01 13:02:51,533 - WARNING - 警告: e:\irrigation_schedule\farm_irrigation\auto_to_config.py:124: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-11-01 13:02:51,533 - INFO - [OK] 生成系统配置 执行成功
+2025-11-01 13:02:51,533 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-01 13:02:51,534 - INFO - 开始执行: 生成灌溉计划
+2025-11-01 13:02:51,534 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe run_irrigation_plan.py --out output\irrigation_plan_20251101_130251.json --summary --realtime
+2025-11-01 13:02:52,456 - INFO - 输出: [DEBUG] 使用真实实时水位API
+====== 灌溉决策摘要 ======
+总 ETA: 32.21 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 2 批
+ - 批次1 ETA=19.38h  田块数=28
+ - 批次2 ETA=12.82h  田块数=12
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_130251.json
+
+2025-11-01 13:02:52,457 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-01 13:02:52,457 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.235820
+2025-11-01 13:02:52,458 - INFO - 生成的文件:
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_20250926_134301.json
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_20251031_221548.json
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_20251101_130251.json
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_modified_1761810147.json
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_modified_1761810735.json
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_modified_1761812108.json
+2025-11-01 13:02:52,458 - INFO -   - output\irrigation_plan_modified_1761812378.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761812588.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761812968.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761813266.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761813993.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761814161.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761814163.json
+2025-11-01 13:02:52,459 - INFO -   - output\irrigation_plan_modified_1761814165.json
+2025-11-01 13:02:52,459 - INFO - [SUCCESS] 自动化流水线执行成功
