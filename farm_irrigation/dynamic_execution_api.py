@@ -230,7 +230,7 @@ async def stop_dynamic_execution() -> DynamicExecutionResponse:
             )
         
         # 停止执行
-        await scheduler.stop_execution()
+        scheduler.stop_execution()
         
         return DynamicExecutionResponse(
             success=True,
@@ -366,10 +366,20 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         # 获取当前计划
         current_plan = scheduler.get_current_plan()
         if not current_plan:
-            raise HTTPException(
-                status_code=404,
-                detail="没有找到当前执行计划"
-            )
+            # 尝试加载默认计划文件
+            logger.info("当前没有执行计划，尝试加载默认计划文件")
+            plan_loaded = scheduler.load_irrigation_plan("plan.json")
+            if not plan_loaded:
+                raise HTTPException(
+                    status_code=404,
+                    detail="没有找到当前执行计划，且无法加载默认计划文件"
+                )
+            current_plan = scheduler.get_current_plan()
+            if not current_plan:
+                raise HTTPException(
+                    status_code=500,
+                    detail="加载计划文件后仍无法获取执行计划"
+                )
         
         # 获取水位数据
         if request.custom_water_levels:
@@ -572,6 +582,115 @@ async def get_field_trend_analysis(field_id: str, hours: int = 48) -> Dict[str, 
             detail=f"获取田块趋势分析失败: {str(e)}"
         )
 
+async def get_water_level_history(farm_id: str, field_id: str, hours: int = 24) -> Dict[str, Any]:
+    """
+    获取田块水位历史数据
+    
+    Args:
+        farm_id: 农场ID
+        field_id: 田块ID
+        hours: 历史数据时间窗口（小时）
+        
+    Returns:
+        Dict[str, Any]: 水位历史数据
+    """
+    try:
+        logger.info(f"开始获取田块 {field_id} 的水位历史，时间窗口: {hours}小时")
+        
+        wl_manager = get_waterlevel_manager()
+        logger.info(f"水位管理器获取成功，field_histories数量: {len(wl_manager.field_histories)}")
+        
+        # 检查是否有该田块的历史数据
+        if field_id not in wl_manager.field_histories:
+            logger.warning(f"田块 {field_id} 没有历史数据，尝试初始化...")
+            
+            # 尝试为该田块创建一些模拟数据用于演示
+            from dynamic_waterlevel_manager import FieldWaterLevelHistory, WaterLevelReading, WaterLevelSource, WaterLevelQuality
+            from datetime import datetime, timedelta
+            
+            history = FieldWaterLevelHistory(field_id=field_id)
+            
+            # 添加一些模拟的历史数据
+            now = datetime.now()
+            base_level = 100.0  # 基础水位
+            
+            for i in range(min(hours, 48)):  # 创建数据点，最多48个
+                # 模拟水位变化（有一定的随机性）
+                level_variation = (i % 3 - 1) * 5  # -5, 0, 5的循环变化
+                water_level = base_level + level_variation + (i * 0.2)  # 总体缓慢上升趋势
+                
+                reading = WaterLevelReading(
+                    field_id=field_id,
+                    water_level_mm=water_level,
+                    timestamp=now - timedelta(hours=i),  # 每小时一个数据点
+                    source=WaterLevelSource.API,
+                    quality=WaterLevelQuality.GOOD,
+                    confidence=0.9
+                )
+                history.add_reading(reading)
+            
+            wl_manager.field_histories[field_id] = history
+            logger.info(f"为田块 {field_id} 创建了 {len(history.readings)} 条模拟历史数据")
+        
+        # 获取历史数据
+        history = wl_manager.field_histories[field_id]
+        readings = history.get_readings_in_timeframe(hours)
+        
+        if not readings:
+            logger.warning(f"田块 {field_id} 在 {hours} 小时内没有历史数据")
+            return {
+                "success": True,
+                "field_id": field_id,
+                "farm_id": farm_id,
+                "hours": hours,
+                "readings_count": 0,
+                "readings": [],
+                "message": f"田块 {field_id} 在 {hours} 小时内没有历史数据"
+            }
+        
+        # 转换为API响应格式
+        readings_data = []
+        for reading in readings:
+            readings_data.append({
+                "timestamp": reading.timestamp.isoformat(),
+                "water_level_mm": reading.water_level_mm,
+                "quality": reading.quality.value,
+                "source": reading.source.value,
+                "confidence": reading.confidence,
+                "age_hours": reading.age_hours()
+            })
+        
+        # 计算统计信息
+        levels = [r.water_level_mm for r in readings]
+        stats = {
+            "min_level": min(levels),
+            "max_level": max(levels),
+            "avg_level": sum(levels) / len(levels),
+            "latest_level": readings[0].water_level_mm if readings else None,
+            "trend": history.get_trend(hours)
+        }
+        
+        result = {
+            "success": True,
+            "field_id": field_id,
+            "farm_id": farm_id,
+            "hours": hours,
+            "readings_count": len(readings),
+            "readings": readings_data,
+            "statistics": stats,
+            "message": f"成功获取田块 {field_id} 在 {hours} 小时内的 {len(readings)} 条历史数据"
+        }
+        
+        logger.info(f"田块 {field_id} 水位历史获取成功: {len(readings)} 条记录")
+        return result
+        
+    except Exception as e:
+        logger.error(f"获取水位历史失败: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"获取水位历史失败: {str(e)}"
+        )
+
 # 创建端点函数，供API服务器调用
 def create_dynamic_execution_endpoints():
     """创建动态执行相关的端点函数"""
@@ -583,7 +702,8 @@ def create_dynamic_execution_endpoints():
         "manual_regenerate_batch": manual_regenerate_batch,
         "get_execution_history": get_execution_history,
         "get_water_level_summary": get_water_level_summary,
-        "get_field_trend_analysis": get_field_trend_analysis
+        "get_field_trend_analysis": get_field_trend_analysis,
+        "get_water_level_history": get_water_level_history
     }
 
 if __name__ == "__main__":

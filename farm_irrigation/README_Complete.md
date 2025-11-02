@@ -1,528 +1,746 @@
-# 农场灌溉调度系统 - 完整文档
-
-## 目录
-
-1. [系统概述](#系统概述)
-2. [快速开始](#快速开始)
-3. [自动化流水线](#自动化流水线)
-4. [API接口文档](#api接口文档)
-5. [批次重新生成功能](#批次重新生成功能)
-6. [配置文件说明](#配置文件说明)
-7. [故障排除](#故障排除)
-
----
+# 智能农场灌溉调度系统 API 文档
 
 ## 系统概述
 
-农场灌溉调度系统是一个智能化的农业灌溉管理平台，提供从数据预处理到灌溉计划生成的完整解决方案。系统支持多种运行模式，包括命令行、Web API和自动化流水线。
+智能农场灌溉调度系统是一个基于实时数据的智能灌溉管理平台，支持动态执行、批次管理、水位监控和计划优化等功能。
 
-### 核心功能
+## 统一响应格式
 
-- **智能调度算法**：基于田块水位、面积和距离的优化调度
-- **实时数据融合**：支持实时水位数据的动态融合
-- **批次管理**：灵活的批次重新生成和修改功能
-- **多种接口**：命令行、Web API、自动化流水线
-- **可视化输出**：生成详细的灌溉计划和统计报告
-
----
-
-## 快速开始
-
-### 环境准备
-
-1. **安装依赖**
-
-```bash
-cd e:/irrigation_schedule/farm_irrigation
-pip install -r requirements.txt
-```
-
-2. **准备数据文件**
-   将GIS数据文件放入输入目录（默认：`./gzp_farm`）：
-
-- 渠段数据：`港中坪水路_code.geojson`
-- 节制闸数据：`港中坪阀门与节制闸_code.geojson`
-- 田块数据：`港中坪田块_code.geojson`
-
-### 运行方式
-
-**方式1：自动化流水线（推荐）**
-
-```bash
-python pipeline.py
-```
-
-**方式2：分步执行**
-
-```bash
-# 1. 数据预处理
-python farmgis_convert.py
-python fix_farmgis_convert.py
-
-# 2. 配置生成
-python auto_to_config.py
-
-# 3. 计划生成
-python run_irrigation_plan.py --config config.json --output plan.json
-```
-
-**方式3：API服务**
-
-```bash
-python api_server.py
-```
-
----
-
-## 自动化流水线
-
-### 概述
-
-自动化流水线将原本需要手动执行的多个步骤整合为一键执行，大大简化了使用流程。
-
-### 执行方式
-
-#### 方式1：快速执行（推荐新手）
-
-```bash
-# Windows用户：双击运行批处理文件
-run_pipeline.bat
-
-# Linux/Mac用户
-python pipeline.py
-```
-
-#### 方式2：命令行参数
-
-```bash
-# 基本用法
-python pipeline.py --input-dir ./data --output-dir ./results
-
-# 指定泵站和供区
-python pipeline.py --pumps 1,2,3 --zones A,B --input-dir ./data
-
-# 多泵方案生成
-python pipeline.py --multi-pump --realtime --input-dir ./data
-```
-
-#### 方式3：配置文件（推荐生产环境）
-
-1. 编辑配置文件 `pipeline_config.yaml`：
-
-```yaml
-input_dir: "./gzp_farm"
-output_dir: "./output"
-options:
-  pumps: "1,2"
-  zones: "A,B"
-  merge_waterlevels: true
-  print_summary: true
-```
-
-2. 执行：
-
-```bash
-python pipeline.py --config pipeline_config.yaml
-```
-
-### 命令行参数
-
-| 参数               | 说明           | 默认值       | 示例                     |
-| ------------------ | -------------- | ------------ | ------------------------ |
-| `--input-dir`      | 输入数据目录   | `./gzp_farm` | `--input-dir ./data`     |
-| `--output-dir`     | 输出目录       | `./output`   | `--output-dir ./results` |
-| `--config`         | 配置文件路径   | -            | `--config config.yaml`   |
-| `--pumps`          | 启用的泵站列表 | -            | `--pumps 1,2,3`          |
-| `--zones`          | 启用的供区列表 | -            | `--zones A,B,C`          |
-| `--no-waterlevels` | 不融合实时水位 | false        | `--no-waterlevels`       |
-| `--multi-pump`     | 生成多泵方案   | false        | `--multi-pump`           |
-| `--realtime`       | 使用实时水位   | false        | `--realtime`             |
-
-### 多泵方案功能
-
-多泵方案功能可以分析不同水泵组合的灌溉效果，帮助用户选择最优的水泵使用策略。
-
-#### 使用方法
-
-```bash
-# 命令行方式
-python pipeline.py --multi-pump --realtime
-
-# 或使用run_irrigation_plan.py
-python run_irrigation_plan.py --multi-pump --realtime --summary
-```
-
-#### 方案生成逻辑
-
-系统按以下优先级生成多泵方案：
-
-1. **单泵方案优先**：首先检查是否有单个水泵能覆盖所有需要灌溉的段
-2. **双泵组合**：如果单泵无法覆盖，尝试两个水泵的组合
-3. **全泵组合**：如果双泵组合仍无法覆盖，使用所有可用水泵
-
----
-
-## API接口文档
-
-### 服务启动
-
-```bash
-# 基本启动
-python api_server.py
-
-# 指定端口和地址
-python api_server.py --host 0.0.0.0 --port 8080
-
-# 开发模式（自动重载）
-python api_server.py --reload
-```
-
-### 核心API端点
-
-#### 1. POST `/api/irrigation/plan-with-upload`
-
-生成灌溉计划（支持文件上传）
-
-**主要参数：**
-
-| 参数名               | 类型    | 必填 | 默认值           | 说明                           |
-| -------------------- | ------- | ---- | ---------------- | ------------------------------ |
-| farm_id              | string  | 否   | "13944136728576" | 农场ID（用于获取实时水位数据） |
-| target_depth_mm      | float   | 否   | 90.0             | 目标灌溉深度(mm)               |
-| pumps                | string  | 否   | null             | 启用的泵站，逗号分隔           |
-| zones                | string  | 否   | null             | 启用的供区，逗号分隔           |
-| merge_waterlevels    | boolean | 否   | true             | 是否融合实时水位               |
-| multi_pump_scenarios | boolean | 否   | false            | 是否生成多泵方案               |
-| custom_waterlevels   | string  | 否   | null             | 自定义水位数据，格式：field_id:water_level_mm,field_id:water_level_mm |
-
-**请求示例：**
-
-```bash
-curl -X POST "http://127.0.0.1:8000/api/irrigation/plan-with-upload" \
--H "Content-Type: application/x-www-form-urlencoded" \
--d "farm_id=13944136728576&target_depth_mm=90&merge_waterlevels=true"
-```
-
-#### 2. POST `/api/irrigation/multi-pump-scenarios`
-
-生成多水泵方案
-
-**主要参数：**
-
-| 参数名           | 类型    | 必填 | 说明                           |
-| ---------------- | ------- | ---- | ------------------------------ |
-| config_file      | string  | 是   | 配置文件路径                   |
-| active_pumps     | array   | 否   | 指定活跃水泵列表               |
-| zone_ids         | array   | 否   | 指定供区ID列表                 |
-| use_realtime_wl  | boolean | 否   | 是否使用实时水位数据           |
-
-**请求示例：**
-
-```bash
-curl -X POST "http://127.0.0.1:8000/api/irrigation/multi-pump-scenarios" \
--H "Content-Type: application/json" \
--d '{"config_file":"config.json","use_realtime_wl":true}'
-```
-
-#### 3. GET `/api/irrigation/batch-info/{plan_id}`
-
-获取指定灌溉计划的批次信息
-
-**路径参数：**
-
-| 参数名  | 类型   | 必填 | 说明                                    |
-| ------- | ------ | ---- | --------------------------------------- |
-| plan_id | string | 是   | 计划ID或文件名（如：plan.json）         |
-
-**请求示例：**
-
-```bash
-curl -X GET "http://127.0.0.1:8000/api/irrigation/batch-info/plan.json"
-```
-
-#### 4. POST `/api/irrigation/regenerate-batch`
-
-批次重新生成（详见批次重新生成功能章节）
-
-#### 5. 动态执行API
-
-系统还提供动态执行相关的API端点：
-
-- `POST /api/irrigation/dynamic-execution/start` - 启动动态执行
-- `POST /api/irrigation/dynamic-execution/stop` - 停止动态执行
-- `GET /api/irrigation/dynamic-execution/status` - 获取执行状态
-- `POST /api/irrigation/dynamic-execution/update-waterlevels` - 更新水位数据
-- `GET /api/irrigation/dynamic-execution/history` - 获取执行历史
-
-#### 6. 系统API
-
-- `GET /api/health` - 健康检查
-- `GET /` - 服务根路径，返回API服务信息
-
-### 响应格式
-
-所有API接口都遵循统一的响应格式：
-
-**成功响应：**
-```json
-{
-    "success": true,
-    "message": "操作成功",
-    "data": { ... }
-}
-```
-
-**错误响应：**
-```json
-{
-    "success": false,
-    "message": "错误描述信息",
-    "error_code": "ERROR_CODE"
-}
-```
-
----
-
-## 批次重新生成功能
-
-### 概述
-
-批次重新生成API允许前端根据用户的修改（添加或移除田块）重新生成灌溉批次计划，而无需重新运行完整的灌溉管道。
-
-### API端点
-
-#### POST `/api/irrigation/regenerate-batch`
-
-根据田块修改请求重新生成灌溉批次计划。
-
-#### 请求参数
+所有API接口均采用统一的JSON响应格式：
 
 ```json
 {
-  "original_plan_id": "irrigation_plan_20250926_134301.json",
-  "field_modifications": [
-    {
-      "field_id": "S5-G33-F23",
-      "action": "remove"
-    },
-    {
-      "field_id": "S5-G35-F24",
-      "action": "add",
-      "custom_water_level": 5.0
-    }
-  ],
-  "pump_assignments": [
-    {
-      "batch_id": 1,
-      "pumps_used": ["P1", "P2"]
-    }
-  ],
-  "custom_water_levels": {
-    "S3-G1-F1": 75.0,
-    "S4-G2-F5": 80.0
+  "status": "success|error",
+  "message": "操作结果描述信息",
+  "data": {
+    // 具体的响应数据
   }
 }
 ```
 
-#### 参数说明
+- `status`: 操作状态，`success` 表示成功，`error` 表示失败
+- `message`: 操作结果的描述信息
+- `data`: 具体的响应数据，根据不同接口返回不同结构
 
-- **original_plan_id** (string): 原始计划ID或文件路径
-- **field_modifications** (array, 可选): 田块修改列表
-  - **field_id** (string): 田块ID
-  - **action** (string): 操作类型，`"add"` 或 `"remove"`
-  - **custom_water_level** (number, 可选): 自定义水位(mm)
-- **pump_assignments** (array, 可选): 泵站分配修改
-- **custom_water_levels** (object, 可选): 自定义水位设置
+## 服务配置
 
-### 功能特性
+### 主动态执行服务
+- **服务地址**: `http://0.0.0.0:8000`
+- **启动命令**: `python main_dynamic_execution_api.py`
 
-1. **智能田块管理**
-   - 添加田块：将新田块添加到灌溉计划中
-   - 移除田块：从现有计划中移除指定田块
-   - 自定义水位：支持为添加的田块设置自定义水位
+### 集成API服务
+- **服务地址**: `http://127.0.0.1:8000`
+- **启动命令**: `python api_server.py`
 
-2. **批次重新生成**
-   - 自动重排：根据段ID和距离重新排列田块
-   - 批次优化：按照配置的批次大小限制重新分组
-   - 统计更新：自动更新面积、缺水量等统计信息
+### Web可视化服务
+- **服务地址**: `http://0.0.0.0:5000`
+- **启动命令**: `python web_farm_irrigation_modified.py`
 
-3. **缓存机制**
-   - 智能缓存：基于请求参数生成缓存键
-   - 性能优化：相同请求直接返回缓存结果
-   - 过期管理：5分钟缓存过期时间
+---
 
-### 使用示例
+## 一、系统管理模块
 
-#### 基本用法：田块修改
+### 1.1 系统初始化功能
+
+#### 1.1.1 系统初始化
+- **请求地址**: `POST /api/system/init`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "farm_id": "string",
+  "config_path": "string",
+  "reset_data": "boolean"
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "系统初始化成功",
+  "data": {
+    "initialization_time": "2025-01-XX 10:00:00",
+    "farm_id": "13944136728576",
+    "modules_loaded": ["scheduler", "waterlevel_manager", "plan_regenerator"]
+  }
+}
+```
+
+#### 1.1.2 系统状态查询
+- **请求地址**: `GET /api/system/status`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "系统状态获取成功",
+  "data": {
+    "system_status": "running",
+    "uptime_seconds": 3600,
+    "active_modules": ["scheduler", "waterlevel_manager"],
+    "memory_usage_mb": 256,
+    "cpu_usage_percent": 15.5
+  }
+}
+```
+
+### 1.2 健康检查功能
+
+#### 1.2.1 系统健康检查
+- **请求地址**: `POST /api/system/health-check`
+- **请求方式**: POST
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "系统健康检查完成",
+  "data": {
+    "overall_health": "healthy",
+    "components": {
+      "database": "healthy",
+      "scheduler": "healthy",
+      "waterlevel_manager": "healthy"
+    },
+    "check_time": "2025-01-XX 10:00:00"
+  }
+}
+```
+
+#### 1.2.2 API服务健康检查
+- **请求地址**: `GET /api/health`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "API服务运行正常",
+  "data": {
+    "service": "irrigation_api",
+    "version": "1.0.0",
+    "timestamp": "2025-01-XX 10:00:00"
+  }
+}
+```
+
+---
+
+## 二、动态执行模块
+
+### 2.1 执行控制功能
+
+#### 2.1.1 启动动态执行
+- **请求地址**: `POST /api/execution/start`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "plan_file_path": "string",
+  "farm_id": "string",
+  "config_file_path": "string",
+  "auto_start": "boolean",
+  "water_level_update_interval_minutes": "integer",
+  "enable_plan_regeneration": "boolean",
+  "execution_mode": "string"
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "动态执行启动成功",
+  "data": {
+    "execution_id": "exec_20250101_001",
+    "scheduler_status": "running",
+    "total_batches": 5,
+    "current_batch": 1,
+    "start_time": "2025-01-XX 10:00:00"
+  }
+}
+```
+
+#### 2.1.2 停止动态执行
+- **请求地址**: `POST /api/execution/stop`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "execution_id": "string",
+  "force_stop": "boolean"
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "动态执行已停止",
+  "data": {
+    "execution_id": "exec_20250101_001",
+    "stop_time": "2025-01-XX 12:00:00",
+    "final_status": "stopped",
+    "completed_batches": 3
+  }
+}
+```
+
+### 2.2 执行状态功能
+
+#### 2.2.1 获取执行状态
+- **请求地址**: `GET /api/execution/status`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "执行状态获取成功",
+  "data": {
+    "execution_id": "exec_20250101_001",
+    "status": "running",
+    "current_batch": 2,
+    "total_batches": 5,
+    "progress_percentage": 40.0,
+    "start_time": "2025-01-XX 10:00:00",
+    "estimated_completion_time": "2025-01-XX 14:00:00",
+    "last_water_level_update": "2025-01-XX 11:30:00",
+    "total_regenerations": 1,
+    "active_fields": ["F001", "F002"],
+    "completed_batches": [1]
+  }
+}
+```
+
+#### 2.2.2 获取执行历史
+- **请求地址**: `GET /api/execution/history`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "执行历史获取成功",
+  "data": {
+    "total_executions": 10,
+    "executions": [
+      {
+        "execution_id": "exec_20250101_001",
+        "start_time": "2025-01-01 10:00:00",
+        "end_time": "2025-01-01 14:00:00",
+        "status": "completed",
+        "total_batches": 5,
+        "success_rate": 100.0
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 三、水位管理模块
+
+### 3.1 水位更新功能
+
+#### 3.1.1 更新水位数据
+- **请求地址**: `POST /api/water-levels/update`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "farm_id": "string",
+  "field_ids": ["string"],
+  "force_update": "boolean"
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "水位数据更新成功",
+  "data": {
+    "updated_fields": {
+      "F001": 2.5,
+      "F002": 3.1
+    },
+    "update_timestamp": "2025-01-XX 10:00:00",
+    "data_quality_summary": {
+      "valid": 2,
+      "invalid": 0,
+      "missing": 0
+    }
+  }
+}
+```
+
+### 3.2 水位查询功能
+
+#### 3.2.1 获取水位汇总
+- **请求地址**: `GET /api/water-levels/summary`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "水位汇总获取成功",
+  "data": {
+    "total_fields": 10,
+    "average_water_level": 2.8,
+    "min_water_level": 1.5,
+    "max_water_level": 4.2,
+    "last_update": "2025-01-XX 10:00:00",
+    "field_details": {
+      "F001": 2.5,
+      "F002": 3.1
+    }
+  }
+}
+```
+
+#### 3.2.2 获取田块水位趋势
+- **请求地址**: `GET /api/water-levels/trend/{field_id}`
+- **请求方式**: GET
+- **请求参数**: 
+  - `field_id`: 田块ID（路径参数）
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "田块水位趋势获取成功",
+  "data": {
+    "field_id": "F001",
+    "trend_data": [
+      {
+        "timestamp": "2025-01-XX 09:00:00",
+        "water_level": 2.3
+      },
+      {
+        "timestamp": "2025-01-XX 10:00:00",
+        "water_level": 2.5
+      }
+    ],
+    "trend_analysis": {
+      "direction": "increasing",
+      "rate_cm_per_hour": 0.2
+    }
+  }
+}
+```
+
+---
+
+## 四、计划重新生成模块
+
+### 4.1 手动重新生成功能
+
+#### 4.1.1 手动重新生成批次
+- **请求地址**: `POST /api/regeneration/manual`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "batch_index": "integer",
+  "custom_water_levels": {
+    "F001": 2.5,
+    "F002": 3.1
+  },
+  "force_regeneration": "boolean"
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "批次重新生成成功",
+  "data": {
+    "batch_index": 2,
+    "changes_count": 3,
+    "execution_time_adjustment_seconds": 300.0,
+    "water_usage_adjustment_m3": 15.5,
+    "change_summary": "调整了3个田块的灌溉时间，总用水量增加15.5立方米"
+  }
+}
+```
+
+### 4.2 重新生成查询功能
+
+#### 4.2.1 获取重新生成汇总
+- **请求地址**: `GET /api/regeneration/summary/{farm_id}`
+- **请求方式**: GET
+- **请求参数**:
+  - `farm_id`: 农场ID（路径参数）
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "重新生成汇总获取成功",
+  "data": {
+    "farm_id": "13944136728576",
+    "total_regenerations": 5,
+    "successful_regenerations": 4,
+    "failed_regenerations": 1,
+    "last_regeneration_time": "2025-01-XX 10:00:00",
+    "average_improvement_percent": 12.5
+  }
+}
+```
+
+---
+
+## 五、批次管理模块
+
+### 5.1 批次查询功能
+
+#### 5.1.1 获取批次详情
+- **请求地址**: `GET /api/batches/{batch_index}/details`
+- **请求方式**: GET
+- **请求参数**:
+  - `batch_index`: 批次索引（路径参数）
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "批次详情获取成功",
+  "data": {
+    "batch_index": 1,
+    "status": "completed",
+    "start_time": "2025-01-XX 10:00:00",
+    "end_time": "2025-01-XX 11:30:00",
+    "fields": ["F001", "F002", "F003"],
+    "total_water_usage_m3": 150.5,
+    "execution_duration_minutes": 90
+  }
+}
+```
+
+#### 5.1.2 获取当前计划
+- **请求地址**: `GET /api/batches/current-plan`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "当前计划获取成功",
+  "data": {
+    "plan_id": "plan_20250101_001",
+    "total_batches": 5,
+    "current_batch": 2,
+    "plan_status": "executing",
+    "created_time": "2025-01-XX 09:00:00",
+    "estimated_completion": "2025-01-XX 14:00:00"
+  }
+}
+```
+
+---
+
+## 六、灌溉计划模块
+
+### 6.1 计划生成功能
+
+#### 6.1.1 上传文件生成计划
+- **请求地址**: `POST /api/irrigation/plan-with-upload`
+- **请求方式**: POST
+- **请求参数**: 
+  - `file`: 上传的文件（multipart/form-data）
+  - `farm_id`: 农场ID
+  - `config_options`: 配置选项（JSON字符串）
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "灌溉计划生成成功",
+  "data": {
+    "plan_id": "plan_20250101_001",
+    "total_batches": 5,
+    "total_fields": 20,
+    "estimated_duration_hours": 4.5,
+    "total_water_usage_m3": 500.0,
+    "plan_file_path": "/e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_20251101_143125.json"
+  }
+}
+```
+
+#### 6.1.2 多泵站场景生成
+- **请求地址**: `POST /api/irrigation/multi-pump-scenarios`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "farm_id": "string",
+  "pump_configurations": [
+    {
+      "pump_id": "string",
+      "capacity_m3_per_hour": "number",
+      "location": "string"
+    }
+  ]
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "多泵站场景生成成功",
+  "data": {
+    "scenarios": [
+      {
+        "scenario_id": "scenario_001",
+        "pump_assignments": ["pump_1", "pump_2"],
+        "estimated_duration_hours": 3.5,
+        "efficiency_score": 85.5
+      }
+    ],
+    "recommended_scenario": "scenario_001"
+  }
+}
+```
+
+### 6.2 批次重新生成功能
+
+#### 6.2.1 批次重新生成
+- **请求地址**: `POST /api/irrigation/regenerate-batch`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "original_plan_id": "string",
+  "field_modifications": {
+    "F001": {
+      "target_water_level": 3.0,
+      "priority": "high"
+    }
+  },
+  "pump_assignments": ["pump_1"],
+  "custom_water_levels": {
+    "F001": 2.5
+  }
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "批次重新生成成功",
+  "data": {
+    "new_plan_id": "plan_20250101_002",
+    "changes_summary": {
+      "modified_fields": 3,
+      "time_adjustment_minutes": 15,
+      "water_usage_change_m3": 25.5
+    },
+    "optimization_results": {
+      "efficiency_improvement_percent": 12.5,
+      "water_savings_m3": 10.0
+    }
+  }
+}
+```
+
+---
+
+## 七、Web可视化模块
+
+### 7.1 地理数据功能
+
+#### 7.1.1 获取田块数据
+- **请求地址**: `GET /geojson/fields`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "田块数据获取成功",
+  "data": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "F_id": "F001",
+          "area": 1000.5,
+          "crop_type": "rice"
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [[[lng, lat], [lng, lat]]]
+        }
+      }
+    ]
+  }
+}
+```
+
+#### 7.1.2 获取闸门数据
+- **请求地址**: `GET /geojson/gates`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "闸门数据获取成功",
+  "data": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "G_id": "G001",
+          "gate_type": "control",
+          "status": "open"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [lng, lat]
+        }
+      }
+    ]
+  }
+}
+```
+
+### 7.2 计划管理功能
+
+#### 7.2.1 生成灌溉计划
+- **请求地址**: `GET /v1/plan`
+- **请求方式**: GET
+- **请求参数**: 无
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "灌溉计划生成成功",
+  "data": {
+    "plan": {
+      "batches": [
+        {
+          "batch_index": 1,
+          "fields": ["F001", "F002"],
+          "start_time": "2025-01-XX 10:00:00",
+          "duration_minutes": 90
+        }
+      ]
+    },
+    "summary": {
+      "total_batches": 5,
+      "total_duration_hours": 4.5
+    }
+  }
+}
+```
+
+---
+
+## 八、数据管理模块
+
+### 8.1 数据清理功能
+
+#### 8.1.1 清理执行数据
+- **请求地址**: `POST /api/data/cleanup`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "cleanup_type": "string",
+  "days_to_keep": "integer",
+  "confirm": "boolean"
+}
+```
+- **响应内容**:
+```json
+{
+  "status": "success",
+  "message": "数据清理完成",
+  "data": {
+    "cleaned_records": 150,
+    "freed_space_mb": 25.5,
+    "cleanup_time": "2025-01-XX 10:00:00"
+  }
+}
+```
+
+---
+
+## 使用示例
+
+### Python 示例
 
 ```python
 import requests
 
-request_data = {
-    "original_plan_id": "irrigation_plan_20250926_134301.json",
-    "field_modifications": [
-        {
-            "field_id": "S5-G33-F23",
-            "action": "remove"
-        },
-        {
-            "field_id": "S5-G35-F24",
-            "action": "add",
-            "custom_water_level": 10.0
-        }
-    ]
-}
+# 启动动态执行
+response = requests.post('http://0.0.0.0:8000/api/execution/start', json={
+    "plan_file_path": "/e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_20251101_143125.json",
+    "farm_id": "13944136728576",
+    "enable_realtime_waterlevels": True
+})
+print(response.json())
 
-response = requests.post(
-    "http://127.0.0.1:8000/api/irrigation/regenerate-batch",
-    json=request_data
-)
+# 获取执行状态
+response = requests.get('http://0.0.0.0:8000/api/execution/status')
+print(response.json())
 
-result = response.json()
-print(f"修改成功: {result['success']}")
+# 更新水位数据
+response = requests.post('http://0.0.0.0:8000/api/water-levels/update', json={
+    "farm_id": "13944136728576",
+    "force_update": True
+})
+print(response.json())
 ```
 
-#### curl命令示例
+### cURL 示例
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/api/irrigation/regenerate-batch" \
--H "Content-Type: application/json" \
--d '{
-  "original_plan_id": "plan.json",
-  "field_modifications": [
-    {
-      "field_id": "S3-G1-F37",
-      "action": "add"
-    }
-  ]
-}'
+# 启动动态执行
+curl -X POST http://0.0.0.0:8000/api/execution/start \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_file_path": "/e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_20251101_143125.json",
+    "farm_id": "13944136728576",
+    "enable_realtime_waterlevels": true
+  }'
+
+# 获取执行状态
+curl -X GET http://0.0.0.0:8000/api/execution/status
+
+# 更新水位数据
+curl -X POST http://0.0.0.0:8000/api/water-levels/update \
+  -H "Content-Type: application/json" \
+  -d '{
+    "farm_id": "13944136728576",
+    "force_update": true
+  }'
+
+# 健康检查
+curl -X GET http://0.0.0.0:8000/api/health
 ```
 
 ---
 
-## 配置文件说明
+## 错误码说明
 
-### pipeline_config.yaml
-
-自动化流水线的配置文件：
-
-```yaml
-# 输入输出目录配置
-input_dir: "./gzp_farm"          # GIS数据输入目录
-output_dir: "./output"           # 输出目录
-
-# 执行选项
-options:
-  pumps: "1,2"                   # 启用的泵站列表，逗号分隔
-  zones: "A,B"                   # 启用的供区列表，逗号分隔
-  merge_waterlevels: true        # 是否融合实时水位数据
-  print_summary: true            # 是否打印执行摘要
-
-# 高级配置（可选）
-advanced:
-  log_level: "INFO"              # 日志级别
-  log_file: "pipeline.log"       # 日志文件名
-  step_timeout: 300              # 每个步骤的超时时间（秒）
-```
-
-### auto_to_config.py 配置
-
-`auto_to_config.py` 使用的默认配置参数：
-
-- **默认农场ID**: "13944136728576"
-- **默认时间窗口**: 20.0小时
-- **默认目标补水深度**: 90.0毫米
-- **默认水位阈值**: 低水位80mm，最优100mm，高水位140mm
-- **默认泵配置**: 额定流量300m³/h，效率0.8
-
-### config.json
-
-由 `auto_to_config.py` 生成的主配置文件，包含农场基本信息、渠段、闸门、田块数据、泵站配置和灌溉参数。
+| 错误码 | 说明 |
+|--------|------|
+| 400 | 请求参数错误 |
+| 401 | 未授权访问 |
+| 404 | 资源不存在 |
+| 500 | 服务器内部错误 |
+| 503 | 服务不可用 |
 
 ---
 
-## 故障排除
+**最后更新时间**: 2025年1月
 
-### 常见问题
+**版本**: v2.0.0
 
-#### 1. Python环境问题
-
-**问题：** 找不到Python或版本不兼容
-
-**解决方案：**
-- 安装Python 3.7+
-- 确保Python添加到系统PATH
-- 使用虚拟环境：
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
-```
-
-#### 2. 依赖包问题
-
-**问题：** 缺少必要的Python包
-
-**解决方案：**
-
-```bash
-pip install -r requirements.txt
-```
-
-#### 3. 数据文件问题
-
-**问题：** 找不到GIS数据文件
-
-**解决方案：**
-- 检查数据文件路径
-- 确保文件格式正确（GeoJSON）
-- 验证文件权限
-
-#### 4. API服务问题
-
-**问题：** API服务启动失败
-
-**解决方案：**
-
-```bash
-# 查找占用端口的进程
-netstat -tulpn | grep :8000
-
-# 杀死进程
-kill -9 <process_id>
-
-# 或使用不同端口
-python api_server.py --port 8080
-```
-
-### 调试技巧
-
-#### 1. 启用详细日志
-
-```bash
-python pipeline.py --verbose
-```
-
-#### 2. 查看日志文件
-
-```bash
-tail -f pipeline.log
-```
-
-#### 3. 单独测试模块
-
-```bash
-# 测试配置生成
-python auto_to_config.py
-
-# 测试计划生成
-python run_irrigation_plan.py --config config.json
-
-# 测试API服务
-curl -X GET http://localhost:8000/api/health
-```
-
----
-
-*最后更新时间：2025年1月*
+**更新日志**:
+- 重构API文档结构，采用模块→功能→接口三级组织
+- 统一API响应格式为 status、message、data 三字段结构
+- 简化文档内容，去除冗余信息
+- 完善接口参数和响应示例
+- 更新服务配置和使用示例

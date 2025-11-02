@@ -120,6 +120,19 @@ class FieldWaterLevelHistory:
         
         level_diff = newest.water_level_mm - oldest.water_level_mm
         return level_diff / time_diff_hours
+    
+    def get_readings_in_timeframe(self, hours: int = 24) -> List[WaterLevelReading]:
+        """
+        获取指定时间范围内的历史读数
+        
+        Args:
+            hours: 时间窗口（小时）
+            
+        Returns:
+            List[WaterLevelReading]: 时间范围内的读数列表，按时间倒序排列
+        """
+        cutoff_time = datetime.now() - timedelta(hours=hours)
+        return [r for r in self.readings if r.timestamp >= cutoff_time]
 
 class DynamicWaterLevelManager:
     """动态水位管理器"""
@@ -461,6 +474,76 @@ class DynamicWaterLevelManager:
         if cleaned_count > 0:
             logger.info(f"清理了 {cleaned_count} 条过期水位数据")
             self._save_cache()
+    
+    def get_water_level_summary(self, field_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+        """
+        获取水位数据摘要
+        
+        Args:
+            field_ids: 指定田块ID列表，如果为None则返回所有田块的摘要
+            
+        Returns:
+            Dict[str, Any]: 水位摘要数据
+        """
+        try:
+            # 确定要统计的田块
+            target_fields = field_ids if field_ids else list(self.field_histories.keys())
+            
+            summary = {
+                "total_fields": len(target_fields),
+                "fields_with_data": 0,
+                "fields_without_data": [],
+                "quality_distribution": {quality.value: 0 for quality in WaterLevelQuality},
+                "source_distribution": {source.value: 0 for source in WaterLevelSource},
+                "field_details": {},
+                "last_updated": datetime.now().isoformat()
+            }
+            
+            for field_id in target_fields:
+                if field_id in self.field_histories:
+                    history = self.field_histories[field_id]
+                    latest_reading = history.get_latest_reading()
+                    
+                    if latest_reading:
+                        summary["fields_with_data"] += 1
+                        summary["quality_distribution"][latest_reading.quality.value] += 1
+                        summary["source_distribution"][latest_reading.source.value] += 1
+                        
+                        # 计算数据年龄
+                        age_hours = (datetime.now() - latest_reading.timestamp).total_seconds() / 3600
+                        
+                        summary["field_details"][field_id] = {
+                            "water_level_mm": latest_reading.water_level_mm,
+                            "quality": latest_reading.quality.value,
+                            "source": latest_reading.source.value,
+                            "confidence": latest_reading.confidence,
+                            "age_hours": round(age_hours, 2),
+                            "timestamp": latest_reading.timestamp.isoformat(),
+                            "readings_count": len(history.readings)
+                        }
+                    else:
+                        summary["fields_without_data"].append(field_id)
+                else:
+                    summary["fields_without_data"].append(field_id)
+            
+            # 计算统计信息
+            summary["coverage_rate"] = summary["fields_with_data"] / summary["total_fields"] if summary["total_fields"] > 0 else 0
+            
+            logger.info(f"生成水位摘要: {summary['fields_with_data']}/{summary['total_fields']} 个田块有数据")
+            return summary
+            
+        except Exception as e:
+            logger.error(f"生成水位摘要失败: {e}")
+            return {
+                "total_fields": 0,
+                "fields_with_data": 0,
+                "fields_without_data": [],
+                "quality_distribution": {},
+                "source_distribution": {},
+                "field_details": {},
+                "error": str(e),
+                "last_updated": datetime.now().isoformat()
+            }
 
 if __name__ == "__main__":
     # 示例用法

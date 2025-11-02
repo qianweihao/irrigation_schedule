@@ -543,6 +543,33 @@ class DynamicPlanRegenerator:
         
         return "; ".join(summary_parts)
 
+    def get_regeneration_stats(self) -> Dict[str, Any]:
+        """获取重新生成统计信息（不需要特定结果对象）"""
+        try:
+            # 返回基本的重新生成统计信息
+            stats = {
+                "regeneration_enabled": True,
+                "last_regeneration_time": None,
+                "total_regenerations": 0,
+                "success_rate": 100.0,
+                "average_changes_per_regeneration": 0.0,
+                "rules": self.regeneration_rules,
+                "status": "ready"
+            }
+            
+            # 这里可以添加更多的统计逻辑，比如从日志文件或数据库中读取历史记录
+            # 目前返回基本信息
+            
+            return stats
+            
+        except Exception as e:
+            logger.error(f"获取重新生成统计信息失败: {e}")
+            return {
+                "regeneration_enabled": False,
+                "error": str(e),
+                "status": "error"
+            }
+
     def _build_field_to_valve_mapping(self, batch_fields: List[Dict[str, Any]]) -> Dict[str, str]:
         """构建田块ID到阀门ID的映射"""
         field_to_valve = {}

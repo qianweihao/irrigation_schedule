@@ -96,9 +96,15 @@ class BatchExecutionScheduler:
         
         # 执行状态
         self.is_running = False
+        self.execution_id: Optional[str] = None
+        self.execution_status: str = "idle"  # idle, running, completed, error
         self.current_plan: Optional[Dict[str, Any]] = None
         self.batch_executions: Dict[int, BatchExecution] = {}
         self.execution_start_time: Optional[datetime] = None
+        self.current_batch_index: int = 0
+        self.total_regenerations: int = 0
+        self.last_water_level_update: Optional[str] = None
+        self.error_message: Optional[str] = None
         
         # 回调函数
         self.device_control_callback: Optional[Callable] = None
@@ -153,18 +159,31 @@ class BatchExecutionScheduler:
             if not plan_file.exists():
                 logger.error(f"计划文件不存在: {plan_path}")
                 return False
-            
+
             with open(plan_file, 'r', encoding='utf-8') as f:
-                self.current_plan = json.load(f)
+                raw_data = json.load(f)
             
+            # 检查文件结构并提取实际的计划数据
+            if "scenarios" in raw_data and raw_data["scenarios"]:
+                # 新格式：使用第一个scenario的plan
+                self.current_plan = raw_data["scenarios"][0]["plan"]
+                logger.info(f"使用scenarios格式，选择第一个scenario: {raw_data['scenarios'][0].get('scenario_name', 'Unknown')}")
+            elif "batches" in raw_data and "steps" in raw_data:
+                # 旧格式：直接使用根级别的数据
+                self.current_plan = raw_data
+                logger.info("使用传统格式的计划文件")
+            else:
+                logger.error(f"无法识别的计划文件格式: {plan_path}")
+                return False
+
             # 解析批次信息
             self._parse_batches()
-            
+
             logger.info(f"灌溉计划加载成功: {plan_path}")
             logger.info(f"共有 {len(self.batch_executions)} 个批次")
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(f"加载灌溉计划失败: {e}")
             return False
@@ -223,22 +242,37 @@ class BatchExecutionScheduler:
             self.status_manager.log_error("scheduler", "没有可执行的灌溉计划")
             return False
         
+        # 设置执行状态
         self.is_running = True
         self.execution_start_time = datetime.now()
+        self.execution_id = f"exec_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        self.execution_status = "running"
+        self.current_batch_index = 0
+        self.error_message = None
         
         # 更新状态
         batch_id = f"batch_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        self.status_manager.start_execution(batch_id, len(self.batch_executions))
-        self.status_manager.log_info("scheduler", "开始执行灌溉计划")
+        # 使用update_execution_status而不是不存在的start_execution方法
+        self.status_manager.update_execution_status(
+            farm_id=batch_id,
+            batch_index=1,  # 开始执行时使用批次1
+            status=ExecutionStatus.RUNNING,
+            total_batches=len(self.batch_executions),
+            current_batch=0
+        )
+        self.status_manager.log_info("scheduler", f"开始执行灌溉计划，执行ID: {self.execution_id}")
         self.status_manager.log_info("scheduler", f"执行开始时间: {self.execution_start_time}")
         
         try:
-            # 启动主执行循环
-            await self._execution_loop()
+            # 在后台启动主执行循环，不阻塞当前调用
+            import asyncio
+            asyncio.create_task(self._execution_loop())
             
         except Exception as e:
-            self.status_manager.log_error("scheduler", f"执行过程中发生错误: {e}")
+            self.status_manager.log_error("scheduler", f"启动执行循环失败: {e}")
             self.is_running = False
+            self.execution_status = "error"
+            self.error_message = str(e)
             return False
         
         return True
@@ -278,8 +312,10 @@ class BatchExecutionScheduler:
             # 等待一段时间后再次检查
             await asyncio.sleep(30)  # 每30秒检查一次
         
+        # 执行完成，更新状态
         logger.info("所有批次执行完成")
         self.is_running = False
+        self.execution_status = "completed"
     
     def _has_pending_batches(self) -> bool:
         """检查是否还有待执行的批次"""
@@ -351,6 +387,8 @@ class BatchExecutionScheduler:
                             except (ValueError, TypeError):
                                 continue
                 
+                # 更新最后水位更新时间
+                self.last_water_level_update = datetime.now().isoformat()
                 logger.info(f"从API获取到 {len(water_levels)} 个水位数据")
             else:
                 logger.warning("水位API不可用，使用配置文件中的默认水位")
@@ -389,6 +427,9 @@ class BatchExecutionScheduler:
             new_plan = build_concurrent_plan(cfg)
             new_plan_json = plan_to_json(new_plan)
             
+            # 更新重新生成计数
+            self.total_regenerations += 1
+            
             logger.info(f"批次 {batch_exec.batch_index} 计划重新生成完成")
             
             return new_plan_json
@@ -410,6 +451,9 @@ class BatchExecutionScheduler:
             batch_exec.started_at = datetime.now()
             batch_exec.execution_log.append(f"开始执行批次 {batch_exec.batch_index}")
             
+            # 更新当前批次索引
+            self.current_batch_index = batch_exec.batch_index
+            
             # 使用更新后的计划或原始计划
             plan_to_execute = batch_exec.updated_plan or batch_exec.original_plan
             
@@ -427,6 +471,8 @@ class BatchExecutionScheduler:
             batch_exec.status = BatchStatus.FAILED
             batch_exec.error_message = str(e)
             batch_exec.execution_log.append(f"执行批次失败: {e}")
+            self.error_message = str(e)
+            self.execution_status = "error"
             logger.error(f"执行批次 {batch_exec.batch_index} 失败: {e}")
     
     async def _check_batch_completion(self, batch_exec: BatchExecution, elapsed_hours: float):
@@ -479,28 +525,40 @@ class BatchExecutionScheduler:
         Returns:
             Dict[str, Any]: 执行状态信息
         """
-        status = {
-            "is_running": self.is_running,
-            "execution_start_time": self.execution_start_time.isoformat() if self.execution_start_time else None,
-            "total_batches": len(self.batch_executions),
-            "batches": {}
-        }
+        # 计算当前批次和完成的批次
+        completed_batches = []
+        active_fields = []
         
         for batch_index, batch_exec in self.batch_executions.items():
-            status["batches"][batch_index] = {
-                "status": batch_exec.status.value,
-                "original_start_time": batch_exec.original_start_time,
-                "original_duration": batch_exec.original_duration,
-                "current_start_time": batch_exec.current_start_time,
-                "current_duration": batch_exec.current_duration,
-                "started_at": batch_exec.started_at.isoformat() if batch_exec.started_at else None,
-                "completed_at": batch_exec.completed_at.isoformat() if batch_exec.completed_at else None,
-                "error_message": batch_exec.error_message,
-                "execution_log": batch_exec.execution_log[-5:],  # 最近5条日志
-                "water_levels_count": len(batch_exec.water_levels) if batch_exec.water_levels else 0
-            }
+            if batch_exec.status == BatchStatus.COMPLETED:
+                completed_batches.append({
+                    "batch_index": batch_index,
+                    "completed_at": batch_exec.completed_at.isoformat() if batch_exec.completed_at else None,
+                    "duration": batch_exec.current_duration
+                })
+            elif batch_exec.status == BatchStatus.EXECUTING:
+                self.current_batch_index = batch_index
+                # 从批次执行中提取活跃字段信息
+                if hasattr(batch_exec, 'execution_plan') and batch_exec.execution_plan:
+                    for field_id, field_data in batch_exec.execution_plan.items():
+                        active_fields.append({
+                            "field_id": field_id,
+                            "status": "running",
+                            "start_time": batch_exec.started_at.isoformat() if batch_exec.started_at else None
+                        })
         
-        return status
+        return {
+            "execution_id": self.execution_id or "",
+            "status": self.execution_status,
+            "current_batch": self.current_batch_index,
+            "total_batches": len(self.batch_executions),
+            "start_time": self.execution_start_time.isoformat() if self.execution_start_time else None,
+            "last_water_level_update": self.last_water_level_update,
+            "total_regenerations": self.total_regenerations,
+            "active_fields": active_fields,
+            "completed_batches": completed_batches,
+            "error_message": self.error_message
+        }
     
     def set_device_control_callback(self, callback: Callable):
         """设置设备控制回调函数"""

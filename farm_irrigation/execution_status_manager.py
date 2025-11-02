@@ -67,6 +67,7 @@ class ExecutionLogEntry:
 class BatchExecutionStatus:
     """批次执行状态"""
     batch_id: str
+    farm_id: str
     status: ExecutionStatus
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
@@ -82,6 +83,7 @@ class BatchExecutionStatus:
         """转换为字典"""
         return {
             'batch_id': self.batch_id,
+            'farm_id': self.farm_id,
             'status': self.status.value,
             'start_time': self.start_time.isoformat() if self.start_time else None,
             'end_time': self.end_time.isoformat() if self.end_time else None,
@@ -112,6 +114,7 @@ class ExecutionStatusManager:
         # 当前执行状态
         self.current_status = BatchExecutionStatus(
             batch_id="",
+            farm_id="",
             status=ExecutionStatus.IDLE
         )
         
@@ -156,10 +159,13 @@ class ExecutionStatusManager:
                         farm_id TEXT NOT NULL,
                         batch_index INTEGER,
                         level TEXT NOT NULL,
+                        category TEXT NOT NULL,
                         message TEXT NOT NULL,
                         details TEXT,
                         timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
-                        source TEXT
+                        source TEXT,
+                        batch_id TEXT,
+                        field_id TEXT
                     )
                 ''')
                 
@@ -192,6 +198,9 @@ class ExecutionStatusManager:
     def _setup_logging(self):
         """设置日志记录"""
         try:
+            # 设置实例logger
+            self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+            
             # 确保日志目录存在
             log_dir = os.path.dirname(self.log_path)
             if log_dir and not os.path.exists(log_dir):
@@ -208,12 +217,14 @@ class ExecutionStatusManager:
             file_handler.setFormatter(formatter)
             
             # 添加到logger
-            logger.addHandler(file_handler)
+            self.logger.addHandler(file_handler)
             
-            logger.info("日志系统初始化完成")
+            self.logger.info("日志系统初始化完成")
             
         except Exception as e:
             print(f"日志系统初始化失败: {e}")
+            # 设置一个基本的logger以防出错
+            self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
     
     def update_execution_status(self, 
                               farm_id: str, 
@@ -357,6 +368,7 @@ class ExecutionStatusManager:
         
         return BatchExecutionStatus(
             batch_id=f"{row[0]}_{row[1]}",  # 组合farm_id和batch_index作为batch_id
+            farm_id=row[0],  # farm_id
             status=ExecutionStatus(row[2]),
             start_time=parse_datetime(row[3]),
             end_time=parse_datetime(row[4]),
@@ -707,9 +719,10 @@ class ExecutionStatusManager:
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO execution_logs (
-                    timestamp, level, category, message, details, batch_id, field_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    farm_id, timestamp, level, category, message, details, batch_id, field_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
+                self.current_status.farm_id,
                 entry.timestamp.isoformat(),
                 entry.level.value,
                 entry.category,

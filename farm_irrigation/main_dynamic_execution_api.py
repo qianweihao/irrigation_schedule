@@ -17,12 +17,19 @@
 
 import asyncio
 import logging
+import os
+import json
+import glob
+import shutil
+import tempfile
 from datetime import datetime
 from typing import Dict, List, Optional, Any
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Form, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
+import geopandas as gpd
 
 # 导入动态执行相关模块
 from batch_execution_scheduler import BatchExecutionScheduler
@@ -38,7 +45,7 @@ from dynamic_execution_api import (
     ExecutionHistoryResponse,
     start_dynamic_execution, stop_dynamic_execution, get_execution_status,
     update_water_levels, manual_regenerate_batch, get_execution_history,
-    get_water_level_summary, get_field_trend_analysis
+    get_water_level_summary, get_field_trend_analysis, get_water_level_history
 )
 
 # 配置日志
@@ -92,8 +99,132 @@ class SystemInitRequest(BaseModel):
     database_path: str = "execution_status.db"
     cache_file_path: str = "water_level_cache.json"
 
+class IrrigationPlanRequest(BaseModel):
+    """生成灌溉计划请求模型"""
+    farm_id: str
+    config_path: Optional[str] = None
+    output_dir: Optional[str] = None
+    scenario_name: Optional[str] = None
+
+class IrrigationPlanResponse(BaseModel):
+    """生成灌溉计划响应模型"""
+    success: bool
+    message: str
+    data: Optional[Dict[str, Any]] = None
+    plan_id: Optional[str] = None
+
 # 系统启动时间
 _system_start_time = datetime.now()
+
+# 文件上传相关常量
+GZP_FARM_DIR = os.path.join(os.path.dirname(__file__), "gzp_farm")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+
+# GeoJson相关常量
+ROOT = os.path.abspath(os.path.dirname(__file__))
+GEOJSON_DIR = os.path.join(ROOT, "gzp_farm")
+VALVE_FILE = "港中坪阀门与节制闸_code.geojson"
+FIELD_FILE = "港中坪田块_code.geojson"
+WATERWAY_FILE = "港中坪水路_code.geojson"
+
+# 标注后的文件（优先使用）
+LABELED_DIR = os.path.join(ROOT, "labeled_output")
+LABELED_FIELDS = os.path.join(LABELED_DIR, "fields_labeled.geojson")
+LABELED_GATES = os.path.join(LABELED_DIR, "gates_labeled.geojson")
+LABELED_SEGMENT = os.path.join(LABELED_DIR, "segments_labeled.geojson")
+
+# GeoJson辅助函数
+def _looks_like_lonlat(bounds):
+    """检查边界是否像经纬度坐标"""
+    try:
+        minx, miny, maxx, maxy = bounds
+        return -180 <= minx <= 180 and -90 <= miny <= 90 and -180 <= maxx <= 180 and -90 <= maxy <= 90
+    except Exception:
+        return False
+
+def read_geo_ensure_wgs84(path: str) -> gpd.GeoDataFrame:
+    """读取地理数据文件并确保为WGS84坐标系"""
+    gdf = gpd.read_file(path)
+    if gdf.empty:
+        return gdf
+    if gdf.crs is None:
+        # 如果像经纬度，强设 WGS84；否则抛错提示重投影
+        if _looks_like_lonlat(gdf.total_bounds):
+            gdf = gdf.set_crs(epsg=4326)
+        else:
+            raise RuntimeError(f"{os.path.basename(path)} 无 CRS 且不像 WGS84，经纬度范围={gdf.total_bounds}")
+    if gdf.crs.to_epsg() != 4326:
+        gdf = gdf.to_crs(epsg=4326)
+    return gdf
+
+def _first_existing(*paths):
+    """返回第一个存在的文件路径"""
+    for p in paths:
+        if p and os.path.isfile(p):
+            return p
+    return None
+
+# 文件上传辅助函数
+def validate_shp_files(files: List[UploadFile]) -> bool:
+    """验证上传的文件是否为有效的shapefile组合"""
+    if not files:
+        return True  # 允许不上传文件，使用现有数据
+    
+    # 检查文件扩展名
+    extensions = set()
+    for file in files:
+        if file.filename:
+            ext = os.path.splitext(file.filename)[1].lower()
+            extensions.add(ext)
+    
+    # shapefile至少需要.shp, .dbf, .shx文件
+    required_exts = {'.shp', '.dbf', '.shx'}
+    return required_exts.issubset(extensions)
+
+def backup_existing_files() -> str:
+    """备份现有的gzp_farm文件"""
+    if not os.path.exists(GZP_FARM_DIR):
+        return ""
+    
+    backup_dir = tempfile.mkdtemp(prefix="gzp_farm_backup_")
+    if os.listdir(GZP_FARM_DIR):
+        shutil.copytree(GZP_FARM_DIR, os.path.join(backup_dir, "gzp_farm"))
+    return backup_dir
+
+def restore_files(backup_dir: str):
+    """恢复备份的文件"""
+    if backup_dir and os.path.exists(backup_dir):
+        backup_gzp = os.path.join(backup_dir, "gzp_farm")
+        if os.path.exists(backup_gzp):
+            if os.path.exists(GZP_FARM_DIR):
+                shutil.rmtree(GZP_FARM_DIR)
+            shutil.copytree(backup_gzp, GZP_FARM_DIR)
+        shutil.rmtree(backup_dir)
+
+def save_uploaded_files(files: List[UploadFile]) -> bool:
+    """保存上传的文件到gzp_farm目录"""
+    try:
+        # 确保目录存在
+        os.makedirs(GZP_FARM_DIR, exist_ok=True)
+        
+        # 清理现有的shapefile相关文件
+        for filename in os.listdir(GZP_FARM_DIR):
+            if any(filename.endswith(ext) for ext in ['.shp', '.dbf', '.shx', '.prj', '.cpg', '.sbn', '.sbx']):
+                os.remove(os.path.join(GZP_FARM_DIR, filename))
+        
+        # 保存新文件
+        for file in files:
+            if file.filename:
+                file_path = os.path.join(GZP_FARM_DIR, file.filename)
+                with open(file_path, "wb") as f:
+                    content = file.file.read()
+                    f.write(content)
+                file.file.seek(0)  # 重置文件指针
+        
+        return True
+    except Exception as e:
+        logger.error(f"保存文件失败: {e}")
+        return False
 
 @app.on_event("startup")
 async def startup_event():
@@ -113,7 +244,7 @@ async def shutdown_event():
     # 停止正在运行的执行
     global _scheduler
     if _scheduler and _scheduler.is_running:
-        await _scheduler.stop_execution()
+        _scheduler.stop_execution()
     
     logger.info("智能灌溉动态执行系统已关闭")
 
@@ -134,7 +265,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         
         # 初始化执行状态管理器
         _status_manager = ExecutionStatusManager(
-            database_path=request.database_path,
+            db_path=request.database_path,
             log_path="execution_logs"
         )
         logger.info("执行状态管理器初始化完成")
@@ -142,7 +273,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         # 初始化水位管理器
         _waterlevel_manager = DynamicWaterLevelManager(
             config_path=request.config_path,
-            cache_file_path=request.cache_file_path
+            cache_file=request.cache_file_path
         )
         logger.info("水位管理器初始化完成")
         
@@ -289,6 +420,11 @@ async def field_trend_analysis(field_id: str, hours: int = 48):
     """获取田块水位趋势分析"""
     return await get_field_trend_analysis(field_id, hours)
 
+@app.get("/api/water-levels/history")
+async def water_level_history(farm_id: str, field_id: str, hours: int = 24):
+    """获取田块水位历史数据"""
+    return await get_water_level_history(farm_id, field_id, hours)
+
 # ==================== 计划重新生成API ====================
 
 @app.post("/api/regeneration/manual", response_model=ManualRegenerationResponse)
@@ -304,17 +440,77 @@ async def regeneration_summary(farm_id: str):
         if not _plan_regenerator:
             raise HTTPException(status_code=500, detail="计划重新生成器未初始化")
         
-        summary = _plan_regenerator.get_regeneration_summary()
-        summary["farm_id"] = farm_id
-        summary["query_time"] = datetime.now().isoformat()
+        stats = _plan_regenerator.get_regeneration_stats()
+        stats["farm_id"] = farm_id
+        stats["query_time"] = datetime.now().isoformat()
         
-        return summary
+        return stats
         
     except Exception as e:
         logger.error(f"获取重新生成摘要失败: {e}")
         raise HTTPException(status_code=500, detail=f"获取重新生成摘要失败: {str(e)}")
 
 # ==================== 批次管理API ====================
+
+@app.get("/api/batches")
+async def get_batch_list():
+    """获取批次列表"""
+    try:
+        global _scheduler
+        if not _scheduler:
+            raise HTTPException(status_code=500, detail="调度器未初始化")
+        
+        plan = _scheduler.get_current_plan()
+        
+        if not plan:
+            # 尝试加载实际的输出计划文件
+            try:
+                # 首先尝试加载environment中配置的文件
+                output_plan_path = "output/irrigation_plan_modified_1761982575.json"
+                _scheduler.load_irrigation_plan(output_plan_path)
+                plan = _scheduler.get_current_plan()
+                logger.info(f"成功加载输出计划文件: {output_plan_path}")
+            except Exception as load_error:
+                logger.warning(f"加载输出计划文件失败: {load_error}")
+                # 如果输出文件加载失败，尝试加载根目录的plan.json作为备选
+                try:
+                    _scheduler.load_irrigation_plan("plan.json")
+                    plan = _scheduler.get_current_plan()
+                    logger.info("使用根目录plan.json作为备选")
+                except Exception as fallback_error:
+                    logger.error(f"加载备选计划失败: {fallback_error}")
+                    raise HTTPException(status_code=404, detail="当前没有执行计划，且无法加载任何计划文件")
+        
+        if not plan:
+            raise HTTPException(status_code=404, detail="当前没有执行计划")
+        
+        batches = plan.get("batches", [])
+        
+        # 构建批次列表响应
+        batch_list = []
+        for batch in batches:
+            batch_info = {
+                "index": batch.get("index", 0),
+                "area_mu": batch.get("area_mu", 0),
+                "field_count": len(batch.get("fields", [])),
+                "fields": [field.get("id", "") for field in batch.get("fields", [])],
+                "segment_ids": list(set([field.get("segment_id", "") for field in batch.get("fields", []) if field.get("segment_id")]))
+            }
+            batch_list.append(batch_info)
+        
+        return {
+            "success": True,
+            "total_batches": len(batch_list),
+            "batches": batch_list,
+            "farm_id": _scheduler.get_farm_id() if hasattr(_scheduler, 'get_farm_id') else "unknown",
+            "query_time": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取批次列表失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取批次列表失败: {str(e)}")
 
 @app.get("/api/batches/{batch_index}/details")
 async def get_batch_details(batch_index: int):
@@ -324,10 +520,65 @@ async def get_batch_details(batch_index: int):
         if not _scheduler:
             raise HTTPException(status_code=500, detail="调度器未初始化")
         
-        details = await _scheduler.get_batch_details(batch_index)
+        # 获取当前计划以验证批次索引
+        plan = _scheduler.get_current_plan()
+        if not plan:
+            # 尝试加载实际的输出计划文件
+            try:
+                output_plan_path = "output/irrigation_plan_modified_1761982575.json"
+                _scheduler.load_irrigation_plan(output_plan_path)
+                plan = _scheduler.get_current_plan()
+                logger.info(f"成功加载输出计划文件: {output_plan_path}")
+            except Exception as load_error:
+                logger.warning(f"加载输出计划文件失败: {load_error}")
+                raise HTTPException(status_code=404, detail="当前没有执行计划")
         
-        if not details:
+        if not plan:
+            raise HTTPException(status_code=404, detail="当前没有执行计划")
+        
+        # 验证批次索引是否有效（批次索引从1开始）
+        batches = []
+        if 'scenarios' in plan and isinstance(plan['scenarios'], list) and len(plan['scenarios']) > 0:
+            first_scenario = plan['scenarios'][0]
+            if 'plan' in first_scenario and 'batches' in first_scenario['plan']:
+                batches = first_scenario['plan']['batches']
+        elif 'batches' in plan:
+            batches = plan['batches']
+        
+        if not batches or batch_index < 1 or batch_index > len(batches):
             raise HTTPException(status_code=404, detail=f"批次 {batch_index} 不存在")
+        
+        # 获取批次信息（从计划文件中）
+        batch_info = batches[batch_index - 1]  # 转换为0基索引
+        
+        # 尝试从调度器获取执行详情（如果有的话）
+        execution_details = None
+        try:
+            # 调度器使用0基索引
+            execution_details = await _scheduler.get_batch_details(batch_index - 1)
+        except Exception as e:
+            logger.warning(f"获取批次执行详情失败: {e}")
+        
+        # 构建详细信息
+        details = {
+            "batch_index": batch_index,
+            "area_mu": batch_info.get("area_mu", 0),
+            "field_count": len(batch_info.get("fields", [])),
+            "fields": [
+                {
+                    "id": field.get("id"),
+                    "area_mu": field.get("area_mu"),
+                    "segment_id": field.get("segment_id"),
+                    "distance_rank": field.get("distance_rank"),
+                    "wl_mm": field.get("wl_mm"),
+                    "inlet_G_id": field.get("inlet_G_id")
+                }
+                for field in batch_info.get("fields", [])
+            ],
+            "segment_ids": list(set(field.get("segment_id") for field in batch_info.get("fields", []) if field.get("segment_id"))),
+            "execution_details": execution_details,
+            "query_time": datetime.now().isoformat()
+        }
         
         return details
         
@@ -362,6 +613,259 @@ async def get_current_plan():
         logger.error(f"获取当前计划失败: {e}")
         raise HTTPException(status_code=500, detail=f"获取当前计划失败: {str(e)}")
 
+# ==================== 灌溉计划生成API ====================
+
+@app.post("/api/irrigation/plan-generation", response_model=IrrigationPlanResponse)
+async def generate_irrigation_plan(request: IrrigationPlanRequest):
+    """生成灌溉计划"""
+    try:
+        logger.info(f"开始生成灌溉计划 - farm_id: {request.farm_id}")
+        
+        # 导入pipeline模块
+        try:
+            from pipeline import IrrigationPipeline
+        except ImportError as e:
+            logger.error(f"导入pipeline模块失败: {e}")
+            raise HTTPException(status_code=500, detail="系统模块导入失败")
+        
+        # 设置默认参数
+        output_dir = request.output_dir or os.path.join(os.path.dirname(__file__), "output")
+        config_path = request.config_path or os.path.join(os.path.dirname(__file__), "config.json")
+        
+        # 确保输出目录存在
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # 构建pipeline参数
+        kwargs = {
+            'input_dir': os.path.join(os.path.dirname(__file__), "gzp_farm"),
+            'output_dir': output_dir,
+            'config_file': config_path if os.path.exists(config_path) else None,
+            'merge_waterlevels': True,
+            'print_summary': True
+        }
+        
+        logger.info(f"Pipeline参数: {kwargs}")
+        
+        # 运行灌溉计划生成
+        try:
+            pipeline = IrrigationPipeline()
+            success = pipeline.run_pipeline(**kwargs)
+            logger.info(f"Pipeline执行结果: success={success}")
+        except Exception as pipeline_error:
+            logger.error(f"Pipeline执行异常: {pipeline_error}")
+            raise HTTPException(status_code=500, detail=f"灌溉计划生成异常: {str(pipeline_error)}")
+        
+        if not success:
+            logger.error("Pipeline执行失败")
+            raise HTTPException(status_code=500, detail="灌溉计划生成失败")
+        
+        # 读取生成的计划文件（查找最新的irrigation_plan_*.json文件）
+        plan_data = None
+        plan_id = None
+        
+        if os.path.exists(output_dir):
+            plan_files = glob.glob(os.path.join(output_dir, "irrigation_plan_*.json"))
+            if plan_files:
+                # 获取最新的文件
+                latest_plan_file = max(plan_files, key=os.path.getmtime)
+                plan_id = os.path.basename(latest_plan_file).replace('.json', '')
+                logger.info(f"读取计划文件: {latest_plan_file}")
+                
+                try:
+                    with open(latest_plan_file, 'r', encoding='utf-8') as f:
+                        plan_data = json.load(f)
+                    logger.info(f"成功读取计划数据，包含 {len(plan_data) if plan_data else 0} 项")
+                except Exception as e:
+                    logger.error(f"读取计划文件失败: {e}")
+            else:
+                logger.warning("未找到灌溉计划文件")
+        
+        # 准备响应数据
+        response_data = {
+            "success": True,
+            "message": "灌溉计划生成成功",
+            "data": plan_data,
+            "plan_id": plan_id
+        }
+        
+        logger.info("灌溉计划生成完成")
+        return IrrigationPlanResponse(**response_data)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"生成灌溉计划失败: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"服务器内部错误: {str(e)}"
+        )
+
+@app.post("/api/irrigation/plan-with-upload", response_model=IrrigationPlanResponse)
+async def generate_irrigation_plan_with_upload(
+    farm_id: str = Form("13944136728576"),
+    target_depth_mm: float = Form(90.0),
+    pumps: Optional[str] = Form(None),
+    zones: Optional[str] = Form(None),
+    merge_waterlevels: bool = Form(True),
+    print_summary: bool = Form(True),
+    multi_pump_scenarios: bool = Form(False),
+    custom_waterlevels: Optional[str] = Form(None),
+    files: List[UploadFile] = File(default=[])
+):
+    """生成灌溉计划（支持文件上传）"""
+    backup_dir = ""
+    
+    try:
+        logger.info(f"开始处理灌溉计划请求 - farm_id: {farm_id}, target_depth_mm: {target_depth_mm}")
+        
+        # 导入pipeline模块
+        try:
+            from pipeline import IrrigationPipeline
+        except ImportError as e:
+            logger.error(f"导入pipeline模块失败: {e}")
+            raise HTTPException(status_code=500, detail="系统模块导入失败")
+        
+        # 验证上传的文件
+        if files and files[0].filename:  # 检查是否真的有文件上传
+            logger.info(f"检测到文件上传，文件数量: {len(files)}")
+            for file in files:
+                logger.info(f"上传文件: {file.filename}")
+            
+            if not validate_shp_files(files):
+                logger.error("文件验证失败：无效的shapefile文件组合")
+                raise HTTPException(
+                    status_code=400, 
+                    detail="无效的shapefile文件组合，需要包含.shp, .dbf, .shx文件"
+                )
+            
+            logger.info("文件验证通过")
+            
+            # 备份现有文件
+            logger.info("开始备份现有文件")
+            backup_dir = backup_existing_files()
+            logger.info(f"备份目录: {backup_dir}")
+            
+            # 保存上传的文件
+            logger.info("开始保存上传的文件")
+            if not save_uploaded_files(files):
+                logger.error("文件保存失败，恢复备份")
+                if backup_dir:
+                    restore_files(backup_dir)
+                raise HTTPException(status_code=500, detail="文件保存失败")
+            logger.info("文件保存成功")
+        else:
+            logger.info("未检测到文件上传，使用现有数据")
+        
+        # 构建pipeline参数
+        kwargs = {
+            'input_dir': GZP_FARM_DIR,
+            'output_dir': OUTPUT_DIR,
+            'config_file': None,
+            'pumps': pumps,
+            'zones': zones,
+            'merge_waterlevels': merge_waterlevels,
+            'print_summary': print_summary,
+            'multi_pump_scenarios': multi_pump_scenarios,
+            'custom_waterlevels': custom_waterlevels
+        }
+        logger.info(f"Pipeline参数: {kwargs}")
+        
+        # 更新auto_config_params.yaml中的farm_id和target_depth_mm
+        config_params_file = os.path.join(os.path.dirname(__file__), "auto_config_params.yaml")
+        logger.info(f"配置文件路径: {config_params_file}")
+        
+        try:
+            if os.path.exists(config_params_file):
+                import yaml
+                logger.info("读取配置文件")
+                with open(config_params_file, 'r', encoding='utf-8') as f:
+                    config_params = yaml.safe_load(f)
+                
+                config_params['default_farm_id'] = farm_id
+                config_params['default_target_depth_mm'] = target_depth_mm
+                
+                logger.info("更新配置文件")
+                with open(config_params_file, 'w', encoding='utf-8') as f:
+                    yaml.dump(config_params, f, ensure_ascii=False, indent=2)
+                logger.info("配置文件更新成功")
+            else:
+                logger.info("配置文件不存在，跳过更新")
+        except Exception as config_error:
+            logger.error(f"配置文件处理错误: {config_error}")
+            # 配置文件错误不应该阻止主流程
+        
+        # 确保输出目录存在
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        
+        # 运行灌溉计划生成
+        logger.info("开始运行灌溉计划生成")
+        try:
+            pipeline = IrrigationPipeline()
+            success = pipeline.run_pipeline(**kwargs)
+            logger.info(f"Pipeline执行结果: success={success}")
+        except Exception as pipeline_error:
+            logger.error(f"Pipeline执行异常: {pipeline_error}")
+            if backup_dir:
+                logger.info("恢复备份文件")
+                restore_files(backup_dir)
+            raise HTTPException(status_code=500, detail=f"灌溉计划生成异常: {str(pipeline_error)}")
+        
+        if not success:
+            logger.error("Pipeline执行失败")
+            if backup_dir:
+                logger.info("恢复备份文件")
+                restore_files(backup_dir)
+            raise HTTPException(status_code=500, detail="灌溉计划生成失败")
+        
+        # 读取生成的计划文件（查找最新的irrigation_plan_*.json文件）
+        plan_data = None
+        plan_id = None
+        
+        if os.path.exists(OUTPUT_DIR):
+            plan_files = glob.glob(os.path.join(OUTPUT_DIR, "irrigation_plan_*.json"))
+            if plan_files:
+                # 获取最新的文件
+                latest_plan_file = max(plan_files, key=os.path.getmtime)
+                plan_id = os.path.basename(latest_plan_file).replace('.json', '')
+                logger.info(f"读取计划文件: {latest_plan_file}")
+                
+                try:
+                    with open(latest_plan_file, 'r', encoding='utf-8') as f:
+                        plan_data = json.load(f)
+                    logger.info(f"成功读取计划数据，包含 {len(plan_data) if plan_data else 0} 项")
+                except Exception as e:
+                    logger.error(f"读取计划文件失败: {e}")
+            else:
+                logger.warning("未找到灌溉计划文件")
+        
+        # 清理备份
+        if backup_dir:
+            shutil.rmtree(backup_dir)
+        
+        # 准备响应数据
+        response_data = {
+            "success": True,
+            "message": "灌溉计划生成成功",
+            "data": plan_data,
+            "plan_id": plan_id
+        }
+        
+        logger.info("灌溉计划生成完成")
+        return IrrigationPlanResponse(**response_data)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        # 恢复备份文件
+        if backup_dir:
+            restore_files(backup_dir)
+        
+        logger.error(f"生成灌溉计划失败: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"服务器内部错误: {str(e)}"
+        )
+
 # ==================== 数据管理API ====================
 
 @app.post("/api/data/cleanup")
@@ -383,6 +887,158 @@ async def cleanup_old_data(retention_days: int = 30):
     except Exception as e:
         logger.error(f"清理旧数据失败: {e}")
         raise HTTPException(status_code=500, detail=f"清理旧数据失败: {str(e)}")
+
+# ==================== GeoJson API ====================
+
+@app.get("/geojson/fields")
+async def api_fields():
+    """获取田块GeoJson数据"""
+    try:
+        p = _first_existing(LABELED_FIELDS, os.path.join(GEOJSON_DIR, FIELD_FILE))
+        if not p:
+            raise HTTPException(status_code=404, detail="未找到田块图层")
+        
+        gdf = read_geo_ensure_wgs84(p)
+        return JSONResponse(content=json.loads(gdf.to_json()))
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取田块GeoJson数据失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取田块数据失败: {str(e)}")
+
+@app.get("/geojson/gates")
+async def api_gates():
+    """获取闸门GeoJson数据"""
+    try:
+        p = _first_existing(LABELED_GATES, os.path.join(GEOJSON_DIR, VALVE_FILE))
+        if not p:
+            raise HTTPException(status_code=404, detail="未找到闸门图层")
+        
+        gdf = read_geo_ensure_wgs84(p)
+        return JSONResponse(content=json.loads(gdf.to_json()))
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取闸门GeoJson数据失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取闸门数据失败: {str(e)}")
+
+@app.get("/geojson")
+async def api_geojson(type: Optional[str] = Query(None, description="数据类型: waterway/fields/gates")):
+    """兼容旧接口：/geojson?type=waterway|fields|gates"""
+    try:
+        if not type:
+            raise HTTPException(status_code=400, detail="type 参数必须为 waterway/fields/gates 之一")
+        
+        typ = type.lower().strip()
+        
+        if typ in ("fields", "field"):
+            return await api_fields()
+        
+        if typ in ("gates", "gate", "valves", "valve"):
+            return await api_gates()
+        
+        if typ in ("waterway", "segments", "lines"):
+            p = _first_existing(LABELED_SEGMENT, os.path.join(GEOJSON_DIR, WATERWAY_FILE))
+            if not p:
+                raise HTTPException(status_code=404, detail="未找到水路图层")
+            
+            gdf = read_geo_ensure_wgs84(p)
+            return JSONResponse(content=json.loads(gdf.to_json()))
+        
+        raise HTTPException(status_code=400, detail="type 参数必须为 waterway/fields/gates 之一")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取GeoJson数据失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取GeoJson数据失败: {str(e)}")
+
+# ==================== 监控面板API ====================
+
+@app.get("/api/monitoring/dashboard")
+async def get_monitoring_dashboard(farm_id: Optional[str] = Query("default_farm", description="农场ID")):
+    """获取监控面板数据"""
+    try:
+        global _scheduler, _waterlevel_manager, _status_manager
+        
+        # 获取系统状态
+        system_status = {
+            "scheduler_initialized": _scheduler is not None,
+            "waterlevel_manager_initialized": _waterlevel_manager is not None,
+            "status_manager_initialized": _status_manager is not None,
+            "current_time": datetime.now().isoformat(),
+            "uptime_seconds": (datetime.now() - _system_start_time).total_seconds()
+        }
+        
+        # 获取执行状态
+        execution_status = {}
+        if _scheduler:
+            try:
+                status = _scheduler.get_execution_status()
+                execution_status = {
+                    "is_running": _scheduler.is_running,
+                    "execution_id": status.get("execution_id"),
+                    "status": status.get("status"),
+                    "current_batch": status.get("current_batch"),
+                    "total_batches": status.get("total_batches", 0),
+                    "start_time": status.get("start_time"),
+                    "last_water_level_update": status.get("last_water_level_update"),
+                    "total_regenerations": status.get("total_regenerations", 0),
+                    "active_fields": status.get("active_fields", []),
+                    "completed_batches": status.get("completed_batches", []),
+                    "error_message": status.get("error_message")
+                }
+            except Exception as e:
+                logger.warning(f"获取执行状态失败: {e}")
+                execution_status = {"error": str(e)}
+        
+        # 获取水位数据摘要
+        water_level_summary = {}
+        if _waterlevel_manager:
+            try:
+                summary = _waterlevel_manager.get_water_level_summary()
+                water_level_summary = {
+                    "total_fields": summary.get("total_fields", 0),
+                    "fields_with_data": summary.get("fields_with_data", 0),
+                    "last_update": summary.get("last_update"),
+                    "average_level": summary.get("average_level", 0),
+                    "quality_summary": summary.get("quality_summary", {}),
+                    "field_summaries": summary.get("field_summaries", {})
+                }
+            except Exception as e:
+                logger.warning(f"获取水位摘要失败: {e}")
+                water_level_summary = {"error": str(e)}
+        
+        # 获取最近的执行历史
+        recent_history = []
+        if _status_manager:
+            try:
+                history = await _status_manager.get_recent_executions(limit=5)
+                recent_history = history
+            except Exception as e:
+                logger.warning(f"获取执行历史失败: {e}")
+                recent_history = []
+        
+        dashboard_data = {
+            "farm_id": farm_id,
+            "timestamp": datetime.now().isoformat(),
+            "system_status": system_status,
+            "execution_status": execution_status,
+            "water_level_summary": water_level_summary,
+            "recent_history": recent_history
+        }
+        
+        return {
+            "success": True,
+            "message": "监控面板数据获取成功",
+            "data": dashboard_data
+        }
+        
+    except Exception as e:
+        logger.error(f"获取监控面板数据失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取监控面板数据失败: {str(e)}")
 
 # ==================== 根路径和文档 ====================
 

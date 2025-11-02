@@ -1,0 +1,511 @@
+{
+  "info": {
+    "name": "灌溉系统API测试集合",
+    "description": "农场灌溉管理系统完整API测试集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. 系统管理",
+      "item": [
+        {
+          "name": "系统初始化",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_file_path\": \"/path/to/config.json\",\n  \"force_reinit\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/system/init",
+              "host": ["{{base_url}}"],
+              "path": ["api", "system", "init"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "健康检查",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/system/health-check",
+              "host": ["{{base_url}}"],
+              "path": ["api", "system", "health-check"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"服务健康状态正常\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"healthy\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. 动态执行",
+      "item": [
+        {
+          "name": "启动动态执行",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan_file_path\": \"{{plan_file_path}}\",\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_file_path\": \"{{config_file_path}}\",\n  \"auto_start\": true,\n  \"water_level_update_interval_minutes\": 30,\n  \"enable_plan_regeneration\": true,\n  \"execution_mode\": \"simulation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/execution/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "execution", "start"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"执行启动成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    ",
+                  "    // 保存execution_id供后续使用",
+                  "    if (jsonData.data && jsonData.data.execution_id) {",
+                  "        pm.environment.set(\"execution_id\", jsonData.data.execution_id);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "查询执行状态",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/execution/status?execution_id={{execution_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "execution", "status"],
+              "query": [
+                {
+                  "key": "execution_id",
+                  "value": "{{execution_id}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态查询成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property(\"status\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "停止执行",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"execution_id\": \"{{execution_id}}\",\n  \"reason\": \"手动停止测试\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/execution/stop",
+              "host": ["{{base_url}}"],
+              "path": ["api", "execution", "stop"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. 水位管理",
+      "item": [
+        {
+          "name": "更新水位数据",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"field_id\": \"{{field_id}}\",\n  \"water_level_mm\": {{water_level}},\n  \"timestamp\": \"2025-01-01T12:00:00Z\",\n  \"source\": \"manual\",\n  \"quality\": \"good\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/water-levels/update",
+              "host": ["{{base_url}}"],
+              "path": ["api", "water-levels", "update"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"水位更新成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取水位历史",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/water-levels/history?farm_id={{farm_id}}&field_id={{field_id}}&hours=24",
+              "host": ["{{base_url}}"],
+              "path": ["api", "water-levels", "history"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                },
+                {
+                  "key": "field_id",
+                  "value": "{{field_id}}"
+                },
+                {
+                  "key": "hours",
+                  "value": "24"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "获取水位汇总",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/water-levels/summary?farm_id={{farm_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "water-levels", "summary"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. 计划重新生成",
+      "item": [
+        {
+          "name": "手动重新生成",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"batch_index\": 1,\n  \"custom_water_levels\": {\n    \"S3-G5-F3\": 95.0\n  },\n  \"force_regeneration\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/regeneration/manual",
+              "host": ["{{base_url}}"],
+              "path": ["api", "regeneration", "manual"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"重新生成请求成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取执行状态",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/execution/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "execution", "status"]
+            }
+          }
+        },
+        {
+          "name": "获取重新生成摘要",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/regeneration/summary/{{farm_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "regeneration", "summary", "{{farm_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. 批次管理",
+      "item": [
+        {
+          "name": "获取批次列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/batches?farm_id={{farm_id}}&status=active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "batches"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "获取批次详情",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/batches/{{batch_index}}/details",
+              "host": ["{{base_url}}"],
+              "path": ["api", "batches", "{{batch_index}}", "details"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. 灌溉计划生成",
+      "item": [
+        {
+          "name": "生成灌溉计划",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_path\": \"/path/to/config.json\",\n  \"output_dir\": \"/path/to/output\",\n  \"scenario_name\": \"test_scenario\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/plan-generation",
+              "host": ["{{base_url}}"],
+              "path": ["api", "irrigation", "plan-generation"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"计划生成成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    ",
+                  "    // 保存plan_id供后续使用",
+                  "    if (jsonData.data && jsonData.data.plan_id) {",
+                  "        pm.environment.set(\"plan_id\", jsonData.data.plan_id);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "上传并生成计划",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "config_file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scenario_name",
+                  "value": "upload_test",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/plan-with-upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "irrigation", "plan-with-upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Web可视化",
+      "item": [
+        {
+          "name": "获取GeoJSON数据",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/geojson/fields?farm_id={{farm_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["geojson", "fields"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "获取监控面板数据",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/dashboard?farm_id={{farm_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "dashboard"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 全局预请求脚本",
+          "console.log('发送请求到:', pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 全局测试脚本",
+          "pm.test('响应时间小于5秒', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});"
+        ]
+      }
+    }
+  ]
+}
