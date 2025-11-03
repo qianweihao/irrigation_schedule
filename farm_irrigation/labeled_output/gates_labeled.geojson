@@ -1,6 +1,5 @@
 {
 "type": "FeatureCollection",
-"name": "gates_labeled",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32649" } },
 "features": [
 { "type": "Feature", "properties": { "code": "S1-G1", "type": "main-G", "S_id": "S1" }, "geometry": { "type": "Point", "coordinates": [ 577158.525228311656974, 3190947.744318874552846 ] } },

@@ -44,14 +44,26 @@ class DynamicExecutionRequest(BaseModel):
     enable_plan_regeneration: bool = Field(True, description="是否启用计划重新生成")
     execution_mode: str = Field("simulation", description="执行模式：simulation或real")
 
+class ScenarioInfo(BaseModel):
+    """方案信息模型"""
+    scenario_name: str
+    pumps_used: List[str]
+    total_batches: int
+    total_electricity_cost: float
+    total_eta_h: float
+    total_pump_runtime_hours: dict
+    coverage_info: dict
+
 class DynamicExecutionResponse(BaseModel):
     """动态执行响应模型"""
     success: bool
     message: str
     execution_id: Optional[str] = None
     scheduler_status: Optional[str] = None
-    total_batches: Optional[int] = None
+    selected_scenario: Optional[ScenarioInfo] = None
+    total_batches: Optional[int] = None  # 保留向后兼容性
     current_batch: Optional[int] = None
+    all_scenarios: Optional[List[ScenarioInfo]] = None
 
 class ExecutionStatusResponse(BaseModel):
     """执行状态响应模型"""
@@ -66,6 +78,7 @@ class ExecutionStatusResponse(BaseModel):
     total_regenerations: int = 0
     active_fields: List[str] = []
     completed_batches: List[int] = []
+    selected_scenario: Optional[ScenarioInfo] = None
     error_message: Optional[str] = None
 
 class WaterLevelUpdateRequest(BaseModel):
@@ -90,13 +103,15 @@ class ManualRegenerationRequest(BaseModel):
 
 class ManualRegenerationResponse(BaseModel):
     """手动重新生成响应模型"""
-    success: bool
-    message: str
-    batch_index: int
-    changes_count: int = 0
-    execution_time_adjustment_seconds: float = 0.0
-    water_usage_adjustment_m3: float = 0.0
-    change_summary: str = ""
+    success: bool  # 重新生成是否成功
+    message: str  # 详细消息
+    batch_index: int  # 批次索引
+    scenario_name: str = ""  # 当前使用的scenario名称
+    scenario_count: int = 0  # 计划中包含的scenario总数
+    changes_count: int = 0  # 实际变更项目数量（如时间调整、流量调整等）
+    execution_time_adjustment_seconds: float = 0.0  # 执行时间调整（秒）
+    water_usage_adjustment_m3: float = 0.0  # 用水量调整（立方米）
+    change_summary: str = ""  # 变更摘要描述
 
 class ExecutionHistoryResponse(BaseModel):
     """执行历史响应模型"""
@@ -192,6 +207,9 @@ async def start_dynamic_execution(request: DynamicExecutionRequest) -> DynamicEx
         # 获取状态信息
         status = scheduler.get_execution_status()
         
+        # 获取所有方案信息
+        scenarios_info = scheduler.get_all_scenarios_info()
+        
         # 生成执行ID
         execution_id = f"exec_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
@@ -200,8 +218,10 @@ async def start_dynamic_execution(request: DynamicExecutionRequest) -> DynamicEx
             message="动态执行已启动",
             execution_id=execution_id,
             scheduler_status="running" if status.get("is_running") else "stopped",
-            total_batches=status.get("total_batches", 0),
-            current_batch=0  # 刚启动时当前批次为0
+            total_batches=status.get("total_batches", 0),  # 保持兼容性
+            current_batch=0,  # 刚启动时当前批次为0
+            selected_scenario=scenarios_info.get("selected_scenario"),
+            all_scenarios=scenarios_info.get("all_scenarios", [])
         )
         
     except Exception as e:
@@ -229,12 +249,30 @@ async def stop_dynamic_execution() -> DynamicExecutionResponse:
                 message="没有正在执行的任务"
             )
         
+        # 在停止前获取当前执行状态信息
+        execution_status = scheduler.get_execution_status()
+        execution_id = execution_status.get("execution_id")
+        scheduler_status = execution_status.get("status")
+        current_batch = execution_status.get("current_batch")
+        total_batches = execution_status.get("total_batches")
+        
+        # 获取场景信息
+        all_scenarios_info = scheduler.get_all_scenarios_info()
+        selected_scenario = all_scenarios_info.get("selected_scenario")
+        all_scenarios = all_scenarios_info.get("all_scenarios", [])
+        
         # 停止执行
         scheduler.stop_execution()
         
         return DynamicExecutionResponse(
             success=True,
-            message="动态执行已停止"
+            message="动态执行已停止",
+            execution_id=execution_id,
+            scheduler_status=scheduler_status,
+            selected_scenario=selected_scenario,
+            total_batches=total_batches,
+            current_batch=current_batch,
+            all_scenarios=all_scenarios
         )
         
     except Exception as e:
@@ -276,6 +314,14 @@ async def get_execution_status() -> ExecutionStatusResponse:
                 remaining_time = avg_batch_time * (total_batches - current_batch)
                 estimated_completion = (datetime.now() + remaining_time).isoformat()
         
+        # 获取当前选中的scenario信息
+        selected_scenario = None
+        try:
+            scenarios_info = scheduler.get_all_scenarios_info()
+            selected_scenario = scenarios_info.get("selected_scenario")
+        except Exception as e:
+            logger.warning(f"获取选中scenario信息失败: {e}")
+        
         return ExecutionStatusResponse(
             execution_id=status.get("execution_id", ""),
             status=status.get("status", "unknown"),
@@ -288,6 +334,7 @@ async def get_execution_status() -> ExecutionStatusResponse:
             total_regenerations=status.get("total_regenerations", 0),
             active_fields=status.get("active_fields", []),
             completed_batches=status.get("completed_batches", []),
+            selected_scenario=selected_scenario,
             error_message=status.get("error_message")
         )
         
@@ -368,11 +415,20 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         if not current_plan:
             # 尝试加载默认计划文件
             logger.info("当前没有执行计划，尝试加载默认计划文件")
-            plan_loaded = scheduler.load_irrigation_plan("plan.json")
+            
+            # 首先尝试加载output目录中的计划文件
+            output_plan_path = "output/irrigation_plan_modified_1761982575.json"
+            plan_loaded = scheduler.load_irrigation_plan(output_plan_path)
+            
+            if not plan_loaded:
+                # 如果output文件加载失败，尝试加载根目录的plan.json作为备选
+                logger.warning(f"加载输出计划文件失败，尝试备选文件")
+                plan_loaded = scheduler.load_irrigation_plan("plan.json")
+            
             if not plan_loaded:
                 raise HTTPException(
                     status_code=404,
-                    detail="没有找到当前执行计划，且无法加载默认计划文件"
+                    detail="没有找到当前执行计划，且无法加载任何计划文件"
                 )
             current_plan = scheduler.get_current_plan()
             if not current_plan:
@@ -380,6 +436,40 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
                     status_code=500,
                     detail="加载计划文件后仍无法获取执行计划"
                 )
+        
+        # 从调度器获取原始计划数据来提取scenario信息
+        raw_plan_data = getattr(scheduler, 'raw_plan_data', None)
+        if raw_plan_data:
+            scenarios = raw_plan_data.get("scenarios", [])
+        else:
+            # 如果调度器没有raw_plan_data，直接从文件读取
+            import json
+            from pathlib import Path
+            plan_file = Path("output/irrigation_plan_modified_1761982575.json")
+            if plan_file.exists():
+                with open(plan_file, 'r', encoding='utf-8') as f:
+                    file_data = json.load(f)
+                scenarios = file_data.get("scenarios", [])
+            else:
+                scenarios = []
+        
+        scenario_count = len(scenarios)
+        scenario_name = ""
+        
+        if scenarios:
+            # 使用第一个scenario
+            first_scenario = scenarios[0]
+            scenario_name = first_scenario.get("scenario_name", "默认场景")
+            
+            # 如果scenario_name为空，尝试生成一个描述性名称
+            if not scenario_name or scenario_name.strip() == "":
+                scenario_name = f"场景1"
+                
+            logger.info(f"当前计划包含 {scenario_count} 个scenarios，使用第一个scenario: '{scenario_name}'")
+        else:
+            scenario_name = "顶层计划"
+            scenario_count = 1  # 顶层计划算作1个scenario
+            logger.info("当前计划不包含scenarios结构，使用顶层计划")
         
         # 获取水位数据
         if request.custom_water_levels:
@@ -420,11 +510,31 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         # 生成变更摘要
         change_summary = regenerator.generate_change_summary(result.changes)
         
+        # 计算实际变更数量（包括时间和用水量的显著变更）
+        actual_changes_count = len(result.changes)
+        
+        # 如果没有记录的变更但有时间或用水量调整，则计算隐含的变更
+        if actual_changes_count == 0:
+            if abs(result.execution_time_adjustment) > 60:  # 时间调整超过1分钟
+                actual_changes_count += 1
+            if abs(result.total_water_adjustment) > 1:  # 用水量调整超过1立方米
+                actual_changes_count += 1
+        
+        # 构建更准确的消息
+        if scenario_count > 1:
+            message = f"批次 {request.batch_index} 重新生成成功 (基于scenario '{scenario_name}'，共{scenario_count}个scenarios中的第1个)"
+        elif scenario_count == 1 and scenario_name != "顶层计划":
+            message = f"批次 {request.batch_index} 重新生成成功 (基于scenario '{scenario_name}')"
+        else:
+            message = f"批次 {request.batch_index} 重新生成成功 (基于顶层计划)"
+        
         return ManualRegenerationResponse(
             success=True,
-            message=f"批次 {request.batch_index} 重新生成成功",
+            message=message,
             batch_index=request.batch_index,
-            changes_count=len(result.changes),
+            scenario_name=scenario_name,
+            scenario_count=scenario_count,
+            changes_count=actual_changes_count,
             execution_time_adjustment_seconds=result.execution_time_adjustment,
             water_usage_adjustment_m3=result.total_water_adjustment,
             change_summary=change_summary.get("summary", "")
@@ -707,30 +817,7 @@ def create_dynamic_execution_endpoints():
     }
 
 if __name__ == "__main__":
-    # 测试代码
-    import asyncio
-    
-    async def test_dynamic_execution():
-        # 测试启动动态执行
-        request = DynamicExecutionRequest(
-            plan_file_path="irrigation_plan_modified_gzp_farm.json",
-            farm_id="gzp_farm",
-            auto_start=True
-        )
-        
-        try:
-            response = await start_dynamic_execution(request)
-            print(f"启动结果: {response}")
-            
-            # 等待一段时间
-            await asyncio.sleep(5)
-            
-            # 获取状态
-            status = await get_execution_status()
-            print(f"执行状态: {status}")
-            
-        except Exception as e:
-            print(f"测试失败: {e}")
-    
-    # 运行测试
-    asyncio.run(test_dynamic_execution())
+    # 测试代码已移至Postman集合
+    # 请使用 /postman/postman_collection.json 和 /postman/postman_environment.json 进行API测试
+    print("动态执行API模块已加载完成")
+    print("请使用Postman进行接口测试")

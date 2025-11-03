@@ -149,6 +149,16 @@
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.have.property(\"status\");",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含scenario信息\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.selected_scenario) {",
+                  "        pm.expect(jsonData.data.selected_scenario).to.have.property(\"scenario_name\");",
+                  "        pm.expect(jsonData.data.selected_scenario).to.have.property(\"pumps_used\");",
+                  "        pm.expect(jsonData.data.selected_scenario).to.have.property(\"total_batches\");",
+                  "        console.log(\"当前执行的scenario:\", jsonData.data.selected_scenario.scenario_name);",
+                  "    }",
                   "});"
                 ]
               }

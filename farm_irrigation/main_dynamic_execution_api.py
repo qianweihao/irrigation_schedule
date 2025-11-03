@@ -142,6 +142,71 @@ def _looks_like_lonlat(bounds):
     except Exception:
         return False
 
+# Scenario信息辅助函数
+def get_scenario_info(scheduler=None):
+    """
+    获取当前计划的scenario信息
+    
+    Args:
+        scheduler: 调度器实例，如果为None则使用全局调度器
+        
+    Returns:
+        dict: 包含scenario_name, scenario_count, scenarios等信息的字典
+    """
+    if scheduler is None:
+        global _scheduler
+        scheduler = _scheduler
+    
+    if not scheduler:
+        return {
+            "scenario_name": "未知",
+            "scenario_count": 0,
+            "scenarios": [],
+            "selected_scenario_index": 0
+        }
+    
+    # 从调度器获取原始计划数据
+    raw_plan_data = getattr(scheduler, 'raw_plan_data', None)
+    if raw_plan_data:
+        scenarios = raw_plan_data.get("scenarios", [])
+    else:
+        # 如果调度器没有raw_plan_data，直接从文件读取
+        import json
+        from pathlib import Path
+        plan_file = Path("output/irrigation_plan_modified_1761982575.json")
+        if plan_file.exists():
+            try:
+                with open(plan_file, 'r', encoding='utf-8') as f:
+                    file_data = json.load(f)
+                scenarios = file_data.get("scenarios", [])
+            except Exception:
+                scenarios = []
+        else:
+            scenarios = []
+    
+    scenario_count = len(scenarios)
+    scenario_name = ""
+    selected_scenario_index = 0
+    
+    if scenarios:
+        # 使用第一个scenario
+        first_scenario = scenarios[0]
+        scenario_name = first_scenario.get("scenario_name", "默认场景")
+        
+        # 如果scenario_name为空，尝试生成一个描述性名称
+        if not scenario_name or scenario_name.strip() == "":
+            scenario_name = f"场景1"
+    else:
+        scenario_name = "顶层计划"
+        scenario_count = 1  # 顶层计划算作1个scenario
+    
+    return {
+        "scenario_name": scenario_name,
+        "scenario_count": scenario_count,
+        "scenarios": scenarios,
+        "selected_scenario_index": selected_scenario_index
+    }
+
 def read_geo_ensure_wgs84(path: str) -> gpd.GeoDataFrame:
     """读取地理数据文件并确保为WGS84坐标系"""
     gdf = gpd.read_file(path)
@@ -498,11 +563,17 @@ async def get_batch_list():
             }
             batch_list.append(batch_info)
         
+        # 获取scenario信息
+        scenario_info = get_scenario_info(_scheduler)
+        
         return {
             "success": True,
             "total_batches": len(batch_list),
             "batches": batch_list,
             "farm_id": _scheduler.get_farm_id() if hasattr(_scheduler, 'get_farm_id') else "unknown",
+            "scenario_name": scenario_info["scenario_name"],
+            "scenario_count": scenario_info["scenario_count"],
+            "selected_scenario_index": scenario_info["selected_scenario_index"],
             "query_time": datetime.now().isoformat()
         }
         
@@ -579,6 +650,14 @@ async def get_batch_details(batch_index: int):
             "execution_details": execution_details,
             "query_time": datetime.now().isoformat()
         }
+        
+        # 获取scenario信息
+        scenario_info = get_scenario_info(_scheduler)
+        details.update({
+            "scenario_name": scenario_info["scenario_name"],
+            "scenario_count": scenario_info["scenario_count"],
+            "selected_scenario_index": scenario_info["selected_scenario_index"]
+        })
         
         return details
         

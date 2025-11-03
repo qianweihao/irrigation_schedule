@@ -4777,3 +4777,404 @@ pip install python-multipart
 2025-11-02 17:17:06,371 - INFO - 灌溉计划生成完成
 2025-11-02 17:20:19,161 - INFO - 智能灌溉动态执行系统关闭中...
 2025-11-02 17:20:19,161 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-03 09:26:30,215 - INFO - Pipeline参数: {'input_dir': 'f:\\irrigation_schedule\\farm_irrigation\\gzp_farm', 'output_dir': '/path/to/output', 'config_file': None, 'merge_waterlevels': True, 'print_summary': True}
+2025-11-03 09:26:30,223 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-03 09:26:30,223 - INFO - 输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 09:26:30,223 - INFO - 输出目录: /path/to/output
+2025-11-03 09:26:30,223 - INFO - 检查依赖文件...
+2025-11-03 09:26:30,224 - INFO - 依赖文件检查通过
+2025-11-03 09:26:30,224 - INFO - 检查输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 09:26:30,227 - INFO - 找到 6 个GIS数据文件
+2025-11-03 09:26:30,228 - INFO - === 步骤1: 数据预处理 ===
+2025-11-03 09:26:30,229 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-03 09:26:30,230 - INFO - 开始执行: GIS数据格式转换
+2025-11-03 09:26:30,230 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-11-03 09:26:32,856 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-11-03 09:26:32,856 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-03 09:26:32,856 - INFO - 开始执行: GIS数据修复
+2025-11-03 09:26:32,857 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-11-03 09:26:33,280 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-03 09:26:33,281 - INFO - [OK] GIS数据修复 执行成功
+2025-11-03 09:26:33,281 - INFO - === 步骤2: 配置生成 ===
+2025-11-03 09:26:33,283 - INFO - 开始执行: 生成系统配置
+2025-11-03 09:26:33,283 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py --segments f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪水路_code.geojson --gates f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪阀门与节制闸_code.geojson --fields f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪田块_code.geojson
+2025-11-03 09:26:35,838 - INFO - [OK] 生成系统配置 执行成功
+2025-11-03 09:26:35,838 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-03 09:26:35,839 - INFO - 开始执行: 生成灌溉计划
+2025-11-03 09:26:35,839 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out \path\to\output\irrigation_plan_20251103_092635.json --summary --realtime
+2025-11-03 09:26:36,761 - INFO - 输出: [DEBUG] 使用真实实时水位API
+====== 灌溉决策摘要 ======
+总 ETA: 30.80 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 2 批
+ - 批次1 ETA=19.02h  田块数=25
+ - 批次2 ETA=11.78h  田块数=11
+[done] 计划已写入：F:\path\to\output\irrigation_plan_20251103_092635.json
+
+2025-11-03 09:26:36,761 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-03 09:26:36,762 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:06.537769
+2025-11-03 09:26:36,762 - INFO - 生成的文件:
+2025-11-03 09:26:36,763 - INFO -   - \path\to\output\irrigation_plan_20251103_092635.json
+2025-11-03 09:26:36,763 - INFO - Pipeline执行结果: success=True
+2025-11-03 09:26:36,764 - INFO - 读取计划文件: /path/to/output\irrigation_plan_20251103_092635.json
+2025-11-03 09:26:36,765 - INFO - 成功读取计划数据，包含 8 项
+2025-11-03 09:26:36,765 - INFO - 灌溉计划生成完成
+2025-11-03 09:26:48,369 - INFO - 开始处理灌溉计划请求 - farm_id: 13944136728576, target_depth_mm: 90.0
+2025-11-03 09:26:48,369 - INFO - 未检测到文件上传，使用现有数据
+2025-11-03 09:26:48,370 - INFO - Pipeline参数: {'input_dir': 'f:\\irrigation_schedule\\farm_irrigation\\gzp_farm', 'output_dir': 'f:\\irrigation_schedule\\farm_irrigation\\output', 'config_file': None, 'pumps': None, 'zones': None, 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': False, 'custom_waterlevels': None}
+2025-11-03 09:26:48,370 - INFO - 配置文件路径: f:\irrigation_schedule\farm_irrigation\auto_config_params.yaml
+2025-11-03 09:26:48,371 - INFO - 读取配置文件
+2025-11-03 09:26:48,372 - ERROR - 配置文件处理错误: 'NoneType' object does not support item assignment
+2025-11-03 09:26:48,373 - INFO - 开始运行灌溉计划生成
+2025-11-03 09:26:48,373 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-03 09:26:48,374 - INFO - 输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 09:26:48,374 - INFO - 输出目录: f:\irrigation_schedule\farm_irrigation\output
+2025-11-03 09:26:48,374 - INFO - 检查依赖文件...
+2025-11-03 09:26:48,375 - INFO - 依赖文件检查通过
+2025-11-03 09:26:48,375 - INFO - 检查输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 09:26:48,378 - INFO - 找到 6 个GIS数据文件
+2025-11-03 09:26:48,378 - INFO - === 步骤1: 数据预处理 ===
+2025-11-03 09:26:48,380 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-03 09:26:48,380 - INFO - 开始执行: GIS数据格式转换
+2025-11-03 09:26:48,380 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-11-03 09:26:50,707 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-11-03 09:26:50,708 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-03 09:26:50,708 - INFO - 开始执行: GIS数据修复
+2025-11-03 09:26:50,708 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-11-03 09:26:51,113 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-03 09:26:51,113 - INFO - [OK] GIS数据修复 执行成功
+2025-11-03 09:26:51,114 - INFO - === 步骤2: 配置生成 ===
+2025-11-03 09:26:51,115 - INFO - 开始执行: 生成系统配置
+2025-11-03 09:26:51,116 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py --segments f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪水路_code.geojson --gates f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪阀门与节制闸_code.geojson --fields f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪田块_code.geojson
+2025-11-03 09:26:53,601 - INFO - [OK] 生成系统配置 执行成功
+2025-11-03 09:26:53,601 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-03 09:26:53,602 - INFO - 开始执行: 生成灌溉计划
+2025-11-03 09:26:53,602 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251103_092653.json --summary --realtime
+2025-11-03 09:26:54,421 - INFO - 输出: [DEBUG] 使用真实实时水位API
+====== 灌溉决策摘要 ======
+总 ETA: 30.80 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 2 批
+ - 批次1 ETA=19.02h  田块数=25
+ - 批次2 ETA=11.78h  田块数=11
+[done] 计划已写入：F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251103_092653.json
+
+2025-11-03 09:26:54,421 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-03 09:26:54,422 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:06.048863
+2025-11-03 09:26:54,423 - INFO - 生成的文件:
+2025-11-03 09:26:54,423 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20250926_134301.json
+2025-11-03 09:26:54,423 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_131637.json
+2025-11-03 09:26:54,423 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_132243.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_134017.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_134317.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_135106.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_135552.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251101_143125.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251102_171119.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251102_171547.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251102_171622.json
+2025-11-03 09:26:54,424 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251102_171705.json
+2025-11-03 09:26:54,425 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251103_092653.json
+2025-11-03 09:26:54,425 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_modified_1761982494.json
+2025-11-03 09:26:54,425 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_modified_1761982537.json
+2025-11-03 09:26:54,425 - INFO -   - f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_modified_1761982575.json
+2025-11-03 09:26:54,425 - INFO - Pipeline执行结果: success=True
+2025-11-03 09:26:54,430 - INFO - 读取计划文件: f:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251103_092653.json
+2025-11-03 09:26:54,431 - INFO - 成功读取计划数据，包含 8 项
+2025-11-03 09:26:54,432 - INFO - 灌溉计划生成完成
+2025-11-03 09:28:01,810 - INFO - 生成水位摘要: 0/0 个田块有数据
+2025-11-03 09:28:01,811 - WARNING - 获取执行历史失败: 'ExecutionStatusManager' object has no attribute 'get_recent_executions'
+2025-11-03 09:34:14,881 - INFO - 启动动态执行 - 计划文件: f:/irrigation_schedule/farm_irrigation/output/irrigation_plan_modified_1761982575.json
+2025-11-03 09:34:14,893 - INFO - 配置文件加载成功: f:\irrigation_schedule\farm_irrigation\config.json
+2025-11-03 09:34:14,899 - INFO - 使用scenarios格式，选择第一个scenario: P2单独使用
+2025-11-03 09:34:14,901 - INFO - 批次 1: 开始时间 0.00h, 持续时间 18.28h
+2025-11-03 09:34:14,901 - INFO - 批次 2: 开始时间 18.28h, 持续时间 19.77h
+2025-11-03 09:34:14,902 - INFO - 批次 3: 开始时间 38.05h, 持续时间 18.34h
+2025-11-03 09:34:14,902 - INFO - 批次 4: 开始时间 56.38h, 持续时间 5.22h
+2025-11-03 09:34:14,902 - INFO - 灌溉计划加载成功: f:/irrigation_schedule/farm_irrigation/output/irrigation_plan_modified_1761982575.json
+2025-11-03 09:34:14,903 - INFO - 共有 4 个批次
+2025-11-03 09:34:15,029 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-03 09:34:15,138 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251103_093414
+2025-11-03 09:34:15,209 - INFO - [scheduler] 执行开始时间: 2025-11-03 09:34:14.903089
+2025-11-03 09:34:15,214 - INFO - 开始准备批次 1
+2025-11-03 09:34:15,618 - INFO - 从API获取到 0 个水位数据
+2025-11-03 09:34:16,285 - INFO - 批次 1 计划重新生成完成
+2025-11-03 09:34:16,285 - INFO - 开始执行批次 1
+2025-11-03 09:34:16,285 - INFO - 批次 1 开始执行
+2025-11-03 11:44:32,014 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-03 11:44:32,015 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-03 15:21:44,354 - INFO - Pipeline参数: {'input_dir': 'f:\\irrigation_schedule\\farm_irrigation\\gzp_farm', 'output_dir': '/path/to/output', 'config_file': None, 'merge_waterlevels': True, 'print_summary': True}
+2025-11-03 15:21:44,363 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-03 15:21:44,363 - INFO - 输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 15:21:44,363 - INFO - 输出目录: /path/to/output
+2025-11-03 15:21:44,363 - INFO - 检查依赖文件...
+2025-11-03 15:21:44,364 - INFO - 依赖文件检查通过
+2025-11-03 15:21:44,365 - INFO - 检查输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 15:21:44,368 - INFO - 找到 6 个GIS数据文件
+2025-11-03 15:21:44,368 - INFO - === 步骤1: 数据预处理 ===
+2025-11-03 15:21:44,370 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-03 15:21:44,370 - INFO - 开始执行: GIS数据格式转换
+2025-11-03 15:21:44,370 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-11-03 15:21:47,075 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-11-03 15:21:47,076 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-03 15:21:47,076 - INFO - 开始执行: GIS数据修复
+2025-11-03 15:21:47,076 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-11-03 15:21:47,510 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-03 15:21:47,511 - INFO - [OK] GIS数据修复 执行成功
+2025-11-03 15:21:47,511 - INFO - === 步骤2: 配置生成 ===
+2025-11-03 15:21:47,512 - INFO - 开始执行: 生成系统配置
+2025-11-03 15:21:47,513 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py --segments f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪水路_code.geojson --gates f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪阀门与节制闸_code.geojson --fields f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪田块_code.geojson
+2025-11-03 15:21:50,019 - INFO - [OK] 生成系统配置 执行成功
+2025-11-03 15:21:50,019 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-03 15:21:50,020 - INFO - 开始执行: 生成灌溉计划
+2025-11-03 15:21:50,020 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out \path\to\output\irrigation_plan_20251103_152150.json --summary --realtime
+2025-11-03 15:21:50,959 - INFO - 输出: [DEBUG] 使用真实实时水位API
+====== 灌溉决策摘要 ======
+总 ETA: 30.80 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 2 批
+ - 批次1 ETA=19.02h  田块数=25
+ - 批次2 ETA=11.78h  田块数=11
+[done] 计划已写入：F:\path\to\output\irrigation_plan_20251103_152150.json
+
+2025-11-03 15:21:50,959 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-03 15:21:50,960 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:06.595450
+2025-11-03 15:21:50,960 - INFO - 生成的文件:
+2025-11-03 15:21:50,961 - INFO -   - \path\to\output\irrigation_plan_20251103_092635.json
+2025-11-03 15:21:50,961 - INFO -   - \path\to\output\irrigation_plan_20251103_152150.json
+2025-11-03 15:21:50,961 - INFO - Pipeline执行结果: success=True
+2025-11-03 15:21:50,963 - INFO - 读取计划文件: /path/to/output\irrigation_plan_20251103_152150.json
+2025-11-03 15:21:50,963 - INFO - 成功读取计划数据，包含 8 项
+2025-11-03 15:21:50,964 - INFO - 灌溉计划生成完成
+2025-11-03 15:24:58,236 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-03 15:24:58,237 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-03 15:28:30,767 - INFO - Pipeline参数: {'input_dir': 'f:\\irrigation_schedule\\farm_irrigation\\gzp_farm', 'output_dir': '/path/to/output', 'config_file': None, 'merge_waterlevels': True, 'print_summary': True}
+2025-11-03 15:28:30,784 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-03 15:28:30,784 - INFO - 输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 15:28:30,784 - INFO - 输出目录: /path/to/output
+2025-11-03 15:28:30,785 - INFO - 检查依赖文件...
+2025-11-03 15:28:30,786 - INFO - 依赖文件检查通过
+2025-11-03 15:28:30,786 - INFO - 检查输入目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+2025-11-03 15:28:30,790 - INFO - 找到 6 个GIS数据文件
+2025-11-03 15:28:30,790 - INFO - === 步骤1: 数据预处理 ===
+2025-11-03 15:28:30,793 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-03 15:28:30,793 - INFO - 开始执行: GIS数据格式转换
+2025-11-03 15:28:30,793 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-11-03 15:28:33,602 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-11-03 15:28:33,603 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-03 15:28:33,603 - INFO - 开始执行: GIS数据修复
+2025-11-03 15:28:33,603 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-11-03 15:28:34,074 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-03 15:28:34,075 - INFO - [OK] GIS数据修复 执行成功
+2025-11-03 15:28:34,075 - INFO - === 步骤2: 配置生成 ===
+2025-11-03 15:28:34,077 - INFO - 开始执行: 生成系统配置
+2025-11-03 15:28:34,077 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py --segments f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪水路_code.geojson --gates f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪阀门与节制闸_code.geojson --fields f:\irrigation_schedule\farm_irrigation\gzp_farm\港中坪田块_code.geojson
+2025-11-03 15:28:36,687 - INFO - [OK] 生成系统配置 执行成功
+2025-11-03 15:28:36,687 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-03 15:28:36,688 - INFO - 开始执行: 生成灌溉计划
+2025-11-03 15:28:36,688 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out \path\to\output\irrigation_plan_20251103_152836.json --summary --realtime
+2025-11-03 15:28:37,669 - INFO - 输出: [DEBUG] 使用真实实时水位API
+====== 灌溉决策摘要 ======
+总 ETA: 30.80 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 2 批
+ - 批次1 ETA=19.02h  田块数=25
+ - 批次2 ETA=11.78h  田块数=11
+[done] 计划已写入：F:\path\to\output\irrigation_plan_20251103_152836.json
+
+2025-11-03 15:28:37,670 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-03 15:28:37,670 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:06.886312
+2025-11-03 15:28:37,671 - INFO - 生成的文件:
+2025-11-03 15:28:37,672 - INFO -   - \path\to\output\irrigation_plan_20251103_092635.json
+2025-11-03 15:28:37,672 - INFO -   - \path\to\output\irrigation_plan_20251103_152150.json
+2025-11-03 15:28:37,672 - INFO -   - \path\to\output\irrigation_plan_20251103_152836.json
+2025-11-03 15:28:37,672 - INFO - Pipeline执行结果: success=True
+2025-11-03 15:28:37,673 - INFO - 读取计划文件: /path/to/output\irrigation_plan_20251103_152836.json
+2025-11-03 15:28:37,674 - INFO - 成功读取计划数据，包含 8 项
+2025-11-03 15:28:37,674 - INFO - 灌溉计划生成完成
+2025-11-03 15:28:55,297 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-03 15:28:55,297 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-03 15:30:13,199 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-03 15:30:13,214 - INFO - 输入目录: ./gzp_farm
+2025-11-03 15:30:13,214 - INFO - 输出目录: ./output
+2025-11-03 15:30:13,214 - INFO - 检查依赖文件...
+2025-11-03 15:30:13,215 - INFO - 依赖文件检查通过
+2025-11-03 15:30:13,215 - INFO - 检查输入目录: ./gzp_farm
+2025-11-03 15:30:13,217 - INFO - 找到 6 个GIS数据文件
+2025-11-03 15:30:13,217 - INFO - === 步骤1: 数据预处理 ===
+2025-11-03 15:30:13,218 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-03 15:30:13,218 - INFO - 开始执行: GIS数据格式转换
+2025-11-03 15:30:13,218 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe farmgis_convert.py
+2025-11-03 15:30:15,812 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！
+
+2025-11-03 15:30:15,812 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-03 15:30:15,812 - INFO - 开始执行: GIS数据修复
+2025-11-03 15:30:15,813 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe fix_farmgis_convert.py
+2025-11-03 15:30:16,305 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: f:\irrigation_schedule\farm_irrigation\gzp_farm
+
+[处理] gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪水路_code.geojson
+
+[处理] gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪田块_code.geojson
+
+[处理] gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-03 15:30:16,305 - INFO - [OK] GIS数据修复 执行成功
+2025-11-03 15:30:16,306 - INFO - === 步骤2: 配置生成 ===
+2025-11-03 15:30:16,306 - INFO - 开始执行: 生成系统配置
+2025-11-03 15:30:16,306 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe auto_to_config.py
+2025-11-03 15:30:18,831 - INFO - [OK] 生成系统配置 执行成功
+2025-11-03 15:30:18,831 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-03 15:30:18,832 - INFO - 开始执行: 生成灌溉计划
+2025-11-03 15:30:18,832 - INFO - 命令: C:\Users\00783510\AppData\Local\Programs\Python\Python311\python.exe run_irrigation_plan.py --out output\irrigation_plan_20251103_153018.json --summary --realtime
+2025-11-03 15:30:19,790 - INFO - 输出: [DEBUG] 使用真实实时水位API
+====== 灌溉决策摘要 ======
+总 ETA: 30.80 h
+并灌时窗: 20.0 h
+目标补水深: 90.0 mm
+等效泵流量: 480.0 m3/h
+灌溉批次: 2 批
+ - 批次1 ETA=19.02h  田块数=25
+ - 批次2 ETA=11.78h  田块数=11
+[done] 计划已写入：F:\irrigation_schedule\farm_irrigation\output\irrigation_plan_20251103_153018.json
+
+2025-11-03 15:30:19,790 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-03 15:30:19,790 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:06.590518
+2025-11-03 15:30:19,792 - INFO - 生成的文件:
+2025-11-03 15:30:19,792 - INFO -   - output\irrigation_plan_20250926_134301.json
+2025-11-03 15:30:19,792 - INFO -   - output\irrigation_plan_20251101_131637.json
+2025-11-03 15:30:19,792 - INFO -   - output\irrigation_plan_20251101_132243.json
+2025-11-03 15:30:19,792 - INFO -   - output\irrigation_plan_20251101_134017.json
+2025-11-03 15:30:19,792 - INFO -   - output\irrigation_plan_20251101_134317.json
+2025-11-03 15:30:19,792 - INFO -   - output\irrigation_plan_20251101_135106.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251101_135552.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251101_143125.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251102_171119.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251102_171547.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251102_171622.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251102_171705.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251103_092653.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_20251103_153018.json
+2025-11-03 15:30:19,793 - INFO -   - output\irrigation_plan_modified_1761982494.json
+2025-11-03 15:30:19,794 - INFO -   - output\irrigation_plan_modified_1761982537.json
+2025-11-03 15:30:19,794 - INFO -   - output\irrigation_plan_modified_1761982575.json
+2025-11-03 15:30:19,794 - INFO - [SUCCESS] 自动化流水线执行成功

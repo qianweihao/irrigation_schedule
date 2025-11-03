@@ -99,6 +99,8 @@ class BatchExecutionScheduler:
         self.execution_id: Optional[str] = None
         self.execution_status: str = "idle"  # idle, running, completed, error
         self.current_plan: Optional[Dict[str, Any]] = None
+        self.raw_plan_data: Optional[Dict[str, Any]] = None  # 存储原始完整计划数据
+        self.selected_scenario_name: Optional[str] = None  # 当前选中的方案名称
         self.batch_executions: Dict[int, BatchExecution] = {}
         self.execution_start_time: Optional[datetime] = None
         self.current_batch_index: int = 0
@@ -163,14 +165,20 @@ class BatchExecutionScheduler:
             with open(plan_file, 'r', encoding='utf-8') as f:
                 raw_data = json.load(f)
             
+            # 保存原始完整数据
+            self.raw_plan_data = raw_data
+            
             # 检查文件结构并提取实际的计划数据
             if "scenarios" in raw_data and raw_data["scenarios"]:
                 # 新格式：使用第一个scenario的plan
-                self.current_plan = raw_data["scenarios"][0]["plan"]
-                logger.info(f"使用scenarios格式，选择第一个scenario: {raw_data['scenarios'][0].get('scenario_name', 'Unknown')}")
+                selected_scenario = raw_data["scenarios"][0]
+                self.current_plan = selected_scenario["plan"]
+                self.selected_scenario_name = selected_scenario.get("scenario_name", "Unknown")
+                logger.info(f"使用scenarios格式，选择第一个scenario: {self.selected_scenario_name}")
             elif "batches" in raw_data and "steps" in raw_data:
                 # 旧格式：直接使用根级别的数据
                 self.current_plan = raw_data
+                self.selected_scenario_name = "Default Plan"
                 logger.info("使用传统格式的计划文件")
             else:
                 logger.error(f"无法识别的计划文件格式: {plan_path}")
@@ -558,6 +566,60 @@ class BatchExecutionScheduler:
             "active_fields": active_fields,
             "completed_batches": completed_batches,
             "error_message": self.error_message
+        }
+    
+    def get_all_scenarios_info(self) -> Dict[str, Any]:
+        """
+        获取所有scenarios的信息
+        
+        Returns:
+            Dict[str, Any]: 包含所有方案信息的字典
+        """
+        if not self.raw_plan_data:
+            return {
+                "selected_scenario": None,
+                "all_scenarios": [],
+                "total_scenarios": 0
+            }
+        
+        all_scenarios = []
+        selected_scenario = None
+        
+        # 检查是否有scenarios结构
+        if "scenarios" in self.raw_plan_data and self.raw_plan_data["scenarios"]:
+            for scenario in self.raw_plan_data["scenarios"]:
+                scenario_info = {
+                    "scenario_name": scenario.get("scenario_name", "Unknown"),
+                    "pumps_used": scenario.get("pumps_used", []),
+                    "total_batches": len(scenario.get("plan", {}).get("batches", [])),
+                    "total_electricity_cost": scenario.get("total_electricity_cost", 0.0),
+                    "total_eta_h": scenario.get("total_eta_h", 0.0),
+                    "total_pump_runtime_hours": scenario.get("total_pump_runtime_hours", 0.0),
+                    "coverage_info": scenario.get("coverage_info", {})
+                }
+                all_scenarios.append(scenario_info)
+                
+                # 检查是否是当前选中的方案
+                if scenario.get("scenario_name") == self.selected_scenario_name:
+                    selected_scenario = scenario_info
+        else:
+            # 旧格式，只有一个默认方案
+            scenario_info = {
+                "scenario_name": "Default Plan",
+                "pumps_used": [],
+                "total_batches": len(self.raw_plan_data.get("batches", [])),
+                "total_electricity_cost": 0.0,
+                "total_eta_h": 0.0,
+                "total_pump_runtime_hours": 0.0,
+                "coverage_info": {}
+            }
+            all_scenarios.append(scenario_info)
+            selected_scenario = scenario_info
+        
+        return {
+            "selected_scenario": selected_scenario,
+            "all_scenarios": all_scenarios,
+            "total_scenarios": len(all_scenarios)
         }
     
     def set_device_control_callback(self, callback: Callable):
