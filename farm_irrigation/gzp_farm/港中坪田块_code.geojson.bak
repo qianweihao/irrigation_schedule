@@ -1,5 +1,6 @@
 {
 "type": "FeatureCollection",
+"name": "港中坪田块_code",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "name": "1", "area": "3486.68", "mu": "5.23", "cityCode": "430700", "countyCode": "430703", "farmId": "13944136728576", "id": "1901477857038049280", "code": "S3-G2-F1" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 111.79104342, 28.843915874 ], [ 111.791498739, 28.843562492 ], [ 111.791081061, 28.843186442 ], [ 111.790616418, 28.843538208 ], [ 111.79104342, 28.843915874 ] ] ] } },

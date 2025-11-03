@@ -390,7 +390,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_path\": \"/path/to/config.json\",\n  \"output_dir\": \"/path/to/output\",\n  \"scenario_name\": \"test_scenario\"\n}"
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_path\": \"{{config_file_path}}\",\n  \"output_dir\": \"{{output_dir}}\",\n  \"scenario_name\": \"test_scenario\",\n  \"multi_pump_scenarios\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/irrigation/plan-generation",
@@ -439,6 +439,11 @@
                 {
                   "key": "scenario_name",
                   "value": "upload_test",
+                  "type": "text"
+                },
+                {
+                  "key": "multi_pump_scenarios",
+                  "value": "true",
                   "type": "text"
                 }
               ]

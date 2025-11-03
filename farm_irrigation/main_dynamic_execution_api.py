@@ -105,6 +105,7 @@ class IrrigationPlanRequest(BaseModel):
     config_path: Optional[str] = None
     output_dir: Optional[str] = None
     scenario_name: Optional[str] = None
+    multi_pump_scenarios: Optional[bool] = False
 
 class IrrigationPlanResponse(BaseModel):
     """生成灌溉计划响应模型"""
@@ -720,7 +721,8 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
             'output_dir': output_dir,
             'config_file': config_path if os.path.exists(config_path) else None,
             'merge_waterlevels': True,
-            'print_summary': True
+            'print_summary': True,
+            'multi_pump_scenarios': request.multi_pump_scenarios
         }
         
         logger.info(f"Pipeline参数: {kwargs}")
@@ -782,6 +784,7 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
 @app.post("/api/irrigation/plan-with-upload", response_model=IrrigationPlanResponse)
 async def generate_irrigation_plan_with_upload(
     farm_id: str = Form("13944136728576"),
+    scenario_name: Optional[str] = Form("upload_test"),
     target_depth_mm: float = Form(90.0),
     pumps: Optional[str] = Form(None),
     zones: Optional[str] = Form(None),
@@ -840,6 +843,7 @@ async def generate_irrigation_plan_with_upload(
             'input_dir': GZP_FARM_DIR,
             'output_dir': OUTPUT_DIR,
             'config_file': None,
+            'scenario_name': scenario_name,
             'pumps': pumps,
             'zones': zones,
             'merge_waterlevels': merge_waterlevels,

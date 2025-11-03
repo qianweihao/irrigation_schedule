@@ -164,12 +164,23 @@ Content-Type: application/json
 
 {
   "farm_id": "{{farm_id}}",
-  "config_path": "/path/to/config.json",
-  "output_dir": "/path/to/output",
-  "scenario_name": "test_scenario"
+  "config_path": "{{config_file_path}}",
+  "output_dir": "{{output_dir}}",
+  "scenario_name": "test_scenario",
+  "multi_pump_scenarios": true
 }
 ```
-**重要**：成功后会自动保存 `plan_id` 到环境变量
+**重要参数说明**：
+- `scenario_name`: 灌溉计划的标识名称（可选，默认为null）
+- `multi_pump_scenarios`: 是否生成多水泵方案（可选，默认为false）
+  - `true`: 生成所有可能的水泵组合方案（P1单独、P2单独、P1+P2组合等）
+  - `false`: 仅生成单一最优方案
+
+**预期结果**：
+- 状态码：200
+- 响应包含：`"success": true`
+- 当 `multi_pump_scenarios: true` 时，输出JSON包含 `scenarios` 数组和 `analysis` 字段
+- 成功后会自动保存 `plan_id` 到环境变量
 
 #### 5.2 上传并生成计划
 ```
@@ -180,7 +191,18 @@ Form Data:
 - config_file: [选择配置文件]
 - farm_id: {{farm_id}}
 - scenario_name: upload_test
+- multi_pump_scenarios: true
 ```
+**重要参数说明**：
+- `config_file`: 上传的配置文件（必需）
+- `farm_id`: 农场ID（必需）
+- `scenario_name`: 灌溉计划的标识名称（可选，默认为"upload_test"）
+- `multi_pump_scenarios`: 是否生成多水泵方案（可选，默认为false）
+
+**预期结果**：
+- 状态码：200
+- 响应包含：`"success": true`
+- 当 `multi_pump_scenarios: true` 时，输出包含多个水泵组合方案
 
 ### 阶段6：Web可视化测试
 
@@ -236,18 +258,18 @@ GET {{base_url}}/api/regeneration/summary/{{farm_id}}
 - `GET /api/water-levels/history` - 获取水位历史
 - `GET /api/water-levels/summary` - 获取水位汇总
 
-### 4. 批次管理
-- `GET /api/batches` - 获取批次列表
-- `GET /api/batches/{batch_index}/details` - 获取批次详情
-
-### 5. 灌溉计划生成
-- `POST /api/irrigation/plan-generation` - 生成灌溉计划
-- `POST /api/irrigation/plan-with-upload` - 上传并生成计划
-
-### 6. 计划重新生成
+### 4. 计划重新生成
 - `POST /api/regeneration/manual` - 手动重新生成
 - `GET /api/execution/status` - 获取执行状态
 - `GET /api/regeneration/summary/{farm_id}` - 获取重新生成摘要
+
+### 5. 批次管理
+- `GET /api/batches` - 获取批次列表
+- `GET /api/batches/{batch_index}/details` - 获取批次详情
+
+### 6. 灌溉计划生成 ⭐
+- `POST /api/irrigation/plan-generation` - 生成灌溉计划（支持多方案模式）
+- `POST /api/irrigation/plan-with-upload` - 上传并生成计划（支持多方案模式）
 
 ### 7. Web可视化
 - `GET /geojson/fields` - 获取GeoJSON数据
@@ -255,7 +277,34 @@ GET {{base_url}}/api/regeneration/summary/{{farm_id}}
 
 ## 🔍 测试技巧
 
-### 1. 使用测试脚本
+### 1. 多方案功能测试 ⭐
+**重要功能**：灌溉计划生成接口支持多水泵方案模式
+
+#### 单方案模式 (`multi_pump_scenarios: false`)
+- 生成单一最优灌溉方案
+- 输出JSON结构简单，包含一个方案的详细信息
+- 适用于快速生成推荐方案
+
+#### 多方案模式 (`multi_pump_scenarios: true`)
+- 生成所有可能的水泵组合方案
+- 输出JSON包含：
+  - `scenarios` 数组：包含所有方案（P1单独、P2单独、P1+P2组合等）
+  - `analysis` 字段：方案对比分析
+  - `total_scenarios` 计数：总方案数量
+- 每个方案包含：
+  - `scenario_name`: 方案名称（如"P2单独使用"）
+  - `pumps_used`: 使用的水泵列表
+  - `total_electricity_cost`: 总电费成本
+  - `total_eta_h`: 总运行时间
+  - `coverage_info`: 覆盖信息
+
+#### 测试验证要点
+1. **参数验证**：确认 `multi_pump_scenarios` 参数正确传递
+2. **输出格式**：多方案模式下检查 `scenarios` 数组存在
+3. **日志确认**：在 `pipeline.log` 中确认参数值为 `True`
+4. **方案完整性**：验证所有可能的水泵组合都已生成
+
+### 2. 使用测试脚本
 每个请求都包含自动化测试脚本，会验证：
 - 响应状态码
 - 响应时间

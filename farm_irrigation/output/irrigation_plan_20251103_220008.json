@@ -10,11 +10,15 @@
       "S8"
     ],
     "segment_pump_requirements": {
-      "S4": [
+      "S3": [
         "P1",
         "P2"
       ],
-      "S3": [
+      "S8": [
+        "P1",
+        "P2"
+      ],
+      "S4": [
         "P1",
         "P2"
       ],
@@ -27,10 +31,6 @@
         "P2"
       ],
       "S5": [
-        "P1",
-        "P2"
-      ],
-      "S8": [
         "P1",
         "P2"
       ]
@@ -52,7 +52,6 @@
     {
       "scenario_name": "P2单独使用",
       "pumps_used": [
-        "P1",
         "P2"
       ],
       "total_electricity_cost": 2217.709108854,
@@ -103,7 +102,7 @@
                 "area_mu": 5.225,
                 "segment_id": "S3",
                 "distance_rank": 1,
-                "wl_mm": 1.2,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S3-G2"
               },
               {
@@ -111,7 +110,7 @@
                 "area_mu": 5.199,
                 "segment_id": "S3",
                 "distance_rank": 2,
-                "wl_mm": 1.0,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S3-G3"
               },
               {
@@ -135,7 +134,7 @@
                 "area_mu": 5.21,
                 "segment_id": "S3",
                 "distance_rank": 5,
-                "wl_mm": 0.7000000000000001,
+                "wl_mm": 0.6,
                 "inlet_G_id": "S3-G7"
               },
               {
@@ -143,7 +142,7 @@
                 "area_mu": 4.922,
                 "segment_id": "S3",
                 "distance_rank": 6,
-                "wl_mm": 1.0,
+                "wl_mm": 0.8,
                 "inlet_G_id": "S3-G8"
               },
               {
@@ -159,7 +158,7 @@
                 "area_mu": 5.266,
                 "segment_id": "S3",
                 "distance_rank": 8,
-                "wl_mm": 0.0,
+                "wl_mm": 0.6,
                 "inlet_G_id": "S3-G11"
               },
               {
@@ -167,7 +166,7 @@
                 "area_mu": 5.778,
                 "segment_id": "S4",
                 "distance_rank": 9,
-                "wl_mm": 0.0,
+                "wl_mm": 0.5,
                 "inlet_G_id": "S4-G14"
               },
               {
@@ -183,7 +182,7 @@
                 "area_mu": 5.944,
                 "segment_id": "S4",
                 "distance_rank": 11,
-                "wl_mm": 2.4,
+                "wl_mm": 2.6,
                 "inlet_G_id": "S4-G17"
               },
               {
@@ -191,7 +190,7 @@
                 "area_mu": 4.521,
                 "segment_id": "S4",
                 "distance_rank": 12,
-                "wl_mm": 5.0,
+                "wl_mm": 4.8,
                 "inlet_G_id": "S4-G18"
               },
               {
@@ -207,7 +206,7 @@
                 "area_mu": 4.626,
                 "segment_id": "S4",
                 "distance_rank": 14,
-                "wl_mm": 2.5,
+                "wl_mm": 2.8000000000000003,
                 "inlet_G_id": "S4-G20"
               }
             ],
@@ -234,7 +233,7 @@
                 "area_mu": 5.984,
                 "segment_id": "S4",
                 "distance_rank": 16,
-                "wl_mm": 6.2,
+                "wl_mm": 5.4,
                 "inlet_G_id": "S4-G22"
               },
               {
@@ -250,7 +249,7 @@
                 "area_mu": 4.606,
                 "segment_id": "S4",
                 "distance_rank": 18,
-                "wl_mm": 3.4000000000000004,
+                "wl_mm": 3.5999999999999996,
                 "inlet_G_id": "S4-G24"
               },
               {
@@ -258,7 +257,7 @@
                 "area_mu": 7.672,
                 "segment_id": "S5",
                 "distance_rank": 19,
-                "wl_mm": 0.0,
+                "wl_mm": 1.1,
                 "inlet_G_id": "S5-G27"
               },
               {
@@ -274,7 +273,7 @@
                 "area_mu": 7.916,
                 "segment_id": "S5",
                 "distance_rank": 21,
-                "wl_mm": 0.6,
+                "wl_mm": 0.5,
                 "inlet_G_id": "S5-G30"
               },
               {
@@ -290,7 +289,7 @@
                 "area_mu": 8.19,
                 "segment_id": "S5",
                 "distance_rank": 23,
-                "wl_mm": 0.8,
+                "wl_mm": 0.8999999999999999,
                 "inlet_G_id": "S5-G33"
               },
               {
@@ -298,7 +297,7 @@
                 "area_mu": 3.882,
                 "segment_id": "S5",
                 "distance_rank": 24,
-                "wl_mm": 0.6,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S5-G35"
               },
               {
@@ -306,7 +305,7 @@
                 "area_mu": 8.36,
                 "segment_id": "S6",
                 "distance_rank": 25,
-                "wl_mm": 1.0,
+                "wl_mm": 0.7000000000000001,
                 "inlet_G_id": "S6-G37"
               }
             ],
@@ -341,7 +340,7 @@
                 "area_mu": 12.532,
                 "segment_id": "S6",
                 "distance_rank": 28,
-                "wl_mm": 1.0,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S6-G42"
               },
               {
@@ -365,7 +364,7 @@
                 "area_mu": 9.432,
                 "segment_id": "S7",
                 "distance_rank": 31,
-                "wl_mm": 0.0,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S7-G47"
               },
               {
@@ -373,7 +372,7 @@
                 "area_mu": 10.288,
                 "segment_id": "S7",
                 "distance_rank": 32,
-                "wl_mm": 1.5,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S7-G49"
               },
               {
@@ -381,7 +380,7 @@
                 "area_mu": 9.098,
                 "segment_id": "S7",
                 "distance_rank": 33,
-                "wl_mm": 0.0,
+                "wl_mm": 0.8999999999999999,
                 "inlet_G_id": "S7-G50"
               }
             ],
@@ -400,7 +399,7 @@
                 "area_mu": 8.303,
                 "segment_id": "S7",
                 "distance_rank": 34,
-                "wl_mm": 0.8,
+                "wl_mm": 1.3,
                 "inlet_G_id": "S7-G51"
               },
               {
@@ -408,7 +407,7 @@
                 "area_mu": 8.921,
                 "segment_id": "S8",
                 "distance_rank": 35,
-                "wl_mm": 3.0,
+                "wl_mm": 4.0,
                 "inlet_G_id": "S8-G52"
               },
               {
@@ -416,7 +415,7 @@
                 "area_mu": 3.656,
                 "segment_id": "S8",
                 "distance_rank": 36,
-                "wl_mm": 1.1,
+                "wl_mm": 1.3,
                 "inlet_G_id": "S8-G53"
               }
             ],
@@ -1456,8 +1455,7 @@
     {
       "scenario_name": "P1单独使用",
       "pumps_used": [
-        "P1",
-        "P2"
+        "P1"
       ],
       "total_electricity_cost": 2217.709108854,
       "total_eta_h": 61.603030801500005,
@@ -1507,7 +1505,7 @@
                 "area_mu": 5.225,
                 "segment_id": "S3",
                 "distance_rank": 1,
-                "wl_mm": 1.2,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S3-G2"
               },
               {
@@ -1515,7 +1513,7 @@
                 "area_mu": 5.199,
                 "segment_id": "S3",
                 "distance_rank": 2,
-                "wl_mm": 1.0,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S3-G3"
               },
               {
@@ -1539,7 +1537,7 @@
                 "area_mu": 5.21,
                 "segment_id": "S3",
                 "distance_rank": 5,
-                "wl_mm": 0.7000000000000001,
+                "wl_mm": 0.6,
                 "inlet_G_id": "S3-G7"
               },
               {
@@ -1547,7 +1545,7 @@
                 "area_mu": 4.922,
                 "segment_id": "S3",
                 "distance_rank": 6,
-                "wl_mm": 1.0,
+                "wl_mm": 0.8,
                 "inlet_G_id": "S3-G8"
               },
               {
@@ -1563,7 +1561,7 @@
                 "area_mu": 5.266,
                 "segment_id": "S3",
                 "distance_rank": 8,
-                "wl_mm": 0.0,
+                "wl_mm": 0.6,
                 "inlet_G_id": "S3-G11"
               },
               {
@@ -1571,7 +1569,7 @@
                 "area_mu": 5.778,
                 "segment_id": "S4",
                 "distance_rank": 9,
-                "wl_mm": 0.0,
+                "wl_mm": 0.5,
                 "inlet_G_id": "S4-G14"
               },
               {
@@ -1587,7 +1585,7 @@
                 "area_mu": 5.944,
                 "segment_id": "S4",
                 "distance_rank": 11,
-                "wl_mm": 2.4,
+                "wl_mm": 2.6,
                 "inlet_G_id": "S4-G17"
               },
               {
@@ -1595,7 +1593,7 @@
                 "area_mu": 4.521,
                 "segment_id": "S4",
                 "distance_rank": 12,
-                "wl_mm": 5.0,
+                "wl_mm": 4.8,
                 "inlet_G_id": "S4-G18"
               },
               {
@@ -1611,7 +1609,7 @@
                 "area_mu": 4.626,
                 "segment_id": "S4",
                 "distance_rank": 14,
-                "wl_mm": 2.5,
+                "wl_mm": 2.8000000000000003,
                 "inlet_G_id": "S4-G20"
               }
             ],
@@ -1638,7 +1636,7 @@
                 "area_mu": 5.984,
                 "segment_id": "S4",
                 "distance_rank": 16,
-                "wl_mm": 6.2,
+                "wl_mm": 5.4,
                 "inlet_G_id": "S4-G22"
               },
               {
@@ -1654,7 +1652,7 @@
                 "area_mu": 4.606,
                 "segment_id": "S4",
                 "distance_rank": 18,
-                "wl_mm": 3.4000000000000004,
+                "wl_mm": 3.5999999999999996,
                 "inlet_G_id": "S4-G24"
               },
               {
@@ -1662,7 +1660,7 @@
                 "area_mu": 7.672,
                 "segment_id": "S5",
                 "distance_rank": 19,
-                "wl_mm": 0.0,
+                "wl_mm": 1.1,
                 "inlet_G_id": "S5-G27"
               },
               {
@@ -1678,7 +1676,7 @@
                 "area_mu": 7.916,
                 "segment_id": "S5",
                 "distance_rank": 21,
-                "wl_mm": 0.6,
+                "wl_mm": 0.5,
                 "inlet_G_id": "S5-G30"
               },
               {
@@ -1694,7 +1692,7 @@
                 "area_mu": 8.19,
                 "segment_id": "S5",
                 "distance_rank": 23,
-                "wl_mm": 0.8,
+                "wl_mm": 0.8999999999999999,
                 "inlet_G_id": "S5-G33"
               },
               {
@@ -1702,7 +1700,7 @@
                 "area_mu": 3.882,
                 "segment_id": "S5",
                 "distance_rank": 24,
-                "wl_mm": 0.6,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S5-G35"
               },
               {
@@ -1710,7 +1708,7 @@
                 "area_mu": 8.36,
                 "segment_id": "S6",
                 "distance_rank": 25,
-                "wl_mm": 1.0,
+                "wl_mm": 0.7000000000000001,
                 "inlet_G_id": "S6-G37"
               }
             ],
@@ -1745,7 +1743,7 @@
                 "area_mu": 12.532,
                 "segment_id": "S6",
                 "distance_rank": 28,
-                "wl_mm": 1.0,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S6-G42"
               },
               {
@@ -1769,7 +1767,7 @@
                 "area_mu": 9.432,
                 "segment_id": "S7",
                 "distance_rank": 31,
-                "wl_mm": 0.0,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S7-G47"
               },
               {
@@ -1777,7 +1775,7 @@
                 "area_mu": 10.288,
                 "segment_id": "S7",
                 "distance_rank": 32,
-                "wl_mm": 1.5,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S7-G49"
               },
               {
@@ -1785,7 +1783,7 @@
                 "area_mu": 9.098,
                 "segment_id": "S7",
                 "distance_rank": 33,
-                "wl_mm": 0.0,
+                "wl_mm": 0.8999999999999999,
                 "inlet_G_id": "S7-G50"
               }
             ],
@@ -1804,7 +1802,7 @@
                 "area_mu": 8.303,
                 "segment_id": "S7",
                 "distance_rank": 34,
-                "wl_mm": 0.8,
+                "wl_mm": 1.3,
                 "inlet_G_id": "S7-G51"
               },
               {
@@ -1812,7 +1810,7 @@
                 "area_mu": 8.921,
                 "segment_id": "S8",
                 "distance_rank": 35,
-                "wl_mm": 3.0,
+                "wl_mm": 4.0,
                 "inlet_G_id": "S8-G52"
               },
               {
@@ -1820,7 +1818,7 @@
                 "area_mu": 3.656,
                 "segment_id": "S8",
                 "distance_rank": 36,
-                "wl_mm": 1.1,
+                "wl_mm": 1.3,
                 "inlet_G_id": "S8-G53"
               }
             ],
@@ -2912,7 +2910,7 @@
                 "area_mu": 5.225,
                 "segment_id": "S3",
                 "distance_rank": 1,
-                "wl_mm": 1.2,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S3-G2"
               },
               {
@@ -2920,7 +2918,7 @@
                 "area_mu": 5.199,
                 "segment_id": "S3",
                 "distance_rank": 2,
-                "wl_mm": 1.0,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S3-G3"
               },
               {
@@ -2944,7 +2942,7 @@
                 "area_mu": 5.21,
                 "segment_id": "S3",
                 "distance_rank": 5,
-                "wl_mm": 0.7000000000000001,
+                "wl_mm": 0.6,
                 "inlet_G_id": "S3-G7"
               },
               {
@@ -2952,7 +2950,7 @@
                 "area_mu": 4.922,
                 "segment_id": "S3",
                 "distance_rank": 6,
-                "wl_mm": 1.0,
+                "wl_mm": 0.8,
                 "inlet_G_id": "S3-G8"
               },
               {
@@ -2968,7 +2966,7 @@
                 "area_mu": 5.266,
                 "segment_id": "S3",
                 "distance_rank": 8,
-                "wl_mm": 0.0,
+                "wl_mm": 0.6,
                 "inlet_G_id": "S3-G11"
               },
               {
@@ -2976,7 +2974,7 @@
                 "area_mu": 5.778,
                 "segment_id": "S4",
                 "distance_rank": 9,
-                "wl_mm": 0.0,
+                "wl_mm": 0.5,
                 "inlet_G_id": "S4-G14"
               },
               {
@@ -2992,7 +2990,7 @@
                 "area_mu": 5.944,
                 "segment_id": "S4",
                 "distance_rank": 11,
-                "wl_mm": 2.4,
+                "wl_mm": 2.6,
                 "inlet_G_id": "S4-G17"
               },
               {
@@ -3000,7 +2998,7 @@
                 "area_mu": 4.521,
                 "segment_id": "S4",
                 "distance_rank": 12,
-                "wl_mm": 5.0,
+                "wl_mm": 4.8,
                 "inlet_G_id": "S4-G18"
               },
               {
@@ -3016,7 +3014,7 @@
                 "area_mu": 4.626,
                 "segment_id": "S4",
                 "distance_rank": 14,
-                "wl_mm": 2.5,
+                "wl_mm": 2.8000000000000003,
                 "inlet_G_id": "S4-G20"
               },
               {
@@ -3032,7 +3030,7 @@
                 "area_mu": 5.984,
                 "segment_id": "S4",
                 "distance_rank": 16,
-                "wl_mm": 6.2,
+                "wl_mm": 5.4,
                 "inlet_G_id": "S4-G22"
               },
               {
@@ -3048,7 +3046,7 @@
                 "area_mu": 4.606,
                 "segment_id": "S4",
                 "distance_rank": 18,
-                "wl_mm": 3.4000000000000004,
+                "wl_mm": 3.5999999999999996,
                 "inlet_G_id": "S4-G24"
               },
               {
@@ -3056,7 +3054,7 @@
                 "area_mu": 7.672,
                 "segment_id": "S5",
                 "distance_rank": 19,
-                "wl_mm": 0.0,
+                "wl_mm": 1.1,
                 "inlet_G_id": "S5-G27"
               },
               {
@@ -3072,7 +3070,7 @@
                 "area_mu": 7.916,
                 "segment_id": "S5",
                 "distance_rank": 21,
-                "wl_mm": 0.6,
+                "wl_mm": 0.5,
                 "inlet_G_id": "S5-G30"
               },
               {
@@ -3088,7 +3086,7 @@
                 "area_mu": 8.19,
                 "segment_id": "S5",
                 "distance_rank": 23,
-                "wl_mm": 0.8,
+                "wl_mm": 0.8999999999999999,
                 "inlet_G_id": "S5-G33"
               },
               {
@@ -3096,7 +3094,7 @@
                 "area_mu": 3.882,
                 "segment_id": "S5",
                 "distance_rank": 24,
-                "wl_mm": 0.6,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S5-G35"
               },
               {
@@ -3104,7 +3102,7 @@
                 "area_mu": 8.36,
                 "segment_id": "S6",
                 "distance_rank": 25,
-                "wl_mm": 1.0,
+                "wl_mm": 0.7000000000000001,
                 "inlet_G_id": "S6-G37"
               }
             ],
@@ -3139,7 +3137,7 @@
                 "area_mu": 12.532,
                 "segment_id": "S6",
                 "distance_rank": 28,
-                "wl_mm": 1.0,
+                "wl_mm": 0.0,
                 "inlet_G_id": "S6-G42"
               },
               {
@@ -3163,7 +3161,7 @@
                 "area_mu": 9.432,
                 "segment_id": "S7",
                 "distance_rank": 31,
-                "wl_mm": 0.0,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S7-G47"
               },
               {
@@ -3171,7 +3169,7 @@
                 "area_mu": 10.288,
                 "segment_id": "S7",
                 "distance_rank": 32,
-                "wl_mm": 1.5,
+                "wl_mm": 1.0,
                 "inlet_G_id": "S7-G49"
               },
               {
@@ -3179,7 +3177,7 @@
                 "area_mu": 9.098,
                 "segment_id": "S7",
                 "distance_rank": 33,
-                "wl_mm": 0.0,
+                "wl_mm": 0.8999999999999999,
                 "inlet_G_id": "S7-G50"
               },
               {
@@ -3187,7 +3185,7 @@
                 "area_mu": 8.303,
                 "segment_id": "S7",
                 "distance_rank": 34,
-                "wl_mm": 0.8,
+                "wl_mm": 1.3,
                 "inlet_G_id": "S7-G51"
               },
               {
@@ -3195,7 +3193,7 @@
                 "area_mu": 8.921,
                 "segment_id": "S8",
                 "distance_rank": 35,
-                "wl_mm": 3.0,
+                "wl_mm": 4.0,
                 "inlet_G_id": "S8-G52"
               },
               {
@@ -3203,7 +3201,7 @@
                 "area_mu": 3.656,
                 "segment_id": "S8",
                 "distance_rank": 36,
-                "wl_mm": 1.1,
+                "wl_mm": 1.3,
                 "inlet_G_id": "S8-G53"
               }
             ],
@@ -4033,12 +4031,5 @@
       }
     }
   ],
-  "total_scenarios": 3,
-  "batches": [],
-  "modifications_summary": {
-    "added_fields": [],
-    "removed_fields": [],
-    "total_modifications": 2,
-    "regeneration_timestamp": 1761982537.5628948
-  }
+  "total_scenarios": 3
 }
