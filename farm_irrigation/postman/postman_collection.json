@@ -323,6 +323,53 @@
           }
         },
         {
+          "name": "批次重新生成",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"original_plan_id\": \"{{plan_id}}\",\n  \"field_modifications\": [\n    {\n      \"field_id\": \"{{test_field_add}}\",\n      \"action\": \"add\",\n      \"custom_water_level\": {{custom_water_level}}\n    },\n    {\n      \"field_id\": \"{{test_field_remove}}\",\n      \"action\": \"remove\"\n    }\n  ],\n  \"pump_assignments\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"pump_ids\": [\"{{pump_id_1}}\", \"{{pump_id_2}}\"]\n    }\n  ],\n  \"time_modifications\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"start_time_h\": {{start_time_h}},\n      \"duration_h\": {{duration_h}}\n    }\n  ],\n  \"regeneration_params\": {\n    \"force_regeneration\": true,\n    \"optimize_schedule\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/regeneration/batch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "regeneration", "batch"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"批次重新生成成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.original_plan).to.exist;",
+                  "    pm.expect(jsonData.modified_plan).to.exist;",
+                  "    pm.expect(jsonData.modifications_summary).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"修改摘要包含预期字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var summary = jsonData.modifications_summary;",
+                  "    pm.expect(summary.field_modifications).to.be.an('array');",
+                  "    pm.expect(summary.pump_assignments).to.be.an('array');",
+                  "    pm.expect(summary.time_modifications).to.be.an('array');",
+                  "    pm.expect(summary.total_changes).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "获取重新生成摘要",
           "request": {
             "method": "GET",

@@ -22,6 +22,11 @@ import json
 import glob
 import shutil
 import tempfile
+import hashlib
+import time
+import threading
+import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Form, File, UploadFile, Query
@@ -47,6 +52,20 @@ from dynamic_execution_api import (
     update_water_levels, manual_regenerate_batch, get_execution_history,
     get_water_level_summary, get_field_trend_analysis, get_water_level_history
 )
+
+# 导入批次重新生成相关模块
+from batch_regeneration_api import (
+    BatchModificationRequest, BatchRegenerationResponse,
+    create_batch_regeneration_endpoint, generate_batch_cache_key
+)
+
+# 导入多水泵方案相关模块
+from farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
+
+# 全局缓存和线程池
+_cache = {}
+_cache_lock = threading.Lock()
+_executor = ThreadPoolExecutor(max_workers=2)  # 限制并发数
 
 # 配置日志
 logging.basicConfig(
@@ -81,6 +100,46 @@ _waterlevel_manager: Optional[DynamicWaterLevelManager] = None
 _plan_regenerator: Optional[DynamicPlanRegenerator] = None
 _status_manager: Optional[ExecutionStatusManager] = None
 
+# 缓存相关函数
+def generate_cache_key(farm_id: str, target_depth_mm: float, pumps: str, zones: str, 
+                      merge_waterlevels: bool, print_summary: bool, multi_pump_scenarios: bool = False, 
+                      custom_waterlevels: str = "") -> str:
+    """生成缓存键"""
+    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}_{multi_pump_scenarios}_{custom_waterlevels}"
+    return hashlib.md5(key_data.encode()).hexdigest()
+
+def generate_batch_cache_key(original_plan_id: str, field_modifications: str, 
+                           pump_assignments: str, time_modifications: str, 
+                           regeneration_params: str) -> str:
+    """为批次重新生成生成缓存键"""
+    key_data = f"{original_plan_id}_{field_modifications}_{pump_assignments}_{time_modifications}_{regeneration_params}"
+    return hashlib.md5(key_data.encode()).hexdigest()
+
+def get_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
+    """从缓存获取数据"""
+    with _cache_lock:
+        if cache_key in _cache:
+            cache_data = _cache[cache_key]
+            # 检查缓存是否过期（5分钟）
+            if time.time() - cache_data['timestamp'] < 300:
+                return cache_data['data']
+            else:
+                del _cache[cache_key]
+    return None
+
+def set_cache(cache_key: str, data: Dict[str, Any]):
+    """设置缓存数据"""
+    with _cache_lock:
+        # 限制缓存大小，最多保存10个结果
+        if len(_cache) >= 10:
+            oldest_key = min(_cache.keys(), key=lambda k: _cache[k]['timestamp'])
+            del _cache[oldest_key]
+        
+        _cache[cache_key] = {
+            'data': data,
+            'timestamp': time.time()
+        }
+
 class SystemStatusResponse(BaseModel):
     """系统状态响应模型"""
     system_status: str
@@ -113,6 +172,53 @@ class IrrigationPlanResponse(BaseModel):
     message: str
     data: Optional[Dict[str, Any]] = None
     plan_id: Optional[str] = None
+    multi_pump_scenarios: Optional[Dict[str, Any]] = None
+
+class MultiPumpRequest(BaseModel):
+    """多水泵方案请求模型"""
+    config_file: str
+    active_pumps: Optional[List[str]] = None
+    zone_ids: Optional[List[str]] = None
+    use_realtime_wl: bool = False
+
+class MultiPumpResponse(BaseModel):
+    """多水泵方案响应模型"""
+    scenarios: List[dict]
+    analysis: dict
+    total_scenarios: int
+
+class FieldModification(BaseModel):
+    """田块修改信息"""
+    field_id: str
+    action: str  # 'add' 或 'remove'
+    custom_water_level: Optional[float] = None
+
+class PumpAssignment(BaseModel):
+    """批次水泵分配信息"""
+    batch_index: int
+    pump_ids: List[str]
+
+class TimeModification(BaseModel):
+    """批次时间修改信息"""
+    batch_index: int
+    start_time_h: Optional[float] = None
+    duration_h: Optional[float] = None
+
+class BatchModificationRequest(BaseModel):
+    """批次修改请求"""
+    original_plan_id: str
+    field_modifications: Optional[List[FieldModification]] = []
+    pump_assignments: Optional[List[PumpAssignment]] = []
+    time_modifications: Optional[List[TimeModification]] = []
+    regeneration_params: Optional[Dict[str, Any]] = {}
+
+class BatchRegenerationResponse(BaseModel):
+    """批次重新生成响应"""
+    success: bool
+    message: str
+    original_plan: Optional[Dict[str, Any]] = None
+    modified_plan: Optional[Dict[str, Any]] = None
+    modifications_summary: Dict[str, Any] = {}
 
 # 系统启动时间
 _system_start_time = datetime.now()
@@ -498,6 +604,148 @@ async def manual_regeneration(request: ManualRegenerationRequest):
     """手动重新生成批次"""
     return await manual_regenerate_batch(request)
 
+@app.post("/api/regeneration/batch", response_model=BatchRegenerationResponse)
+async def regenerate_batch_plan(request: BatchModificationRequest):
+    """
+    批次重新生成端点（支持缓存）
+    
+    根据前端的田块修改请求（添加或移除田块），重新生成灌溉批次计划。
+    支持田块修改、水泵分配和时间调整。
+    
+    - **original_plan_id**: 原始计划ID或文件路径
+    - **field_modifications**: 田块修改列表，每项包含field_id、action（add/remove）、可选的custom_water_level
+    - **pump_assignments**: 水泵分配列表，每项包含batch_index和pump_ids
+    - **time_modifications**: 时间修改列表，每项包含batch_index、start_time_h和duration_h
+    - **regeneration_params**: 可选的重新生成参数
+    
+    返回包含原始计划、修改后计划和修改摘要的响应。
+    """
+    try:
+        logger.info(f"开始批次重新生成 - plan_id: {request.original_plan_id}")
+        
+        # 生成缓存键
+        cache_key = generate_batch_cache_key(
+            original_plan_id=request.original_plan_id,
+            field_modifications=str(request.field_modifications),
+            pump_assignments=str(request.pump_assignments),
+            time_modifications=str(request.time_modifications),
+            regeneration_params=str(request.regeneration_params)
+        )
+        
+        # 尝试从缓存获取结果
+        cached_result = get_from_cache(cache_key)
+        if cached_result:
+            logger.info(f"从缓存返回批次重新生成结果 - cache_key: {cache_key}")
+            return BatchRegenerationResponse(**cached_result)
+        
+        # 导入批次重新生成服务
+        from batch_regeneration_api import BatchRegenerationService
+        
+        # 创建服务实例
+        service = BatchRegenerationService()
+        
+        # 加载原始计划
+        try:
+            original_plan = service.load_original_plan(request.original_plan_id)
+            if not original_plan:
+                raise HTTPException(status_code=404, detail=f"未找到计划: {request.original_plan_id}")
+        except Exception as e:
+            logger.error(f"加载原始计划失败: {e}")
+            raise HTTPException(status_code=404, detail=f"加载原始计划失败: {str(e)}")
+        
+        # 应用修改
+        modified_plan = original_plan.copy()
+        modifications_summary = {
+            "field_modifications": [],
+            "pump_assignments": [],
+            "time_modifications": [],
+            "total_changes": 0
+        }
+        
+        # 处理田块修改
+        if request.field_modifications:
+            for mod in request.field_modifications:
+                try:
+                    if mod.action == "add":
+                        # 添加田块到合适的批次
+                        result = service._add_field_to_plan(modified_plan, mod.field_id, mod.custom_water_level)
+                        modifications_summary["field_modifications"].append({
+                            "field_id": mod.field_id,
+                            "action": "add",
+                            "result": result
+                        })
+                    elif mod.action == "remove":
+                        # 从计划中移除田块
+                        result = service._remove_field_from_plan(modified_plan, mod.field_id)
+                        modifications_summary["field_modifications"].append({
+                            "field_id": mod.field_id,
+                            "action": "remove",
+                            "result": result
+                        })
+                    modifications_summary["total_changes"] += 1
+                except Exception as e:
+                    logger.warning(f"田块修改失败 {mod.field_id}: {e}")
+        
+        # 处理水泵分配修改
+        if request.pump_assignments:
+            for assignment in request.pump_assignments:
+                try:
+                    result = service._update_pump_assignment(modified_plan, assignment.batch_index, assignment.pump_ids)
+                    modifications_summary["pump_assignments"].append({
+                        "batch_index": assignment.batch_index,
+                        "pump_ids": assignment.pump_ids,
+                        "result": result
+                    })
+                    modifications_summary["total_changes"] += 1
+                except Exception as e:
+                    logger.warning(f"水泵分配修改失败 batch {assignment.batch_index}: {e}")
+        
+        # 处理时间修改
+        if request.time_modifications:
+            for time_mod in request.time_modifications:
+                try:
+                    result = service._update_batch_timing(modified_plan, time_mod.batch_index, 
+                                                        time_mod.start_time_h, time_mod.duration_h)
+                    modifications_summary["time_modifications"].append({
+                        "batch_index": time_mod.batch_index,
+                        "start_time_h": time_mod.start_time_h,
+                        "duration_h": time_mod.duration_h,
+                        "result": result
+                    })
+                    modifications_summary["total_changes"] += 1
+                except Exception as e:
+                    logger.warning(f"时间修改失败 batch {time_mod.batch_index}: {e}")
+        
+        # 保存修改后的计划
+        try:
+            output_file = service._save_modified_plan(modified_plan, request.original_plan_id)
+            logger.info(f"修改后的计划已保存到: {output_file}")
+        except Exception as e:
+            logger.error(f"保存修改后的计划失败: {e}")
+            raise HTTPException(status_code=500, detail=f"保存修改后的计划失败: {str(e)}")
+        
+        # 准备响应数据
+        response_data = {
+            "success": True,
+            "message": f"批次计划重新生成成功，共进行了 {modifications_summary['total_changes']} 项修改",
+            "original_plan": original_plan,
+            "modified_plan": modified_plan,
+            "modifications_summary": modifications_summary
+        }
+        
+        # 将结果保存到缓存
+        set_cache(cache_key, response_data)
+        logger.info(f"批次重新生成结果已保存到缓存 - cache_key: {cache_key}")
+        
+        logger.info("批次重新生成完成")
+        return BatchRegenerationResponse(**response_data)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"批次重新生成失败: {e}")
+        raise HTTPException(status_code=500, detail=f"批次重新生成失败: {str(e)}")
+
 @app.get("/api/regeneration/summary/{farm_id}")
 async def regeneration_summary(farm_id: str):
     """获取重新生成摘要"""
@@ -697,9 +945,26 @@ async def get_current_plan():
 
 @app.post("/api/irrigation/plan-generation", response_model=IrrigationPlanResponse)
 async def generate_irrigation_plan(request: IrrigationPlanRequest):
-    """生成灌溉计划"""
+    """生成灌溉计划（支持多水泵方案对比和缓存）"""
     try:
         logger.info(f"开始生成灌溉计划 - farm_id: {request.farm_id}")
+        
+        # 生成缓存键
+        cache_key = generate_cache_key(
+            farm_id=request.farm_id,
+            target_depth_mm=90.0,  # 默认值
+            pumps="",
+            zones="",
+            merge_waterlevels=True,
+            print_summary=True,
+            multi_pump_scenarios=request.multi_pump_scenarios or False
+        )
+        
+        # 尝试从缓存获取结果
+        cached_result = get_from_cache(cache_key)
+        if cached_result:
+            logger.info(f"从缓存返回灌溉计划结果 - cache_key: {cache_key}")
+            return IrrigationPlanResponse(**cached_result)
         
         # 导入pipeline模块
         try:
@@ -722,7 +987,7 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
             'config_file': config_path if os.path.exists(config_path) else None,
             'merge_waterlevels': True,
             'print_summary': True,
-            'multi_pump_scenarios': request.multi_pump_scenarios
+            'multi_pump_scenarios': request.multi_pump_scenarios or False
         }
         
         logger.info(f"Pipeline参数: {kwargs}")
@@ -761,13 +1026,40 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
             else:
                 logger.warning("未找到灌溉计划文件")
         
+        # 如果启用了多水泵方案对比，添加方案对比数据
+        multi_pump_data = None
+        if request.multi_pump_scenarios and os.path.exists(config_path):
+            try:
+                logger.info("开始生成多水泵方案对比")
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config_data = json.load(f)
+                
+                # 创建农场配置
+                cfg = farmcfg_from_json_select(config_data)
+                
+                # 生成多水泵方案
+                scenarios_result = generate_multi_pump_scenarios(cfg)
+                multi_pump_data = {
+                    "scenarios": scenarios_result.get('scenarios', []),
+                    "analysis": scenarios_result.get('analysis', {}),
+                    "total_scenarios": scenarios_result.get('total_scenarios', 0)
+                }
+                logger.info(f"多水泵方案生成成功，共 {multi_pump_data['total_scenarios']} 个方案")
+            except Exception as e:
+                logger.warning(f"多水泵方案生成失败: {e}")
+        
         # 准备响应数据
         response_data = {
             "success": True,
             "message": "灌溉计划生成成功",
             "data": plan_data,
-            "plan_id": plan_id
+            "plan_id": plan_id,
+            "multi_pump_scenarios": multi_pump_data
         }
+        
+        # 将结果保存到缓存
+        set_cache(cache_key, response_data)
+        logger.info(f"灌溉计划结果已保存到缓存 - cache_key: {cache_key}")
         
         logger.info("灌溉计划生成完成")
         return IrrigationPlanResponse(**response_data)
@@ -794,11 +1086,40 @@ async def generate_irrigation_plan_with_upload(
     custom_waterlevels: Optional[str] = Form(None),
     files: List[UploadFile] = File(default=[])
 ):
-    """生成灌溉计划（支持文件上传）"""
+    """生成灌溉计划（支持文件上传、多水泵方案对比和缓存）"""
     backup_dir = ""
     
     try:
         logger.info(f"开始处理灌溉计划请求 - farm_id: {farm_id}, target_depth_mm: {target_depth_mm}")
+        
+        # 生成缓存键（包含文件信息）
+        file_hash = ""
+        if files and files[0].filename:
+            # 为上传的文件生成哈希
+            file_contents = []
+            for file in files:
+                content = await file.read()
+                file_contents.append(content)
+                await file.seek(0)  # 重置文件指针
+            file_hash = hashlib.md5(b''.join(file_contents)).hexdigest()[:8]
+        
+        cache_key = generate_cache_key(
+            farm_id=farm_id,
+            target_depth_mm=target_depth_mm,
+            pumps=pumps or "",
+            zones=zones or "",
+            merge_waterlevels=merge_waterlevels,
+            print_summary=print_summary,
+            multi_pump_scenarios=multi_pump_scenarios,
+            file_hash=file_hash
+        )
+        
+        # 尝试从缓存获取结果（仅当没有文件上传时）
+        if not (files and files[0].filename):
+            cached_result = get_from_cache(cache_key)
+            if cached_result:
+                logger.info(f"从缓存返回灌溉计划结果 - cache_key: {cache_key}")
+                return IrrigationPlanResponse(**cached_result)
         
         # 导入pipeline模块
         try:
@@ -921,6 +1242,32 @@ async def generate_irrigation_plan_with_upload(
             else:
                 logger.warning("未找到灌溉计划文件")
         
+        # 如果启用了多水泵方案对比，添加方案对比数据
+        multi_pump_data = None
+        if multi_pump_scenarios:
+            try:
+                logger.info("开始生成多水泵方案对比")
+                config_path = os.path.join(os.path.dirname(__file__), "config.json")
+                if os.path.exists(config_path):
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        config_data = json.load(f)
+                    
+                    # 创建农场配置
+                    cfg = farmcfg_from_json_select(config_data)
+                    
+                    # 生成多水泵方案
+                    scenarios_result = generate_multi_pump_scenarios(cfg)
+                    multi_pump_data = {
+                        "scenarios": scenarios_result.get('scenarios', []),
+                        "analysis": scenarios_result.get('analysis', {}),
+                        "total_scenarios": scenarios_result.get('total_scenarios', 0)
+                    }
+                    logger.info(f"多水泵方案生成成功，共 {multi_pump_data['total_scenarios']} 个方案")
+                else:
+                    logger.warning("配置文件不存在，跳过多水泵方案生成")
+            except Exception as e:
+                logger.warning(f"多水泵方案生成失败: {e}")
+        
         # 清理备份
         if backup_dir:
             shutil.rmtree(backup_dir)
@@ -930,8 +1277,14 @@ async def generate_irrigation_plan_with_upload(
             "success": True,
             "message": "灌溉计划生成成功",
             "data": plan_data,
-            "plan_id": plan_id
+            "plan_id": plan_id,
+            "multi_pump_scenarios": multi_pump_data
         }
+        
+        # 将结果保存到缓存（仅当没有文件上传时）
+        if not (files and files[0].filename):
+            set_cache(cache_key, response_data)
+            logger.info(f"灌溉计划结果已保存到缓存 - cache_key: {cache_key}")
         
         logger.info("灌溉计划生成完成")
         return IrrigationPlanResponse(**response_data)

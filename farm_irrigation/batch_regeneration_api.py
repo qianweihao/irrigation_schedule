@@ -53,7 +53,9 @@ class BatchRegenerationService:
     """批次重新生成服务"""
     
     def __init__(self):
-        self.output_dir = Path("./output")
+        # 确保使用正确的output目录路径
+        current_dir = Path(__file__).parent
+        self.output_dir = current_dir / "output"
         
     def load_original_plan(self, plan_id: str) -> Dict[str, Any]:
         """加载原始计划数据"""
@@ -337,6 +339,17 @@ class BatchRegenerationService:
                 modified_batches.append(batch_index)
         
         return modified_plan
+    
+    def _save_modified_plan(self, modified_plan: Dict[str, Any], original_plan_id: str = None) -> str:
+        """保存修改后的计划并返回文件路径"""
+        timestamp = int(time.time())
+        output_file = self.output_dir / f"irrigation_plan_modified_{timestamp}.json"
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(modified_plan, f, ensure_ascii=False, indent=2)
+        
+        return str(output_file)
     
     def get_batch_info(self, plan_id: str) -> Dict[str, Any]:
         """获取现有计划的批次详细信息"""
