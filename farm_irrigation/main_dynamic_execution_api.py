@@ -277,19 +277,20 @@ def get_scenario_info(scheduler=None):
     if raw_plan_data:
         scenarios = raw_plan_data.get("scenarios", [])
     else:
-        # 如果调度器没有raw_plan_data，直接从文件读取
+        # 如果调度器没有raw_plan_data，查找最新的计划文件
         import json
-        from pathlib import Path
-        plan_file = Path("output/irrigation_plan_modified_1761982575.json")
-        if plan_file.exists():
+        
+        scenarios = []
+        latest_plan_file = find_latest_plan_file()
+        
+        if latest_plan_file:
             try:
-                with open(plan_file, 'r', encoding='utf-8') as f:
+                with open(latest_plan_file, 'r', encoding='utf-8') as f:
                     file_data = json.load(f)
                 scenarios = file_data.get("scenarios", [])
-            except Exception:
+            except Exception as e:
+                logger.warning(f"读取计划文件失败: {e}")
                 scenarios = []
-        else:
-            scenarios = []
     
     scenario_count = len(scenarios)
     scenario_name = ""
@@ -334,6 +335,47 @@ def _first_existing(*paths):
     for p in paths:
         if p and os.path.isfile(p):
             return p
+    return None
+
+def find_latest_plan_file(output_dir_path: str = None) -> Optional[str]:
+    """
+    动态查找最新的完整灌溉计划文件
+    
+    Args:
+        output_dir_path: 输出目录路径，如果为None则使用默认output目录
+        
+    Returns:
+        str: 最新计划文件的完整路径，如果没找到则返回None
+    """
+    from pathlib import Path
+    
+    if output_dir_path is None:
+        script_dir = Path(__file__).parent
+        output_dir = script_dir / "output"
+    else:
+        output_dir = Path(output_dir_path)
+    
+    if not output_dir.exists():
+        logger.warning(f"输出目录不存在: {output_dir}")
+        return None
+    
+    # 查找完整计划文件（排除手动重新生成的文件）
+    plan_patterns = [
+        "irrigation_plan_modified_*.json",
+        "irrigation_plan_2*.json",
+    ]
+    
+    all_plan_files = []
+    for pattern in plan_patterns:
+        all_plan_files.extend(output_dir.glob(pattern))
+    
+    if all_plan_files:
+        # 按修改时间排序，选择最新的文件
+        latest_plan = max(all_plan_files, key=lambda p: p.stat().st_mtime)
+        logger.info(f"找到最新计划文件: {latest_plan}")
+        return str(latest_plan)
+    
+    logger.warning("未找到任何完整计划文件")
     return None
 
 # 文件上传辅助函数
@@ -777,23 +819,27 @@ async def get_batch_list():
         plan = _scheduler.get_current_plan()
         
         if not plan:
-            # 尝试加载实际的输出计划文件
+            # 尝试动态查找并加载最新的计划文件
             try:
-                # 首先尝试加载environment中配置的文件
-                output_plan_path = "output/irrigation_plan_modified_1761982575.json"
-                _scheduler.load_irrigation_plan(output_plan_path)
-                plan = _scheduler.get_current_plan()
-                logger.info(f"成功加载输出计划文件: {output_plan_path}")
-            except Exception as load_error:
-                logger.warning(f"加载输出计划文件失败: {load_error}")
-                # 如果输出文件加载失败，尝试加载根目录的plan.json作为备选
-                try:
+                latest_plan_file = find_latest_plan_file()
+                plan_loaded = False
+                
+                if latest_plan_file:
+                    plan_loaded = _scheduler.load_irrigation_plan(latest_plan_file)
+                    if plan_loaded:
+                        plan = _scheduler.get_current_plan()
+                        logger.info(f"成功加载计划文件: {latest_plan_file}")
+                
+                if not plan_loaded:
+                    # 如果output目录没有文件，尝试加载根目录的plan.json作为备选
+                    logger.warning("output目录中没有找到计划文件，尝试加载根目录的plan.json")
                     _scheduler.load_irrigation_plan("plan.json")
                     plan = _scheduler.get_current_plan()
                     logger.info("使用根目录plan.json作为备选")
-                except Exception as fallback_error:
-                    logger.error(f"加载备选计划失败: {fallback_error}")
-                    raise HTTPException(status_code=404, detail="当前没有执行计划，且无法加载任何计划文件")
+                    
+            except Exception as load_error:
+                logger.error(f"加载计划文件失败: {load_error}")
+                raise HTTPException(status_code=404, detail="当前没有执行计划，且无法加载任何计划文件")
         
         if not plan:
             raise HTTPException(status_code=404, detail="当前没有执行计划")
@@ -843,14 +889,23 @@ async def get_batch_details(batch_index: int):
         # 获取当前计划以验证批次索引
         plan = _scheduler.get_current_plan()
         if not plan:
-            # 尝试加载实际的输出计划文件
+            # 尝试动态查找并加载最新的计划文件
             try:
-                output_plan_path = "output/irrigation_plan_modified_1761982575.json"
-                _scheduler.load_irrigation_plan(output_plan_path)
-                plan = _scheduler.get_current_plan()
-                logger.info(f"成功加载输出计划文件: {output_plan_path}")
+                latest_plan_file = find_latest_plan_file()
+                plan_loaded = False
+                
+                if latest_plan_file:
+                    plan_loaded = _scheduler.load_irrigation_plan(latest_plan_file)
+                    if plan_loaded:
+                        plan = _scheduler.get_current_plan()
+                        logger.info(f"成功加载计划文件: {latest_plan_file}")
+                
+                if not plan_loaded:
+                    logger.warning("output目录中没有找到计划文件")
+                    raise HTTPException(status_code=404, detail="当前没有执行计划")
+                    
             except Exception as load_error:
-                logger.warning(f"加载输出计划文件失败: {load_error}")
+                logger.error(f"加载计划文件失败: {load_error}")
                 raise HTTPException(status_code=404, detail="当前没有执行计划")
         
         if not plan:

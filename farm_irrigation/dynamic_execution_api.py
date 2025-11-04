@@ -13,6 +13,7 @@
 import json
 import logging
 import asyncio
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -112,6 +113,7 @@ class ManualRegenerationResponse(BaseModel):
     execution_time_adjustment_seconds: float = 0.0  # 执行时间调整（秒）
     water_usage_adjustment_m3: float = 0.0  # 用水量调整（立方米）
     change_summary: str = ""  # 变更摘要描述
+    output_file: Optional[str] = None  # 保存的JSON文件路径
 
 class ExecutionHistoryResponse(BaseModel):
     """执行历史响应模型"""
@@ -416,19 +418,52 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             # 尝试加载默认计划文件
             logger.info("当前没有执行计划，尝试加载默认计划文件")
             
-            # 首先尝试加载output目录中的计划文件
-            output_plan_path = "output/irrigation_plan_modified_1761982575.json"
-            plan_loaded = scheduler.load_irrigation_plan(output_plan_path)
+            # 查找output目录中最新的计划文件
+            from pathlib import Path
+            import glob
+            
+            plan_loaded = False
+            # 使用脚本所在目录的output子目录
+            script_dir = Path(__file__).parent
+            output_dir = script_dir / "output"
+            
+            if output_dir.exists():
+                # 查找所有灌溉计划文件，优先使用包含完整scenarios的文件
+                # 排除手动重新生成的文件，因为它们可能只包含部分scenarios
+                plan_patterns = [
+                    "irrigation_plan_modified_*.json",  # 批次重新生成的完整文件
+                    "irrigation_plan_2*.json",  # 按日期命名的完整文件
+                ]
+                
+                all_plan_files = []
+                for pattern in plan_patterns:
+                    all_plan_files.extend(output_dir.glob(pattern))
+                
+                if all_plan_files:
+                    # 按修改时间排序，选择最新的文件
+                    latest_plan = max(all_plan_files, key=lambda p: p.stat().st_mtime)
+                    logger.info(f"找到完整计划文件: {latest_plan}")
+                    plan_loaded = scheduler.load_irrigation_plan(str(latest_plan))
+                else:
+                    # 如果没有找到完整文件，退而求其次使用任何计划文件
+                    logger.warning("未找到完整计划文件，尝试使用任何可用的计划文件")
+                    fallback_patterns = ["irrigation_plan_*.json"]
+                    for pattern in fallback_patterns:
+                        all_plan_files.extend(output_dir.glob(pattern))
+                    if all_plan_files:
+                        latest_plan = max(all_plan_files, key=lambda p: p.stat().st_mtime)
+                        logger.info(f"使用备用计划文件: {latest_plan}")
+                        plan_loaded = scheduler.load_irrigation_plan(str(latest_plan))
             
             if not plan_loaded:
-                # 如果output文件加载失败，尝试加载根目录的plan.json作为备选
-                logger.warning(f"加载输出计划文件失败，尝试备选文件")
+                # 如果output目录没有文件，尝试加载根目录的plan.json
+                logger.warning("output目录中没有找到计划文件，尝试加载根目录的plan.json")
                 plan_loaded = scheduler.load_irrigation_plan("plan.json")
             
             if not plan_loaded:
                 raise HTTPException(
                     status_code=404,
-                    detail="没有找到当前执行计划，且无法加载任何计划文件"
+                    detail="没有找到当前执行计划，且无法加载任何计划文件。请先生成灌溉计划或启动动态执行。"
                 )
             current_plan = scheduler.get_current_plan()
             if not current_plan:
@@ -442,16 +477,32 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         if raw_plan_data:
             scenarios = raw_plan_data.get("scenarios", [])
         else:
-            # 如果调度器没有raw_plan_data，直接从文件读取
-            import json
-            from pathlib import Path
-            plan_file = Path("output/irrigation_plan_modified_1761982575.json")
-            if plan_file.exists():
-                with open(plan_file, 'r', encoding='utf-8') as f:
-                    file_data = json.load(f)
-                scenarios = file_data.get("scenarios", [])
-            else:
-                scenarios = []
+            # 如果调度器没有raw_plan_data，尝试从最新计划文件读取
+            scenarios = []
+            script_dir = Path(__file__).parent
+            output_dir = script_dir / "output"
+            
+            if output_dir.exists():
+                plan_patterns = [
+                    "irrigation_plan_*.json",
+                    "irrigation_plan_modified_*.json",
+                    "irrigation_plan_manual_regen_*.json"
+                ]
+                
+                all_plan_files = []
+                for pattern in plan_patterns:
+                    all_plan_files.extend(output_dir.glob(pattern))
+                
+                if all_plan_files:
+                    # 选择最新的文件
+                    latest_plan = max(all_plan_files, key=lambda p: p.stat().st_mtime)
+                    try:
+                        with open(latest_plan, 'r', encoding='utf-8') as f:
+                            file_data = json.load(f)
+                        scenarios = file_data.get("scenarios", [])
+                    except Exception as e:
+                        logger.warning(f"无法从文件读取scenarios: {e}")
+                        scenarios = []
         
         scenario_count = len(scenarios)
         scenario_name = ""
@@ -507,6 +558,94 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         # 更新调度器中的计划
         await scheduler.update_batch_plan(request.batch_index, result.regenerated_commands)
         
+        # 保存修改后的计划到JSON文件
+        from pathlib import Path
+        script_dir = Path(__file__).parent
+        output_dir = script_dir / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 获取更新后的完整计划
+        updated_plan = scheduler.get_current_plan()
+        
+        # 重建完整的文件结构（保持与其他计划文件一致的格式）
+        if updated_plan:
+            # 获取原始的完整计划数据（包含scenarios结构）
+            raw_plan_data = getattr(scheduler, 'raw_plan_data', None)
+            
+            if raw_plan_data and 'scenarios' in raw_plan_data:
+                # 如果有scenarios结构，保持完整格式
+                full_plan_data = {
+                    'analysis': raw_plan_data.get('analysis', {}),
+                    'scenarios': []
+                }
+                
+                # 找到当前使用的scenario并更新，其他scenarios保持不变
+                scenarios_list = raw_plan_data.get('scenarios', [])
+                logger.info(f"原始计划包含 {len(scenarios_list)} 个scenarios")
+                
+                for i, scenario in enumerate(scenarios_list):
+                    if i == 0:  # 更新第一个scenario（当前使用的）
+                        # 使用深拷贝确保不修改原始数据
+                        import copy
+                        updated_scenario = copy.deepcopy(scenario)
+                        updated_scenario['plan'] = updated_plan
+                        
+                        # 更新scenario级别的统计信息
+                        updated_scenario['total_electricity_cost'] = updated_plan.get('total_electricity_cost', scenario.get('total_electricity_cost', 0))
+                        updated_scenario['total_eta_h'] = updated_plan.get('total_eta_h', scenario.get('total_eta_h', 0))
+                        updated_scenario['total_pump_runtime_hours'] = updated_plan.get('total_pump_runtime_hours', scenario.get('total_pump_runtime_hours', {}))
+                        
+                        # 添加修改元数据到plan中
+                        if 'metadata' not in updated_scenario['plan']:
+                            updated_scenario['plan']['metadata'] = {}
+                        updated_scenario['plan']['metadata']['last_manual_regeneration'] = {
+                            'batch_index': request.batch_index,
+                            'timestamp': datetime.now().isoformat(),
+                            'water_level_source': 'manual' if request.custom_water_levels else 'api',
+                            'custom_water_levels': request.custom_water_levels
+                        }
+                        full_plan_data['scenarios'].append(updated_scenario)
+                        logger.info(f"已更新scenario: {updated_scenario.get('scenario_name', 'Unknown')}")
+                    else:
+                        # 其他scenario保持不变
+                        full_plan_data['scenarios'].append(scenario)
+                        logger.info(f"保留原始scenario: {scenario.get('scenario_name', 'Unknown')}")
+                
+                logger.info(f"最终保存的计划包含 {len(full_plan_data['scenarios'])} 个scenarios")
+                save_data = full_plan_data
+            else:
+                # 如果没有scenarios结构，包装成单scenario格式
+                if 'metadata' not in updated_plan:
+                    updated_plan['metadata'] = {}
+                updated_plan['metadata']['last_manual_regeneration'] = {
+                    'batch_index': request.batch_index,
+                    'timestamp': datetime.now().isoformat(),
+                    'water_level_source': 'manual' if request.custom_water_levels else 'api',
+                    'custom_water_levels': request.custom_water_levels
+                }
+                
+                # 创建单scenario格式
+                save_data = {
+                    'scenarios': [
+                        {
+                            'scenario_name': '手动重新生成的计划',
+                            'pumps_used': updated_plan.get('calc', {}).get('active_pumps', []),
+                            'total_electricity_cost': updated_plan.get('total_electricity_cost', 0),
+                            'total_eta_h': updated_plan.get('total_eta_h', 0),
+                            'total_pump_runtime_hours': updated_plan.get('total_pump_runtime_hours', {}),
+                            'plan': updated_plan
+                        }
+                    ]
+                }
+            
+            # 保存文件
+            timestamp = int(time.time())
+            output_file = output_dir / f"irrigation_plan_manual_regen_{timestamp}.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(save_data, f, ensure_ascii=False, indent=2)
+            
+            logger.info(f"修改后的计划已保存到: {output_file}")
+        
         # 生成变更摘要
         change_summary = regenerator.generate_change_summary(result.changes)
         
@@ -521,12 +660,16 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
                 actual_changes_count += 1
         
         # 构建更准确的消息
+        output_file_name = str(output_file.name) if updated_plan else None
         if scenario_count > 1:
             message = f"批次 {request.batch_index} 重新生成成功 (基于scenario '{scenario_name}'，共{scenario_count}个scenarios中的第1个)"
         elif scenario_count == 1 and scenario_name != "顶层计划":
             message = f"批次 {request.batch_index} 重新生成成功 (基于scenario '{scenario_name}')"
         else:
             message = f"批次 {request.batch_index} 重新生成成功 (基于顶层计划)"
+        
+        if output_file_name:
+            message += f"，已保存到 {output_file_name}"
         
         return ManualRegenerationResponse(
             success=True,
@@ -537,7 +680,8 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             changes_count=actual_changes_count,
             execution_time_adjustment_seconds=result.execution_time_adjustment,
             water_usage_adjustment_m3=result.total_water_adjustment,
-            change_summary=change_summary.get("summary", "")
+            change_summary=change_summary.get("summary", ""),
+            output_file=str(output_file) if updated_plan else None
         )
         
     except HTTPException:
