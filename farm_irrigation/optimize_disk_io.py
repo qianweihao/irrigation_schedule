@@ -230,8 +230,15 @@ def optimize_shapefile_operations(input_dir: str, output_dir: str) -> bool:
         optimizer.cleanup_temp_files()
 
 if __name__ == "__main__":
-    # 测试优化器
-    logging.basicConfig(level=logging.INFO)
+    # 测试优化器（修复编码问题）
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('optimize_disk_io.log', encoding='utf-8')
+        ]
+    )
     
     optimizer = DiskIOOptimizer()
     

@@ -1,0 +1,75 @@
+2025-11-05 15:37:48,412 - __main__ - INFO - 启动智能灌溉动态执行系统服务器...
+2025-11-05 15:37:49,611 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-05 15:37:49,611 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-05 15:37:49,612 - execution_status_manager - INFO - 数据库初始化完成
+2025-11-05 15:37:49,612 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-05 15:37:49,613 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-05 15:37:49,613 - dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-05 15:37:49,613 - dynamic_plan_regenerator - WARNING - 计划模板不存在: plan_templates
+2025-11-05 15:37:49,613 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-05 15:37:49,614 - execution_status_manager - INFO - 数据库初始化完成
+2025-11-05 15:37:49,615 - batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-05 15:37:49,615 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-05 15:37:49,615 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-05 15:37:49,615 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-05 15:37:58,758 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-05 15:44:55,056 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-05 15:44:55,056 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-05 15:44:55,057 - execution_status_manager - INFO - 数据库初始化完成
+2025-11-05 15:44:55,057 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-05 15:44:55,058 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-05 15:44:55,058 - dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-05 15:44:55,058 - dynamic_plan_regenerator - WARNING - 计划模板不存在: plan_templates
+2025-11-05 15:44:55,058 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-05 15:44:55,059 - execution_status_manager - INFO - 数据库初始化完成
+2025-11-05 15:44:55,060 - batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-05 15:44:55,060 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-05 15:44:55,060 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-05 15:44:55,060 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-05 15:46:25,630 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-05 15:46:25,631 - execution_status_manager - INFO - 数据库初始化完成
+2025-11-05 15:46:25,632 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-05 15:46:25,632 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-05 15:46:25,632 - dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-05 15:46:25,632 - dynamic_plan_regenerator - WARNING - 计划模板不存在: plan_templates
+2025-11-05 15:46:25,632 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-05 15:46:25,633 - batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-05 15:46:25,633 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-05 15:46:25,633 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-05 15:48:37,859 - dynamic_execution_api - INFO - 启动动态执行 - 计划文件: e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_modified_1761982575.json
+2025-11-05 15:48:37,859 - batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-05 15:48:37,860 - batch_execution_scheduler - INFO - 配置文件加载成功: e:\irrigation_schedule\farm_irrigation\config.json
+2025-11-05 15:48:37,861 - batch_execution_scheduler - INFO - 使用scenarios格式，选择第一个scenario: P2单独使用
+2025-11-05 15:48:37,861 - batch_execution_scheduler - INFO - 批次 1: 开始时间 0.00h, 持续时间 18.28h
+2025-11-05 15:48:37,862 - batch_execution_scheduler - INFO - 批次 2: 开始时间 18.28h, 持续时间 19.77h
+2025-11-05 15:48:37,862 - batch_execution_scheduler - INFO - 批次 3: 开始时间 38.05h, 持续时间 18.34h
+2025-11-05 15:48:37,862 - batch_execution_scheduler - INFO - 批次 4: 开始时间 56.38h, 持续时间 5.22h
+2025-11-05 15:48:37,862 - batch_execution_scheduler - INFO - 灌溉计划加载成功: e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_modified_1761982575.json
+2025-11-05 15:48:37,862 - batch_execution_scheduler - INFO - 共有 4 个批次
+2025-11-05 15:48:37,866 - execution_status_manager - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-05 15:48:37,869 - execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251105_154837
+2025-11-05 15:48:37,871 - execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-05 15:48:37.862153
+2025-11-05 15:48:37,872 - batch_execution_scheduler - INFO - 开始准备批次 1
+2025-11-05 15:48:38,272 - batch_execution_scheduler - INFO - 从API获取到 0 个水位数据
+2025-11-05 15:48:38,637 - batch_execution_scheduler - INFO - 批次 1 计划重新生成完成
+2025-11-05 15:48:38,637 - batch_execution_scheduler - INFO - 开始执行批次 1
+2025-11-05 15:48:38,637 - batch_execution_scheduler - INFO - 批次 1 开始执行
+2025-11-05 16:15:27,503 - dynamic_execution_api - INFO - 手动重新生成批次 1
+2025-11-05 16:15:27,504 - dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-05 16:15:27,504 - dynamic_plan_regenerator - WARNING - 计划模板不存在: irrigation_plan_template.json
+2025-11-05 16:15:27,504 - dynamic_execution_api - INFO - 当前计划包含 3 个scenarios，使用第一个scenario: 'P2单独使用'
+2025-11-05 16:15:27,504 - dynamic_plan_regenerator - INFO - 开始重新生成批次 1 的计划
+2025-11-05 16:15:27,507 - dynamic_plan_regenerator - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-05 16:15:27,507 - batch_execution_scheduler - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-05 16:15:27,507 - dynamic_execution_api - INFO - 原始计划包含 3 个scenarios
+2025-11-05 16:15:27,508 - dynamic_execution_api - INFO - 已更新scenario: P2单独使用
+2025-11-05 16:15:27,508 - dynamic_execution_api - INFO - 保留原始scenario: P1单独使用
+2025-11-05 16:15:27,508 - dynamic_execution_api - INFO - 保留原始scenario: 全部水泵(P1+P2)组合使用
+2025-11-05 16:15:27,508 - dynamic_execution_api - INFO - 最终保存的计划包含 3 个scenarios
+2025-11-05 16:15:27,514 - dynamic_execution_api - INFO - 修改后的计划已保存到: e:\irrigation_schedule\farm_irrigation\output\irrigation_plan_manual_regen_1762330527.json
+2025-11-05 16:15:48,545 - main_dynamic_execution_api - INFO - 开始批次重新生成 - plan_id: 
+2025-11-05 16:15:48,548 - main_dynamic_execution_api - WARNING - 田块修改失败 S3-G5-F1: BatchRegenerationService._add_field_to_plan() takes 3 positional arguments but 4 were given
+2025-11-05 16:15:48,549 - main_dynamic_execution_api - WARNING - 水泵分配修改失败 batch 1: 'BatchRegenerationService' object has no attribute '_update_pump_assignment'
+2025-11-05 16:15:48,556 - main_dynamic_execution_api - INFO - 修改后的计划已保存到: e:\irrigation_schedule\farm_irrigation\output\irrigation_plan_modified_1762330548.json
+2025-11-05 16:15:48,556 - main_dynamic_execution_api - INFO - 批次重新生成结果已保存到缓存 - cache_key: 72965b07a4dd3a2f5a62d5f5960789dc
+2025-11-05 16:15:48,556 - main_dynamic_execution_api - INFO - 批次重新生成完成

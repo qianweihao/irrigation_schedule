@@ -276,7 +276,7 @@
       "name": "4. 计划重新生成",
       "item": [
         {
-          "name": "手动重新生成",
+          "name": "手动重新生成（水位）",
           "request": {
             "method": "POST",
             "header": [
@@ -323,7 +323,7 @@
           }
         },
         {
-          "name": "批次重新生成",
+          "name": "批次重新生成（田块、水泵、时间）",
           "request": {
             "method": "POST",
             "header": [
@@ -542,6 +542,61 @@
                   "        console.log('触发阈值:', jsonData.analysis.min_fields_trigger);",
                   "        console.log('低于阈值的田块数:', jsonData.analysis.total_fields_below_threshold);",
                   "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "灌溉计划优化",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"original_plan_id\": \"{{plan_id}}\",\n  \"optimization_goals\": [\n    \"cost_minimization\",\n    \"time_minimization\",\n    \"balanced\",\n    \"off_peak\"\n  ],\n  \"constraints\": {\n    \"max_duration_hours\": 24,\n    \"electricity_price_schedule\": {\n      \"peak\": {\n        \"hours\": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],\n        \"price\": 1.0\n      },\n      \"valley\": {\n        \"hours\": [22, 23, 0, 1, 2, 3, 4, 5, 6, 7],\n        \"price\": 0.4\n      }\n    },\n    \"available_pumps\": [\"P1\", \"P2\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/plan-optimization",
+              "host": ["{{base_url}}"],
+              "path": ["api", "irrigation", "plan-optimization"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"优化方案生成成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.total_scenarios).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含优化方案\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.scenarios).to.be.an('array');",
+                  "    pm.expect(jsonData.comparison).to.be.an('object');",
+                  "    pm.expect(jsonData.base_plan_summary).to.be.an('object');",
+                  "    ",
+                  "    console.log('\\n=== 优化方案对比 ===');",
+                  "    jsonData.scenarios.forEach(function(scenario) {",
+                  "        console.log(scenario.name + ':');",
+                  "        console.log('  - 总时长: ' + scenario.total_eta_h.toFixed(1) + '小时');",
+                  "        console.log('  - 总电费: ¥' + scenario.total_electricity_cost.toFixed(2));",
+                  "        console.log('  - 说明: ' + scenario.description);",
+                  "    });",
+                  "    ",
+                  "    console.log('\\n推荐方案: ' + jsonData.comparison.recommended);",
+                  "    console.log('电费范围: ¥' + jsonData.comparison.cost_range.min.toFixed(2) + ' - ¥' + jsonData.comparison.cost_range.max.toFixed(2));",
+                  "    console.log('时长范围: ' + jsonData.comparison.time_range.min.toFixed(1) + 'h - ' + jsonData.comparison.time_range.max.toFixed(1) + 'h');",
                   "});"
                 ]
               }

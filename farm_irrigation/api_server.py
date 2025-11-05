@@ -25,10 +25,14 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 
-# 配置日志
+# 配置日志（修复编码问题）
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('api_server.log', encoding='utf-8')
+    ]
 )
 logger = logging.getLogger(__name__)
 

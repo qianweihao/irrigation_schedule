@@ -38,10 +38,14 @@ from dynamic_waterlevel_manager import DynamicWaterLevelManager
 from dynamic_plan_regenerator import DynamicPlanRegenerator
 from execution_status_manager import ExecutionStatusManager, ExecutionStatus, get_status_manager
 
-# 配置日志
+# 配置日志（修复编码问题）
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('batch_execution_scheduler.log', encoding='utf-8')
+    ]
 )
 logger = logging.getLogger(__name__)
 

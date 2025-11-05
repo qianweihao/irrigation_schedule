@@ -301,42 +301,162 @@ class BatchRegenerationService:
     
     def apply_time_modifications(self, plan_data: Dict[str, Any], 
                                time_modifications: List[TimeModification]) -> Dict[str, Any]:
-        """应用批次时间修改"""
+        """应用批次时间修改（完整实现）"""
         modified_plan = json.loads(json.dumps(plan_data))  # 深拷贝
         
         # 统计修改信息
         modified_batches = []
         
-        for time_mod in time_modifications:
-            batch_index = time_mod.batch_index
+        # 按批次索引排序，确保按顺序处理
+        sorted_time_mods = sorted(time_modifications, key=lambda x: x.batch_index)
+        
+        for scenario in modified_plan.get('scenarios', []):
+            scenario_plan = scenario.get('plan', {})
+            batches = scenario_plan.get('batches', [])
+            steps = scenario_plan.get('steps', [])
             
-            # 验证批次是否存在（从scenarios中查找）
-            batch_found = False
-            scenarios = modified_plan.get('scenarios', [])
-            for scenario in scenarios:
-                scenario_plan = scenario.get('plan', {})
-                batches = scenario_plan.get('batches', [])
+            # 创建批次索引到steps索引的映射
+            batch_to_step_map = {}
+            for i, step in enumerate(steps):
+                # 从label中提取批次索引，格式如 "批次 1"
+                label = step.get('label', '')
+                if '批次' in label:
+                    try:
+                        batch_idx = int(label.split('批次')[1].strip().split()[0])
+                        batch_to_step_map[batch_idx] = i
+                    except (IndexError, ValueError):
+                        pass
+            
+            # 应用时间修改
+            time_offset = 0.0  # 累计时间偏移
+            
+            for time_mod in sorted_time_mods:
+                batch_index = time_mod.batch_index
+                
+                # 验证批次是否存在
+                batch_exists = any(b.get('index') == batch_index for b in batches)
+                if not batch_exists:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"未找到批次 {batch_index}"
+                    )
+                
+                # 找到对应的step索引
+                step_idx = batch_to_step_map.get(batch_index)
+                if step_idx is None:
+                    # 如果没有找到映射，尝试直接使用 batch_index - 1
+                    step_idx = batch_index - 1
+                    if step_idx < 0 or step_idx >= len(steps):
+                        continue
+                
+                step = steps[step_idx]
+                
+                # 获取原始时间
+                original_start = step.get('t_start_h', 0.0)
+                original_end = step.get('t_end_h', 0.0)
+                original_duration = original_end - original_start
+                
+                # 计算新的时间
+                new_start = time_mod.start_time_h if time_mod.start_time_h is not None else (original_start + time_offset)
+                new_duration = time_mod.duration_h if time_mod.duration_h is not None else original_duration
+                new_end = new_start + new_duration
+                
+                # 更新step的时间
+                step['t_start_h'] = new_start
+                step['t_end_h'] = new_end
+                
+                # 更新step中所有commands的时间
+                if 'commands' in step:
+                    for cmd in step['commands']:
+                        cmd['t_start_h'] = new_start
+                        cmd['t_end_h'] = new_end
+                
+                # 更新label以反映新的时间
+                step['label'] = f"批次 {batch_index}"
+                
+                # 计算时间偏移，用于后续批次
+                actual_duration_change = new_duration - original_duration
+                actual_start_change = new_start - original_start
+                time_offset = max(actual_duration_change, actual_start_change)
+                
+                # 更新对应batch的统计信息中的时间
                 for batch in batches:
                     if batch.get('index') == batch_index:
-                        batch_found = True
-                        break
-                if batch_found:
-                    break
-            
-            if not batch_found:
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"未找到批次 {batch_index}"
-                )
-            
-            # 更新scenarios中的时间信息
-            for scenario in modified_plan.get('scenarios', []):
-                if time_mod.start_time_h is not None:
-                    scenario['start_time_h'] = time_mod.start_time_h
-                if time_mod.duration_h is not None:
-                    scenario['duration_h'] = time_mod.duration_h
-                    scenario['total_eta_h'] = time_mod.duration_h
+                        if 'stats' in batch:
+                            batch['stats']['eta_hours'] = new_duration
+                
                 modified_batches.append(batch_index)
+            
+            # 级联更新后续批次的时间
+            if modified_batches and time_offset != 0:
+                last_modified_batch = max(modified_batches)
+                
+                # 找到最后一个修改批次的结束时间
+                last_modified_step_idx = batch_to_step_map.get(last_modified_batch, last_modified_batch - 1)
+                if 0 <= last_modified_step_idx < len(steps):
+                    cumulative_time = steps[last_modified_step_idx].get('t_end_h', 0.0)
+                    
+                    # 更新后续所有批次
+                    for batch_idx in range(last_modified_batch + 1, len(batches) + 1):
+                        step_idx = batch_to_step_map.get(batch_idx, batch_idx - 1)
+                        if 0 <= step_idx < len(steps):
+                            step = steps[step_idx]
+                            
+                            # 计算原始持续时间
+                            original_duration = step.get('t_end_h', 0.0) - step.get('t_start_h', 0.0)
+                            
+                            # 设置新的开始时间为前一批次的结束时间
+                            new_start = cumulative_time
+                            new_end = new_start + original_duration
+                            
+                            # 更新step时间
+                            step['t_start_h'] = new_start
+                            step['t_end_h'] = new_end
+                            
+                            # 更新commands时间
+                            if 'commands' in step:
+                                for cmd in step['commands']:
+                                    cmd['t_start_h'] = new_start
+                                    cmd['t_end_h'] = new_end
+                            
+                            cumulative_time = new_end
+            
+            # 重新计算scenario的总时长
+            if steps:
+                total_duration = 0.0
+                for step in steps:
+                    step_duration = step.get('t_end_h', 0.0) - step.get('t_start_h', 0.0)
+                    total_duration += step_duration
+                
+                # 更新scenario的total_eta_h
+                scenario['total_eta_h'] = total_duration
+                
+                # 更新plan中的total_eta_h
+                if scenario_plan:
+                    scenario_plan['total_eta_h'] = total_duration
+                
+                # 重新计算电费（基于新的总时长）
+                if 'total_pump_runtime_hours' in scenario:
+                    pump_runtime = scenario['total_pump_runtime_hours']
+                    # 获取水泵功率和电价
+                    calc_info = scenario_plan.get('calc', {})
+                    pump_info = calc_info.get('pump', {})
+                    power_kw = pump_info.get('power_kw', 60.0)
+                    electricity_price = pump_info.get('electricity_price', 0.6)
+                    
+                    # 重新计算电费
+                    total_electricity_cost = 0.0
+                    for pump_name, runtime_h in pump_runtime.items():
+                        # 如果修改了时长，按比例调整运行时间
+                        if modified_batches:
+                            # 简化处理：使用总时长的比例
+                            adjusted_runtime = total_duration if total_duration > 0 else runtime_h
+                            total_electricity_cost += adjusted_runtime * power_kw * electricity_price
+                            pump_runtime[pump_name] = adjusted_runtime
+                        else:
+                            total_electricity_cost += runtime_h * power_kw * electricity_price
+                    
+                    scenario['total_electricity_cost'] = total_electricity_cost
         
         return modified_plan
     

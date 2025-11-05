@@ -188,6 +188,21 @@ class MultiPumpResponse(BaseModel):
     analysis: dict
     total_scenarios: int
 
+class OptimizationRequest(BaseModel):
+    """优化请求模型"""
+    original_plan_id: str
+    optimization_goals: List[str] = ["cost_minimization", "time_minimization", "balanced"]
+    constraints: Optional[Dict[str, Any]] = {}
+
+class OptimizationResponse(BaseModel):
+    """优化响应模型"""
+    success: bool
+    message: str
+    total_scenarios: int
+    scenarios: List[Dict[str, Any]]
+    comparison: Dict[str, Any]
+    base_plan_summary: Dict[str, Any]
+
 class FieldModification(BaseModel):
     """田块修改信息"""
     field_id: str
@@ -745,19 +760,24 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
         
         # 处理时间修改
         if request.time_modifications:
-            for time_mod in request.time_modifications:
-                try:
-                    result = service._update_batch_timing(modified_plan, time_mod.batch_index, 
-                                                        time_mod.start_time_h, time_mod.duration_h)
+            try:
+                # 使用apply_time_modifications批量处理所有时间修改（包含级联更新）
+                modified_plan = service.apply_time_modifications(modified_plan, request.time_modifications)
+                
+                # 记录修改摘要
+                for time_mod in request.time_modifications:
                     modifications_summary["time_modifications"].append({
                         "batch_index": time_mod.batch_index,
                         "start_time_h": time_mod.start_time_h,
                         "duration_h": time_mod.duration_h,
-                        "result": result
+                        "result": "success"
                     })
-                    modifications_summary["total_changes"] += 1
-                except Exception as e:
-                    logger.warning(f"时间修改失败 batch {time_mod.batch_index}: {e}")
+                modifications_summary["total_changes"] += len(request.time_modifications)
+            except Exception as e:
+                logger.warning(f"时间修改失败: {e}")
+                modifications_summary["time_modifications"].append({
+                    "error": str(e)
+                })
         
         # 保存修改后的计划
         try:
@@ -1610,6 +1630,71 @@ async def generate_multi_pump_scenarios_api(request: MultiPumpRequest):
             detail=f"多水泵方案生成失败: {str(e)}"
         )
 
+# ==================== 灌溉计划优化API ====================
+
+@app.post("/api/irrigation/plan-optimization", response_model=OptimizationResponse)
+async def optimize_irrigation_plan(request: OptimizationRequest):
+    """
+    灌溉计划智能优化
+    
+    根据不同优化目标自动生成多个优化方案：
+    - cost_minimization: 成本最小化（省电）
+    - time_minimization: 时间最小化（省时）
+    - balanced: 均衡优化
+    - off_peak: 避峰用电
+    - water_saving: 节水优化
+    """
+    try:
+        logger.info(f"开始灌溉计划优化 - plan_id: {request.original_plan_id}")
+        logger.info(f"优化目标: {request.optimization_goals}")
+        
+        # 导入批次重新生成服务来加载计划
+        from batch_regeneration_api import BatchRegenerationService
+        from intelligent_batch_optimizer import IntelligentBatchOptimizer
+        
+        service = BatchRegenerationService()
+        
+        # 加载原始计划
+        try:
+            original_plan = service.load_original_plan(request.original_plan_id)
+            if not original_plan:
+                raise HTTPException(status_code=404, detail=f"未找到计划: {request.original_plan_id}")
+        except Exception as e:
+            logger.error(f"加载原始计划失败: {e}")
+            raise HTTPException(status_code=404, detail=f"加载原始计划失败: {str(e)}")
+        
+        # 创建优化器
+        optimizer = IntelligentBatchOptimizer()
+        
+        # 生成优化方案
+        result = optimizer.generate_optimized_scenarios(
+            base_plan=original_plan,
+            optimization_goals=request.optimization_goals,
+            constraints=request.constraints
+        )
+        
+        logger.info(f"成功生成 {result['total_scenarios']} 个优化方案")
+        
+        return OptimizationResponse(
+            success=True,
+            message=f"成功生成 {result['total_scenarios']} 个优化方案",
+            total_scenarios=result["total_scenarios"],
+            scenarios=result["scenarios"],
+            comparison=result["comparison"],
+            base_plan_summary=result["base_plan_summary"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"灌溉计划优化失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"灌溉计划优化失败: {str(e)}"
+        )
+
 @app.get("/api/info")
 async def api_info():
     """API信息"""
@@ -1623,7 +1708,8 @@ async def api_info():
             "智能计划重新生成",
             "执行状态监控和历史记录",
             "田块水位趋势分析",
-            "多水泵方案对比分析"
+            "多水泵方案对比分析",
+            "灌溉计划智能优化"
         ],
         "endpoints": {
             "system": "/api/system/*",
