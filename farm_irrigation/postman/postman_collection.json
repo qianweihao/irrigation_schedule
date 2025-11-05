@@ -501,6 +501,52 @@
               "path": ["api", "irrigation", "plan-with-upload"]
             }
           }
+        },
+        {
+          "name": "多水泵方案对比",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"config_file\": \"config.json\",\n  \"active_pumps\": null,\n  \"zone_ids\": null,\n  \"use_realtime_wl\": true,\n  \"min_fields_trigger\": {{min_fields_trigger}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/multi-pump-scenarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "irrigation", "multi-pump-scenarios"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"多水泵方案生成成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.scenarios).to.be.an('array');",
+                  "    pm.expect(jsonData.analysis).to.be.an('object');",
+                  "    pm.expect(jsonData.total_scenarios).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含触发条件信息\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.analysis) {",
+                  "        pm.expect(jsonData.analysis).to.have.property('min_fields_trigger');",
+                  "        console.log('触发阈值:', jsonData.analysis.min_fields_trigger);",
+                  "        console.log('低于阈值的田块数:', jsonData.analysis.total_fields_below_threshold);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

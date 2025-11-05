@@ -180,6 +180,7 @@ class MultiPumpRequest(BaseModel):
     active_pumps: Optional[List[str]] = None
     zone_ids: Optional[List[str]] = None
     use_realtime_wl: bool = False
+    min_fields_trigger: Optional[int] = None  # 触发灌溉的最小田块数量，None表示使用配置文件中的值
 
 class MultiPumpResponse(BaseModel):
     """多水泵方案响应模型"""
@@ -1092,14 +1093,17 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
                 # 创建农场配置
                 cfg = farmcfg_from_json_select(config_data)
                 
+                # 从配置中获取触发条件
+                min_fields_trigger = config_data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
+                
                 # 生成多水泵方案
-                scenarios_result = generate_multi_pump_scenarios(cfg)
+                scenarios_result = generate_multi_pump_scenarios(cfg, min_fields_trigger=min_fields_trigger)
                 multi_pump_data = {
                     "scenarios": scenarios_result.get('scenarios', []),
                     "analysis": scenarios_result.get('analysis', {}),
                     "total_scenarios": scenarios_result.get('total_scenarios', 0)
                 }
-                logger.info(f"多水泵方案生成成功，共 {multi_pump_data['total_scenarios']} 个方案")
+                logger.info(f"多水泵方案生成成功，共 {multi_pump_data['total_scenarios']} 个方案（触发阈值: {min_fields_trigger}个田块）")
             except Exception as e:
                 logger.warning(f"多水泵方案生成失败: {e}")
         
@@ -1310,14 +1314,17 @@ async def generate_irrigation_plan_with_upload(
                     # 创建农场配置
                     cfg = farmcfg_from_json_select(config_data)
                     
+                    # 从配置中获取触发条件
+                    min_fields_trigger = config_data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
+                    
                     # 生成多水泵方案
-                    scenarios_result = generate_multi_pump_scenarios(cfg)
+                    scenarios_result = generate_multi_pump_scenarios(cfg, min_fields_trigger=min_fields_trigger)
                     multi_pump_data = {
                         "scenarios": scenarios_result.get('scenarios', []),
                         "analysis": scenarios_result.get('analysis', {}),
                         "total_scenarios": scenarios_result.get('total_scenarios', 0)
                     }
-                    logger.info(f"多水泵方案生成成功，共 {multi_pump_data['total_scenarios']} 个方案")
+                    logger.info(f"多水泵方案生成成功，共 {multi_pump_data['total_scenarios']} 个方案（触发阈值: {min_fields_trigger}个田块）")
                 else:
                     logger.warning("配置文件不存在，跳过多水泵方案生成")
             except Exception as e:
@@ -1545,6 +1552,64 @@ async def root():
         "redoc_url": "/redoc"
     }
 
+@app.post("/api/irrigation/multi-pump-scenarios", response_model=MultiPumpResponse)
+async def generate_multi_pump_scenarios_api(request: MultiPumpRequest):
+    """生成多水泵方案对比（独立API）"""
+    try:
+        logger.info(f"开始处理多水泵方案请求 - config_file: {request.config_file}")
+        
+        # 确定配置文件路径
+        if os.path.isabs(request.config_file):
+            config_path = request.config_file
+        else:
+            config_path = os.path.join(os.path.dirname(__file__), request.config_file)
+        
+        # 检查配置文件是否存在
+        if not os.path.exists(config_path):
+            logger.error(f"配置文件不存在: {config_path}")
+            raise HTTPException(status_code=404, detail=f"配置文件不存在: {request.config_file}")
+        
+        # 加载配置文件
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        # 创建农场配置
+        cfg = farmcfg_from_json_select(
+            config_data,
+            active_pumps=request.active_pumps,
+            zone_ids=request.zone_ids,
+            use_realtime_wl=request.use_realtime_wl
+        )
+        
+        # 确定触发阈值（优先使用请求参数，否则使用配置文件中的值）
+        min_fields_trigger = request.min_fields_trigger
+        if min_fields_trigger is None:
+            min_fields_trigger = config_data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
+        
+        logger.info(f"触发阈值: {min_fields_trigger}个田块")
+        
+        # 生成多水泵方案
+        scenarios_result = generate_multi_pump_scenarios(cfg, min_fields_trigger=min_fields_trigger)
+        
+        logger.info(f"多水泵方案生成成功，共 {scenarios_result.get('total_scenarios', 0)} 个方案")
+        
+        return MultiPumpResponse(
+            scenarios=scenarios_result.get('scenarios', []),
+            analysis=scenarios_result.get('analysis', {}),
+            total_scenarios=scenarios_result.get('total_scenarios', 0)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"多水泵方案生成失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"多水泵方案生成失败: {str(e)}"
+        )
+
 @app.get("/api/info")
 async def api_info():
     """API信息"""
@@ -1557,7 +1622,8 @@ async def api_info():
             "实时水位数据获取和管理", 
             "智能计划重新生成",
             "执行状态监控和历史记录",
-            "田块水位趋势分析"
+            "田块水位趋势分析",
+            "多水泵方案对比分析"
         ],
         "endpoints": {
             "system": "/api/system/*",
@@ -1565,6 +1631,7 @@ async def api_info():
             "water_levels": "/api/water-levels/*",
             "regeneration": "/api/regeneration/*",
             "batches": "/api/batches/*",
+            "irrigation": "/api/irrigation/*",
             "data": "/api/data/*"
         }
     }

@@ -93,7 +93,9 @@ def main(argv=None):
             data, active_pumps=None, zone_ids=zones, use_realtime_wl=args.realtime,
             custom_waterlevels=args.custom_waterlevels if args.custom_waterlevels else None
         )
-        scenarios_result = generate_multi_pump_scenarios(cfg_for_multi)
+        # 从配置中获取触发条件
+        min_fields_trigger = data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
+        scenarios_result = generate_multi_pump_scenarios(cfg_for_multi, min_fields_trigger=min_fields_trigger)
         Path(args.out).write_text(json.dumps(scenarios_result, ensure_ascii=False, indent=2), encoding="utf-8")
         
         if args.summary:

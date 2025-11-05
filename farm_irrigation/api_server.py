@@ -102,6 +102,7 @@ class MultiPumpRequest(BaseModel):
     active_pumps: Optional[List[str]] = None
     zone_ids: Optional[List[str]] = None
     use_realtime_wl: bool = False
+    min_fields_trigger: Optional[int] = None  # 触发灌溉的最小田块数量，None表示使用配置文件中的值
 
 class MultiPumpResponse(BaseModel):
     """多水泵方案响应模型"""
@@ -405,10 +406,15 @@ async def generate_multi_pump_scenarios_api(request: MultiPumpRequest):
             use_realtime_wl=request.use_realtime_wl
         )
         
-        # 生成多水泵方案
-        scenarios_result = generate_multi_pump_scenarios(cfg)
+        # 确定触发阈值（优先使用请求参数，否则使用配置文件中的值）
+        min_fields_trigger = request.min_fields_trigger
+        if min_fields_trigger is None:
+            min_fields_trigger = config_data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
         
-        print(f"多水泵方案生成成功，共 {scenarios_result.get('total_scenarios', 0)} 个方案")
+        # 生成多水泵方案
+        scenarios_result = generate_multi_pump_scenarios(cfg, min_fields_trigger=min_fields_trigger)
+        
+        print(f"多水泵方案生成成功，共 {scenarios_result.get('total_scenarios', 0)} 个方案（触发阈值: {min_fields_trigger}个田块）")
         
         return MultiPumpResponse(
             scenarios=scenarios_result.get('scenarios', []),

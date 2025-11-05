@@ -925,7 +925,7 @@ def _segment_reachable(segment: Segment, active_pumps: List[str]) -> bool:
     """检查段是否可以被激活的水泵覆盖"""
     return _list_intersects(segment.feed_by, active_pumps)
 
-def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
+def generate_multi_pump_scenarios(cfg: FarmConfig, min_fields_trigger: int = 1) -> Dict[str, Any]:
     """
     动态生成多水泵灌溉方案
     
@@ -934,29 +934,54 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
     
     Args:
         cfg: 农场配置对象
+        min_fields_trigger: 触发灌溉的最小田块数量（默认1，即单田块触发）
         
     Returns:
         包含多个方案的字典，每个方案包含成本分析和运行时间
     """
     try:
-        # 1. 分析需要灌溉的地块
-        fields_to_irrigate = []
-        segments_needed = set()
+        # 1. 分析需要灌溉的地块（先收集所有低于阈值的田块）
+        fields_below_threshold = []
         
         for field_id, field in cfg.fields.items():
             # 检查是否需要灌溉（wl_mm不为None且不为NaN，且水位低于低水位阈值）
             if (field.wl_mm is not None) and not (isinstance(field.wl_mm, float) and field.wl_mm != field.wl_mm):
-                # 只有当前水位低于低水位阈值时才需要灌溉
+                # 只有当前水位低于低水位阈值时才加入候选列表
                 if field.wl_mm < field.wl_low:
-                    fields_to_irrigate.append(field)
-                    # 提取基础段ID（去掉子段后缀）
-                    base_sid = field.segment_id.split('-')[0] if '-' in field.segment_id else field.segment_id
-                    segments_needed.add(base_sid)
+                    fields_below_threshold.append(field)
+        
+        # 检查是否达到触发条件
+        if len(fields_below_threshold) < min_fields_trigger:
+            return {
+                "error": f"低于阈值的田块数量不足（当前{len(fields_below_threshold)}个，需要{min_fields_trigger}个）",
+                "analysis": {
+                    "total_fields_below_threshold": len(fields_below_threshold),
+                    "min_fields_trigger": min_fields_trigger,
+                    "trigger_status": "未达到触发条件",
+                    "total_fields_to_irrigate": 0,
+                    "required_segments": [],
+                    "segment_pump_requirements": {},
+                    "valid_pump_combinations": []
+                },
+                "scenarios": []
+            }
+        
+        # 达到触发条件，收集需要灌溉的田块和段
+        fields_to_irrigate = fields_below_threshold
+        segments_needed = set()
+        
+        for field in fields_to_irrigate:
+            # 提取基础段ID（去掉子段后缀）
+            base_sid = field.segment_id.split('-')[0] if '-' in field.segment_id else field.segment_id
+            segments_needed.add(base_sid)
         
         if not fields_to_irrigate:
             return {
                 "error": "没有找到需要灌溉的地块",
                 "analysis": {
+                    "total_fields_below_threshold": 0,
+                    "min_fields_trigger": min_fields_trigger,
+                    "trigger_status": "无低于阈值的田块",
                     "total_fields_to_irrigate": 0,
                     "required_segments": [],
                     "segment_pump_requirements": {},
@@ -997,6 +1022,9 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
             return {
                 "error": "没有找到能够覆盖所有需要灌溉段的水泵组合",
                 "analysis": {
+                    "total_fields_below_threshold": len(fields_below_threshold),
+                    "min_fields_trigger": min_fields_trigger,
+                    "trigger_status": "已达到触发条件但无可用水泵组合",
                     "total_fields_to_irrigate": len(fields_to_irrigate),
                     "required_segments": sorted(segments_needed),
                     "segment_pump_requirements": segment_pump_requirements,
@@ -1068,6 +1096,9 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
         
         return {
             "analysis": {
+                "total_fields_below_threshold": len(fields_below_threshold),
+                "min_fields_trigger": min_fields_trigger,
+                "trigger_status": "已达到触发条件",
                 "total_fields_to_irrigate": len(fields_to_irrigate),
                 "required_segments": sorted(segments_needed),
                 "segment_pump_requirements": segment_pump_requirements,
@@ -1078,9 +1109,16 @@ def generate_multi_pump_scenarios(cfg: FarmConfig) -> Dict[str, Any]:
         }
         
     except Exception as e:
+        # 尝试获取变量，如果不存在则使用默认值
+        fields_count = len(fields_below_threshold) if 'fields_below_threshold' in locals() else 0
+        trigger_value = min_fields_trigger if 'min_fields_trigger' in locals() else 1
+        
         return {
             "error": f"生成多水泵方案时发生错误: {str(e)}",
             "analysis": {
+                "total_fields_below_threshold": fields_count,
+                "min_fields_trigger": trigger_value,
+                "trigger_status": "生成过程中发生错误",
                 "total_fields_to_irrigate": 0,
                 "required_segments": [],
                 "segment_pump_requirements": {},

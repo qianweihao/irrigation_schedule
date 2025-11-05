@@ -184,8 +184,11 @@ def api_multi_pump_scenarios():
         use_realtime_wl=use_realtime
     )
     
+    # 从配置中获取触发条件
+    min_fields_trigger = data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
+    
     # 生成多水泵方案
-    scenarios_result = generate_multi_pump_scenarios(cfg)
+    scenarios_result = generate_multi_pump_scenarios(cfg, min_fields_trigger=min_fields_trigger)
     return make_response(jsonify(scenarios_result))
 
 @app.route("/config.json")
