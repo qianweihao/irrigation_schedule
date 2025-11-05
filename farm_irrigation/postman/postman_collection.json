@@ -94,7 +94,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"plan_file_path\": \"{{plan_file_path}}\",\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_file_path\": \"{{config_file_path}}\",\n  \"auto_start\": true,\n  \"water_level_update_interval_minutes\": 30,\n  \"enable_plan_regeneration\": true,\n  \"execution_mode\": \"simulation\"\n}"
+              "raw": "{\n  \"plan_file_path\": \"{{plan_id}}\",\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_file_path\": \"\",\n  \"auto_start\": true,\n  \"water_level_update_interval_minutes\": 30,\n  \"enable_plan_regeneration\": true,\n  \"execution_mode\": \"simulation\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/execution/start",
@@ -455,9 +455,12 @@
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    ",
-                  "    // 保存plan_id供后续使用",
-                  "    if (jsonData.data && jsonData.data.plan_id) {",
-                  "        pm.environment.set(\"plan_id\", jsonData.data.plan_id);",
+                  "    // 保存plan_id供后续使用（plan_id在响应根级别）",
+                  "    if (jsonData.plan_id) {",
+                  "        pm.environment.set(\"plan_id\", jsonData.plan_id);",
+                  "        console.log(\"✅ plan_id已自动设置: \" + jsonData.plan_id);",
+                  "    } else {",
+                  "        console.log(\"⚠️ 响应中没有找到plan_id\");",
                   "    }",
                   "});"
                 ]

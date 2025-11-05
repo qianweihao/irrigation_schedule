@@ -50,7 +50,7 @@ check_files() {
         "Dockerfile"
         "docker-compose.yml"
         "requirements.txt"
-        "api_server.py"
+        "main_dynamic_execution_api.py"
         "pipeline.py"
     )
     
@@ -171,7 +171,7 @@ check_service_health() {
     local attempt=1
     
     while [[ $attempt -le $max_attempts ]]; do
-        if curl -s http://localhost:8000/api/health > /dev/null 2>&1; then
+        if curl -s http://localhost:8000/api/system/health-check > /dev/null 2>&1; then
             return 0
         fi
         
@@ -189,12 +189,13 @@ show_service_info() {
     log_success "=== 服务信息 ==="
     echo "API服务地址: http://localhost:8000"
     echo "API文档地址: http://localhost:8000/docs"
-    echo "健康检查地址: http://localhost:8000/api/health"
+    echo "健康检查地址: http://localhost:8000/api/system/health-check"
+    echo "Nginx访问地址: http://localhost:80"
     
     if command -v curl &> /dev/null; then
         echo
         log_info "API健康状态:"
-        curl -s http://localhost:8000/api/health || echo "无法连接到API服务"
+        curl -s http://localhost:8000/api/system/health-check || echo "无法连接到API服务"
     fi
     echo
 }

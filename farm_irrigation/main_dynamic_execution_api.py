@@ -103,9 +103,9 @@ _status_manager: Optional[ExecutionStatusManager] = None
 # 缓存相关函数
 def generate_cache_key(farm_id: str, target_depth_mm: float, pumps: str, zones: str, 
                       merge_waterlevels: bool, print_summary: bool, multi_pump_scenarios: bool = False, 
-                      custom_waterlevels: str = "") -> str:
+                      custom_waterlevels: str = "", file_hash: str = "") -> str:
     """生成缓存键"""
-    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}_{multi_pump_scenarios}_{custom_waterlevels}"
+    key_data = f"{farm_id}_{target_depth_mm}_{pumps}_{zones}_{merge_waterlevels}_{print_summary}_{multi_pump_scenarios}_{custom_waterlevels}_{file_hash}"
     return hashlib.md5(key_data.encode()).hexdigest()
 
 def generate_batch_cache_key(original_plan_id: str, field_modifications: str, 
@@ -1090,7 +1090,7 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
             if plan_files:
                 # 获取最新的文件
                 latest_plan_file = max(plan_files, key=os.path.getmtime)
-                plan_id = os.path.basename(latest_plan_file).replace('.json', '')
+                plan_id = latest_plan_file.replace('\\', '/')  # 返回完整路径，统一使用正斜杠
                 logger.info(f"读取计划文件: {latest_plan_file}")
                 
                 try:
@@ -1309,7 +1309,7 @@ async def generate_irrigation_plan_with_upload(
             if plan_files:
                 # 获取最新的文件
                 latest_plan_file = max(plan_files, key=os.path.getmtime)
-                plan_id = os.path.basename(latest_plan_file).replace('.json', '')
+                plan_id = latest_plan_file.replace('\\', '/')  # 返回完整路径，统一使用正斜杠
                 logger.info(f"读取计划文件: {latest_plan_file}")
                 
                 try:

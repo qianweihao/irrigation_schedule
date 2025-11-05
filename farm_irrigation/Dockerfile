@@ -29,7 +29,7 @@ COPY . .
 RUN mkdir -p gzp_farm output logs
 
 # 设置权限
-RUN chmod +x api_server.py
+RUN chmod +x main_dynamic_execution_api.py
 
 # 暴露端口
 EXPOSE 8000
@@ -40,7 +40,7 @@ ENV PYTHONUNBUFFERED=1
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/system/health-check')" || exit 1
 
 # 启动命令
-CMD ["python", "api_server.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "main_dynamic_execution_api.py"]
