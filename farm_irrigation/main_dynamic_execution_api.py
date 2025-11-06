@@ -236,6 +236,35 @@ class BatchRegenerationResponse(BaseModel):
     modified_plan: Optional[Dict[str, Any]] = None
     modifications_summary: Dict[str, Any] = {}
 
+class FieldAdjustment(BaseModel):
+    """批次间田块调整信息"""
+    field_id: str
+    from_batch: int
+    to_batch: int
+
+class AdjustmentOptions(BaseModel):
+    """调整选项"""
+    recalculate_sequence: bool = True  # 是否重新计算灌溉顺序
+    recalculate_timing: bool = True  # 是否重新计算时间
+    maintain_pump_assignments: bool = True  # 是否保持水泵分配
+    regenerate_commands: bool = True  # 是否重新生成命令
+
+class BatchAdjustmentRequest(BaseModel):
+    """批次间田块调整请求"""
+    plan_id: str
+    field_adjustments: List[FieldAdjustment]
+    options: Optional[AdjustmentOptions] = AdjustmentOptions()
+
+class BatchAdjustmentResponse(BaseModel):
+    """批次间田块调整响应"""
+    success: bool
+    message: str
+    original_plan: Optional[Dict[str, Any]] = None
+    adjusted_plan: Optional[Dict[str, Any]] = None
+    changes_summary: Dict[str, Any] = {}
+    validation: Dict[str, Any] = {}
+    output_file: Optional[str] = None
+
 # 系统启动时间
 _system_start_time = datetime.now()
 
@@ -1016,6 +1045,82 @@ async def get_current_plan():
     except Exception as e:
         logger.error(f"获取当前计划失败: {e}")
         raise HTTPException(status_code=500, detail=f"获取当前计划失败: {str(e)}")
+
+@app.post("/api/batch/adjust", response_model=BatchAdjustmentResponse)
+async def adjust_fields_between_batches(request: BatchAdjustmentRequest):
+    """
+    批次间田块调整接口
+    
+    在不改变批次数量的情况下，调整田块在批次间的分配。
+    保持现有批次结构，只重新计算灌溉顺序和时间。
+    
+    - **plan_id**: 计划ID或文件路径
+    - **field_adjustments**: 田块调整列表，每项包含field_id、from_batch、to_batch
+    - **options**: 调整选项（是否重新计算顺序、时间等）
+    
+    与 /api/regeneration/batch 的区别：
+    - /api/regeneration/batch: 增减田块，可能改变批次数量和结构
+    - /api/batch/adjust: 批次间移动田块，批次数量不变，只调整分配
+    
+    返回包含原始计划、调整后计划和变更摘要的响应。
+    """
+    try:
+        logger.info(f"开始批次间田块调整 - plan_id: {request.plan_id}")
+        logger.info(f"调整数量: {len(request.field_adjustments)}")
+        
+        # 导入批次调整服务
+        from batch_adjustment_service import BatchAdjustmentService
+        
+        # 创建服务实例
+        service = BatchAdjustmentService()
+        
+        # 转换请求为字典格式
+        field_adjustments = [
+            {
+                "field_id": adj.field_id,
+                "from_batch": adj.from_batch,
+                "to_batch": adj.to_batch
+            }
+            for adj in request.field_adjustments
+        ]
+        
+        options = {
+            "recalculate_sequence": request.options.recalculate_sequence,
+            "recalculate_timing": request.options.recalculate_timing,
+            "maintain_pump_assignments": request.options.maintain_pump_assignments,
+            "regenerate_commands": request.options.regenerate_commands
+        }
+        
+        # 执行调整
+        result = service.adjust_fields_between_batches(
+            plan_id=request.plan_id,
+            field_adjustments=field_adjustments,
+            options=options
+        )
+        
+        logger.info(f"批次调整完成 - 成功调整 {result['changes_summary']['total_fields_moved']} 个田块")
+        
+        return BatchAdjustmentResponse(
+            success=result["success"],
+            message=result["message"],
+            original_plan=result["original_plan"],
+            adjusted_plan=result["adjusted_plan"],
+            changes_summary=result["changes_summary"],
+            validation=result["validation"],
+            output_file=result.get("output_file")
+        )
+        
+    except ValueError as ve:
+        logger.error(f"批次调整验证失败: {ve}")
+        raise HTTPException(status_code=400, detail=str(ve))
+    except FileNotFoundError as fnf:
+        logger.error(f"计划文件未找到: {fnf}")
+        raise HTTPException(status_code=404, detail=str(fnf))
+    except Exception as e:
+        logger.error(f"批次调整失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"批次调整失败: {str(e)}")
 
 # ==================== 灌溉计划生成API ====================
 

@@ -380,6 +380,70 @@
               "path": ["api", "regeneration", "summary", "{{farm_id}}"]
             }
           }
+        },
+        {
+          "name": "批次间田块调整",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan_id\": \"{{plan_id}}\",\n  \"field_adjustments\": [\n    {\n      \"field_id\": \"{{field_id_move_1}}\",\n      \"from_batch\": {{from_batch_1}},\n      \"to_batch\": {{to_batch_1}}\n    },\n    {\n      \"field_id\": \"{{field_id_move_2}}\",\n      \"from_batch\": {{from_batch_2}},\n      \"to_batch\": {{to_batch_2}}\n    }\n  ],\n  \"options\": {\n    \"recalculate_sequence\": true,\n    \"recalculate_timing\": true,\n    \"maintain_pump_assignments\": true,\n    \"regenerate_commands\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/batch/adjust",
+              "host": ["{{base_url}}"],
+              "path": ["api", "batch", "adjust"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"批次间田块调整成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.original_plan).to.exist;",
+                  "    pm.expect(jsonData.adjusted_plan).to.exist;",
+                  "    pm.expect(jsonData.changes_summary).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"变更摘要包含预期字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var summary = jsonData.changes_summary;",
+                  "    pm.expect(summary.total_fields_moved).to.be.a('number');",
+                  "    pm.expect(summary.affected_batches).to.be.an('array');",
+                  "    pm.expect(summary.field_movements).to.be.an('array');",
+                  "    pm.expect(summary.batch_time_changes).to.be.an('array');",
+                  "    ",
+                  "    console.log('\\n=== 批次调整结果 ===');",
+                  "    console.log('移动田块数: ' + summary.total_fields_moved);",
+                  "    console.log('受影响批次: ' + summary.affected_batches.join(', '));",
+                  "    ",
+                  "    if (summary.batch_time_changes && summary.batch_time_changes.length > 0) {",
+                  "        console.log('\\n批次时间变化:');",
+                  "        summary.batch_time_changes.forEach(function(change) {",
+                  "            console.log('  批次' + change.batch_index + ': ' + change.old_duration_h + 'h -> ' + change.new_duration_h + 'h (变化: ' + change.time_diff_h + 'h)');",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"验证通过\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.validation).to.exist;",
+                  "    pm.expect(jsonData.validation.is_valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

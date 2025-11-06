@@ -14,6 +14,7 @@
    - [批次管理](#6-批次管理)
    - [水位管理](#7-水位管理)
    - [计划重新生成](#8-计划重新生成)
+   - [批次间田块调整](#9-批次间田块调整)
 6. [典型业务流程](#典型业务流程)
 7. [错误码说明](#错误码说明)
 8. [常见问题](#常见问题)
@@ -1278,6 +1279,184 @@ Content-Type: application/json
 
 ---
 
+### 9. 批次间田块调整
+
+#### 9.1 批次间田块调整
+
+**接口说明**: 在不改变批次数量的情况下，调整田块在批次间的分配。保持现有批次结构，重新计算灌溉顺序和时间。
+
+**与批次重新生成的区别**:
+- `/api/regeneration/batch`: 增减田块，**可能改变批次数量和结构**，适用于田块增减场景
+- `/api/batch/adjust`: 批次间移动田块，**批次数量不变**，只调整分配，适用于优化现有批次场景
+
+**请求**
+```
+POST /api/batch/adjust
+Content-Type: application/json
+```
+
+**请求参数**
+```json
+{
+  "plan_id": "/app/output/irrigation_plan_20250109_123456.json",
+  "field_adjustments": [
+    {
+      "field_id": "S3-G5-F3",
+      "from_batch": 1,
+      "to_batch": 2
+    },
+    {
+      "field_id": "S5-G27-F19",
+      "from_batch": 2,
+      "to_batch": 1
+    }
+  ],
+  "options": {
+    "recalculate_sequence": true,
+    "recalculate_timing": true,
+    "maintain_pump_assignments": true,
+    "regenerate_commands": true
+  }
+}
+```
+
+**参数说明**
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| plan_id | string | ✅ 是 | - | 灌溉计划ID或文件路径。<br>**业务含义**: 要调整的计划文件路径，使用"生成灌溉计划"接口返回的`plan_id`。<br>**示例**: `"/app/output/irrigation_plan_20250109_123456.json"` 或 `"output/irrigation_plan_20250109_123456.json"` (相对路径) |
+| field_adjustments | array | ✅ 是 | - | 田块调整列表。<br>**业务含义**: 指定要在批次间移动的田块。支持多个田块同时移动，可以实现批次间田块交换。<br>**常用场景**:<br>• 优化批次负载均衡<br>• 调整灌溉优先级<br>• 根据实际情况重新分配田块<br>**格式**: 见下方详细说明 |
+| options | object | ❌ 否 | 全部为`true` | 调整选项配置。<br>**业务含义**: 控制调整后的重新计算行为。<br>**子字段**:<br>• `recalculate_sequence`: 是否重新计算灌溉顺序<br>• `recalculate_timing`: 是否重新计算时间<br>• `maintain_pump_assignments`: 是否保持水泵分配<br>• `regenerate_commands`: 是否重新生成命令 |
+
+**field_adjustments 详细说明**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| field_id | string | ✅ | 田块唯一标识符。<br>**格式**: `S{片区}-G{闸门}-F{田块}`<br>**示例**: `"S3-G5-F3"` |
+| from_batch | integer | ✅ | 源批次索引（**从1开始**）。<br>**业务含义**: 田块当前所在的批次。<br>**示例**: `1` |
+| to_batch | integer | ✅ | 目标批次索引（**从1开始**）。<br>**业务含义**: 要将田块移动到的目标批次。<br>**⚠️ 注意**: 必须是已存在的批次索引<br>**示例**: `2` |
+
+**options 详细说明**
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| recalculate_sequence | boolean | `true` | 是否重新计算批次内田块的灌溉顺序。<br>**业务含义**: `true`时，系统会根据距离等级重新排序田块，优化灌溉路径。<br>**建议**: 通常保持`true` |
+| recalculate_timing | boolean | `true` | 是否重新计算批次时间。<br>**业务含义**: `true`时，系统会根据新的田块分配重新计算每个批次的灌溉时长和预计完成时间。<br>**建议**: 通常保持`true` |
+| maintain_pump_assignments | boolean | `true` | 是否保持原有水泵分配。<br>**业务含义**: `true`时保持原计划的水泵配置，`false`时可能根据新分配重新选择水泵。<br>**建议**: 保持`true`以避免水泵配置变化 |
+| regenerate_commands | boolean | `true` | 是否重新生成执行命令。<br>**业务含义**: `true`时，系统会更新`steps`中的详细执行指令（包括`sequence.fields`和`full_order`），确保命令与批次一致。<br>**⚠️ 重要**: 必须设为`true`，否则执行时会出现数据不一致 |
+
+**响应示例**
+```json
+{
+  "success": true,
+  "message": "批次间田块调整成功",
+  "original_plan": {
+    "batches": [
+      {
+        "index": 1,
+        "fields": [
+          {"id": "S3-G5-F3", "area_mu": 5.225}
+        ]
+      },
+      {
+        "index": 2,
+        "fields": [
+          {"id": "S5-G27-F19", "area_mu": 6.358}
+        ]
+      }
+    ]
+  },
+  "adjusted_plan": {
+    "batches": [
+      {
+        "index": 1,
+        "fields": [
+          {"id": "S5-G27-F19", "area_mu": 6.358}
+        ]
+      },
+      {
+        "index": 2,
+        "fields": [
+          {"id": "S3-G5-F3", "area_mu": 5.225}
+        ]
+      }
+    ]
+  },
+  "changes_summary": {
+    "total_fields_moved": 2,
+    "affected_batches": [1, 2],
+    "field_movements": [
+      {
+        "field_id": "S3-G5-F3",
+        "from_batch": 1,
+        "to_batch": 2,
+        "status": "success"
+      },
+      {
+        "field_id": "S5-G27-F19",
+        "from_batch": 2,
+        "to_batch": 1,
+        "status": "success"
+      }
+    ],
+    "batch_time_changes": [
+      {
+        "batch_index": 1,
+        "old_duration_h": 18.28,
+        "new_duration_h": 19.15,
+        "time_diff_h": 0.87
+      },
+      {
+        "batch_index": 2,
+        "old_duration_h": 19.15,
+        "new_duration_h": 18.28,
+        "time_diff_h": -0.87
+      }
+    ]
+  },
+  "validation": {
+    "is_valid": true,
+    "total_fields": 36,
+    "total_batches": 4,
+    "warnings": []
+  },
+  "output_file": "/app/output/irrigation_plan_20250109_123456_adjusted_20250109_140530.json"
+}
+```
+
+**关键字段说明**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| original_plan | object | 原始计划的关键信息（仅包含受影响批次） |
+| adjusted_plan | object | 调整后的完整计划数据 |
+| changes_summary | object | 变更摘要信息 |
+| changes_summary.total_fields_moved | integer | 移动的田块总数 |
+| changes_summary.affected_batches | array | 受影响的批次索引列表 |
+| changes_summary.field_movements | array | 每个田块的移动详情 |
+| changes_summary.batch_time_changes | array | 批次时间变化详情 |
+| validation | object | 验证结果 |
+| validation.is_valid | boolean | 调整后的计划是否有效 |
+| validation.warnings | array | 警告信息（如有） |
+| output_file | string | 调整后计划保存的文件路径 |
+
+**使用场景**
+
+| 场景 | 说明 | 示例 |
+|------|------|------|
+| **负载均衡** | 某个批次田块过多，灌溉时间过长 | 将部分田块移至其他批次，平衡各批次时长 |
+| **优先级调整** | 需要优先灌溉某些田块 | 将急需灌溉的田块移至第1批次 |
+| **故障应对** | 某批次的水泵或闸门故障 | 将该批次的田块分散到其他批次 |
+| **田块交换** | 两个批次间互换田块 | 同时移动两个方向的田块，实现交换 |
+
+**注意事项**
+1. ⚠️ 调整不会改变批次总数，只会重新分配田块
+2. ⚠️ 必须确保`from_batch`中包含指定的`field_id`
+3. ⚠️ 建议调整后检查`validation.is_valid`确保计划有效
+4. ⚠️ 调整会生成新的计划文件，原计划文件不会被修改
+5. ✅ 支持多场景计划（如P1单独、P2单独、P1+P2组合），会同时更新所有场景
+6. ✅ 系统会自动更新`batches`、`steps`、`sequence.fields`和`full_order`，确保数据一致
+
+---
+
 ## 典型业务流程
 
 ### 流程1：标准灌溉计划生成与执行 
@@ -1503,6 +1682,96 @@ const regenData = await regenResponse.json();
 
 ---
 
+### 流程6：批次间田块调整优化
+
+**适用场景**: 已有计划，需要优化批次间的田块分配
+
+```javascript
+// 步骤1: 生成初始计划
+const planResponse = await fetch(`${BASE_URL}/api/irrigation/plan-generation`, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify({
+    farm_id: "13944136728576",
+    multi_pump_scenarios: true
+  })
+});
+const planData = await planResponse.json();
+const planId = planData.plan_id;
+
+// 步骤2: 查看当前批次分配
+const batchesResponse = await fetch(`${BASE_URL}/api/batches?farm_id=13944136728576`);
+const batchesData = await batchesResponse.json();
+
+// 分析批次，发现批次1时间过长，批次2时间较短
+console.log('批次1时长:', batchesData.batches[0].duration_h); // 例如: 20.5h
+console.log('批次2时长:', batchesData.batches[1].duration_h); // 例如: 15.2h
+
+// 步骤3: 调整田块分配（交换两个田块实现负载均衡）
+const adjustResponse = await fetch(`${BASE_URL}/api/batch/adjust`, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify({
+    plan_id: planId,
+    field_adjustments: [
+      {
+        field_id: "S3-G5-F3",      // 从批次1移到批次2
+        from_batch: 1,
+        to_batch: 2
+      },
+      {
+        field_id: "S5-G27-F19",    // 从批次2移到批次1（交换）
+        from_batch: 2,
+        to_batch: 1
+      }
+    ],
+    options: {
+      recalculate_sequence: true,
+      recalculate_timing: true,
+      maintain_pump_assignments: true,
+      regenerate_commands: true
+    }
+  })
+});
+const adjustData = await adjustResponse.json();
+
+// 步骤4: 查看调整结果
+console.log('调整成功:', adjustData.success);
+console.log('移动田块数:', adjustData.changes_summary.total_fields_moved);
+
+// 查看时间变化
+adjustData.changes_summary.batch_time_changes.forEach(change => {
+  console.log(`批次${change.batch_index}: ${change.old_duration_h}h -> ${change.new_duration_h}h`);
+  console.log(`  变化: ${change.time_diff_h > 0 ? '+' : ''}${change.time_diff_h}h`);
+});
+
+// 步骤5: 验证调整后的计划
+if (adjustData.validation.is_valid) {
+  console.log('✅ 调整后的计划有效，可以执行');
+  
+  // 步骤6: 使用调整后的计划执行
+  const execResponse = await fetch(`${BASE_URL}/api/execution/start`, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      plan_file_path: adjustData.output_file,  // 使用调整后的计划文件
+      farm_id: "13944136728576",
+      auto_start: true,
+      enable_plan_regeneration: true
+    })
+  });
+} else {
+  console.log('❌ 调整后的计划无效:', adjustData.validation.warnings);
+}
+```
+
+**流程图**:
+```
+生成计划 → 分析批次 → 识别优化点 → 调整田块分配 → 验证计划 → 执行
+```
+
+---
+
 ## 错误码说明
 ### HTTP 状态码
 
@@ -1665,7 +1934,75 @@ GET /api/batches/0/details  // 会返回404
 
 ---
 
-### Q7: 轮询执行状态
+### Q7: 批次重新生成和批次间田块调整的区别
+
+**A**: 这两个接口虽然都涉及批次修改，但应用场景和效果完全不同：
+
+| 特性 | 批次重新生成<br>`/api/regeneration/batch` | 批次间田块调整<br>`/api/batch/adjust` |
+|------|------------------------------------------|-------------------------------------|
+| **主要功能** | 修改田块数量，重新生成批次结构 | 在现有批次间移动田块 |
+| **批次数量** | ✅ 可能改变 | ❌ 保持不变 |
+| **田块总数** | ✅ 可能改变（增加/删除田块） | ❌ 保持不变 |
+| **批次结构** | ✅ 可能完全重新划分 | ❌ 只调整分配 |
+| **水泵分配** | ✅ 可以修改 | 🔒 通常保持不变 |
+| **适用场景** | • 增加新田块到计划<br>• 移除某些田块<br>• 大幅调整灌溉范围 | • 优化批次负载均衡<br>• 调整灌溉优先级<br>• 批次间田块交换 |
+| **计算强度** | 🔴 高（重新计算批次划分） | 🟢 低（仅重新计算顺序和时间） |
+| **使用时机** | 计划内容需要改变时 | 计划内容不变，仅优化分配时 |
+
+**推荐使用场景**:
+
+**使用批次重新生成** (`/api/regeneration/batch`)：
+```javascript
+// 场景1: 增加新田块
+{
+  field_modifications: [
+    { field_id: "S3-G10-F30", action: "add", custom_water_level: 95.0 }
+  ]
+}
+
+// 场景2: 移除故障田块
+{
+  field_modifications: [
+    { field_id: "S3-G5-F3", action: "remove" }
+  ]
+}
+
+// 场景3: 修改水泵分配
+{
+  pump_assignments: [
+    { batch_index: 1, pump_ids: ["P1", "P2"] }
+  ]
+}
+```
+
+**使用批次间田块调整** (`/api/batch/adjust`)：
+```javascript
+// 场景1: 负载均衡（批次1太长，批次2太短）
+{
+  field_adjustments: [
+    { field_id: "S3-G5-F3", from_batch: 1, to_batch: 2 }
+  ]
+}
+
+// 场景2: 提高优先级（将田块移到第一批次）
+{
+  field_adjustments: [
+    { field_id: "S5-G27-F19", from_batch: 3, to_batch: 1 }
+  ]
+}
+
+// 场景3: 田块交换
+{
+  field_adjustments: [
+    { field_id: "S3-G5-F3", from_batch: 1, to_batch: 2 },
+    { field_id: "S5-G27-F19", from_batch: 2, to_batch: 1 }
+  ]
+}
+```
+
+---
+
+### Q8: 轮询执行状态
 
 **A**: 推荐使用以下轮询策略：
 
@@ -1847,6 +2184,7 @@ interface ExecutionStatus {
 | 计划优化 | POST | `/api/irrigation/plan-optimization` | `original_plan_id`, `optimization_goals` | 原始计划ID，优化目标列表 |
 | 批次详情 | GET | `/api/batches/{index}/details` | `batch_index` | 批次索引（从1开始） |
 | 更新水位 | POST | `/api/water-levels/update` | `field_id`, `water_level_mm` | 田块ID，水位值(mm) |
+| 批次间田块调整 | POST | `/api/batch/adjust` | `plan_id`, `field_adjustments`, `options` | 计划ID，田块调整列表，调整选项 |
 
 **重要ID类型对照**
 
