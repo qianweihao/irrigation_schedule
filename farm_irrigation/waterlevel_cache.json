@@ -17,11 +17,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.165779"
     },
     "1901481355163082752": {
       "field_id": "1901481355163082752",
       "readings": [
+        {
+          "field_id": "1901481355163082752",
+          "water_level_mm": 1.3,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901481355163082752",
+            "sectionCode": "29",
+            "waterlevel_mm": 1.3
+          }
+        },
         {
           "field_id": "1901481355163082752",
           "water_level_mm": 1.4000000000000001,
@@ -36,11 +49,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901482275678593024": {
       "field_id": "1901482275678593024",
       "readings": [
+        {
+          "field_id": "1901482275678593024",
+          "water_level_mm": 3.5,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901482275678593024",
+            "sectionCode": "35",
+            "waterlevel_mm": 3.5
+          }
+        },
         {
           "field_id": "1901482275678593024",
           "water_level_mm": 3.1,
@@ -55,11 +81,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1891823144638259200": {
       "field_id": "1891823144638259200",
       "readings": [
+        {
+          "field_id": "1891823144638259200",
+          "water_level_mm": 0.5,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891823144638259200",
+            "sectionCode": "38",
+            "waterlevel_mm": 0.5
+          }
+        },
         {
           "field_id": "1891823144638259200",
           "water_level_mm": 0.7000000000000001,
@@ -74,11 +113,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901480688168083456": {
       "field_id": "1901480688168083456",
       "readings": [
+        {
+          "field_id": "1901480688168083456",
+          "water_level_mm": 1.0,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901480688168083456",
+            "sectionCode": "24",
+            "waterlevel_mm": 1.0
+          }
+        },
         {
           "field_id": "1901480688168083456",
           "water_level_mm": 1.0,
@@ -93,11 +145,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1891823619731267584": {
       "field_id": "1891823619731267584",
       "readings": [
+        {
+          "field_id": "1891823619731267584",
+          "water_level_mm": 2.8000000000000003,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891823619731267584",
+            "sectionCode": "40",
+            "waterlevel_mm": 2.8000000000000003
+          }
+        },
         {
           "field_id": "1891823619731267584",
           "water_level_mm": 3.0,
@@ -112,11 +177,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1891822967093370880": {
       "field_id": "1891822967093370880",
       "readings": [
+        {
+          "field_id": "1891822967093370880",
+          "water_level_mm": 1.0,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891822967093370880",
+            "sectionCode": "37",
+            "waterlevel_mm": 1.0
+          }
+        },
         {
           "field_id": "1891822967093370880",
           "water_level_mm": 1.5,
@@ -131,11 +209,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901478159908741120": {
       "field_id": "1901478159908741120",
       "readings": [
+        {
+          "field_id": "1901478159908741120",
+          "water_level_mm": 0.7000000000000001,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901478159908741120",
+            "sectionCode": "3",
+            "waterlevel_mm": 0.7000000000000001
+          }
+        },
         {
           "field_id": "1901478159908741120",
           "water_level_mm": 0.7000000000000001,
@@ -150,11 +241,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901478962346205184": {
       "field_id": "1901478962346205184",
       "readings": [
+        {
+          "field_id": "1901478962346205184",
+          "water_level_mm": 3.7,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901478962346205184",
+            "sectionCode": "10",
+            "waterlevel_mm": 3.7
+          }
+        },
         {
           "field_id": "1901478962346205184",
           "water_level_mm": 3.5,
@@ -169,11 +273,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901478711140950016": {
       "field_id": "1901478711140950016",
       "readings": [
+        {
+          "field_id": "1901478711140950016",
+          "water_level_mm": 1.0,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901478711140950016",
+            "sectionCode": "8",
+            "waterlevel_mm": 1.0
+          }
+        },
         {
           "field_id": "1901478711140950016",
           "water_level_mm": 1.2,
@@ -188,11 +305,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901480278892093440": {
       "field_id": "1901480278892093440",
       "readings": [
+        {
+          "field_id": "1901480278892093440",
+          "water_level_mm": 5.4,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901480278892093440",
+            "sectionCode": "20",
+            "waterlevel_mm": 5.4
+          }
+        },
         {
           "field_id": "1901480278892093440",
           "water_level_mm": 6.0,
@@ -207,11 +337,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901480445254967296": {
       "field_id": "1901480445254967296",
       "readings": [
+        {
+          "field_id": "1901480445254967296",
+          "water_level_mm": 3.1,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901480445254967296",
+            "sectionCode": "21",
+            "waterlevel_mm": 3.1
+          }
+        },
         {
           "field_id": "1901480445254967296",
           "water_level_mm": 3.5,
@@ -226,11 +369,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1891821697230086144": {
       "field_id": "1891821697230086144",
       "readings": [
+        {
+          "field_id": "1891821697230086144",
+          "water_level_mm": 0.7000000000000001,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891821697230086144",
+            "sectionCode": "33",
+            "waterlevel_mm": 0.7000000000000001
+          }
+        },
         {
           "field_id": "1891821697230086144",
           "water_level_mm": 0.8999999999999999,
@@ -245,11 +401,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901478816942268416": {
       "field_id": "1901478816942268416",
       "readings": [
+        {
+          "field_id": "1901478816942268416",
+          "water_level_mm": 0.6,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901478816942268416",
+            "sectionCode": "9",
+            "waterlevel_mm": 0.6
+          }
+        },
         {
           "field_id": "1901478816942268416",
           "water_level_mm": 0.6,
@@ -264,11 +433,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901480038592028672": {
       "field_id": "1901480038592028672",
       "readings": [
+        {
+          "field_id": "1901480038592028672",
+          "water_level_mm": 4.8,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901480038592028672",
+            "sectionCode": "18",
+            "waterlevel_mm": 4.8
+          }
+        },
         {
           "field_id": "1901480038592028672",
           "water_level_mm": 4.8,
@@ -283,11 +465,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901479235957432320": {
       "field_id": "1901479235957432320",
       "readings": [
+        {
+          "field_id": "1901479235957432320",
+          "water_level_mm": 2.6,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901479235957432320",
+            "sectionCode": "12",
+            "waterlevel_mm": 2.6
+          }
+        },
         {
           "field_id": "1901479235957432320",
           "water_level_mm": 2.3000000000000003,
@@ -302,11 +497,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1891823423307816960": {
       "field_id": "1891823423307816960",
       "readings": [
+        {
+          "field_id": "1891823423307816960",
+          "water_level_mm": 1.2,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891823423307816960",
+            "sectionCode": "39",
+            "waterlevel_mm": 1.2
+          }
+        },
         {
           "field_id": "1891823423307816960",
           "water_level_mm": 1.3,
@@ -321,11 +529,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901481203845177344": {
       "field_id": "1901481203845177344",
       "readings": [
+        {
+          "field_id": "1901481203845177344",
+          "water_level_mm": 0.7000000000000001,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901481203845177344",
+            "sectionCode": "28",
+            "waterlevel_mm": 0.7000000000000001
+          }
+        },
         {
           "field_id": "1901481203845177344",
           "water_level_mm": 0.8,
@@ -340,11 +561,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901480136478695424": {
       "field_id": "1901480136478695424",
       "readings": [
+        {
+          "field_id": "1901480136478695424",
+          "water_level_mm": 2.8000000000000003,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901480136478695424",
+            "sectionCode": "19",
+            "waterlevel_mm": 2.8000000000000003
+          }
+        },
         {
           "field_id": "1901480136478695424",
           "water_level_mm": 3.4000000000000004,
@@ -359,7 +593,7 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901479888112984064": {
       "field_id": "1901479888112984064",
@@ -378,11 +612,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.166779"
     },
     "1901480933362900992": {
       "field_id": "1901480933362900992",
       "readings": [
+        {
+          "field_id": "1901480933362900992",
+          "water_level_mm": 0.8999999999999999,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901480933362900992",
+            "sectionCode": "26",
+            "waterlevel_mm": 0.8999999999999999
+          }
+        },
         {
           "field_id": "1901480933362900992",
           "water_level_mm": 1.0,
@@ -397,11 +644,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1891823874275188736": {
       "field_id": "1891823874275188736",
       "readings": [
+        {
+          "field_id": "1891823874275188736",
+          "water_level_mm": 1.5,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891823874275188736",
+            "sectionCode": "41",
+            "waterlevel_mm": 1.5
+          }
+        },
         {
           "field_id": "1891823874275188736",
           "water_level_mm": 0.8999999999999999,
@@ -416,11 +676,24 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
     },
     "1901478465031774208": {
       "field_id": "1901478465031774208",
       "readings": [
+        {
+          "field_id": "1901478465031774208",
+          "water_level_mm": 0.6,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1901478465031774208",
+            "sectionCode": "6",
+            "waterlevel_mm": 0.6
+          }
+        },
         {
           "field_id": "1901478465031774208",
           "water_level_mm": 0.8,
@@ -435,8 +708,27 @@
           }
         }
       ],
-      "last_updated": "2025-11-05T21:36:36.624227"
+      "last_updated": "2025-11-07T22:21:37.708487"
+    },
+    "1891822716580175872": {
+      "field_id": "1891822716580175872",
+      "readings": [
+        {
+          "field_id": "1891822716580175872",
+          "water_level_mm": 1.0,
+          "timestamp": "2025-11-07T22:21:37.166779",
+          "source": "api",
+          "quality": "excellent",
+          "confidence": 0.7200000000000001,
+          "metadata": {
+            "sectionID": "1891822716580175872",
+            "sectionCode": "36",
+            "waterlevel_mm": 1.0
+          }
+        }
+      ],
+      "last_updated": "2025-11-07T22:21:37.708487"
     }
   },
-  "last_updated": "2025-11-05T21:36:36.624227"
+  "last_updated": "2025-11-07T22:21:37.708487"
 }

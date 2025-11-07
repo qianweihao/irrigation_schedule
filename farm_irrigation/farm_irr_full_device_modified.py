@@ -427,6 +427,55 @@ def _per_mu_volume_m3(d_target_mm: float) -> float:
     # 1 亩·mm ≈ 0.666667 m3
     return 0.666667 * float(d_target_mm)
 
+def _calculate_field_deficit_m3(field: FieldPlot, custom_wl_low: float = None, custom_wl_opt: float = None) -> float:
+    """
+    动态计算田块的缺水量（立方米）
+    
+    逻辑：
+    - 如果当前水位 < wl_low，则需要灌溉到 wl_opt
+    - 缺水深度 = wl_opt - wl_mm
+    - 缺水量 = 面积(亩) × 缺水深度(mm) × 0.666667
+    
+    Args:
+        field: 田块对象
+        custom_wl_low: 自定义低水位阈值（可选），覆盖 field.wl_low
+        custom_wl_opt: 自定义最优水位（可选），覆盖 field.wl_opt
+        
+    Returns:
+        float: 缺水量（立方米），如果不需要灌溉则返回0
+    """
+    # 如果水位为 None 或 NaN，跳过
+    if field.wl_mm is None or (isinstance(field.wl_mm, float) and field.wl_mm != field.wl_mm):
+        return 0.0
+    
+    # 使用自定义标准（如果提供），否则使用田块默认值
+    wl_low = custom_wl_low if custom_wl_low is not None else field.wl_low
+    wl_opt = custom_wl_opt if custom_wl_opt is not None else field.wl_opt
+    
+    # 如果当前水位 >= 低水位阈值，不需要灌溉
+    if field.wl_mm >= wl_low:
+        return 0.0
+    
+    # 计算缺水深度：从当前水位灌溉到最优水位
+    deficit_mm = wl_opt - field.wl_mm
+    
+    # 转换为立方米：1亩·mm ≈ 0.666667 m³
+    deficit_m3 = field.area_mu * deficit_mm * 0.666667
+    
+    return deficit_m3
+
+def _calculate_batch_deficit_m3(fields: List[FieldPlot]) -> float:
+    """
+    计算批次的总缺水量（立方米）
+    
+    Args:
+        fields: 批次中的田块列表
+        
+    Returns:
+        float: 总缺水量（立方米）
+    """
+    return sum(_calculate_field_deficit_m3(f) for f in fields)
+
 def _q_avail(cfg: FarmConfig) -> float:
     return float(cfg.pump.q_rated_m3ph)
 
@@ -546,8 +595,9 @@ def _build_time_constrained_plan(cfg: FarmConfig) -> Plan:
             batch = Batch(index=len(batches) + 1, fields=batch_fields)
             batches.append(batch)
             
-            # 计算批次统计
-            need_m3 = batch.area_mu * per_mu_m3
+            # 计算批次统计 - 使用动态计算
+            # 逻辑：如果 wl_mm < wl_low，灌溉到 wl_opt
+            need_m3 = _calculate_batch_deficit_m3(batch.fields)
             eta_h = slot_duration  # 使用时间段的持续时间
             batch_stats.append(BatchStat(
                 deficit_vol_m3=need_m3,
@@ -709,16 +759,31 @@ def build_concurrent_plan(cfg: FarmConfig) -> Plan:
         key=lambda f: (seg_rank.get(_base_sid(f.segment_id), 9999), f.distance_rank, f.id)
     )
 
-    # 4) 分批（覆盖面积不超过泵能力 × 时窗）
+    # 4) 分批（基于实际缺水量，不超过泵能力 × 时窗）
+    # 泵在时间窗内能提供的总水量（立方米）
+    max_water_m3 = q_av * cfg.t_win_h
+    
     batches: List[Batch] = []
-    cur, acc = [], 0.0
+    cur_fields = []
+    cur_deficit_m3 = 0.0
+    
     for f in eligible_fields:
-        if cur and (acc + f.area_mu > A_cover_mu):
-            batches.append(Batch(index=len(batches)+1, fields=list(cur)))
-            cur, acc = [], 0.0
-        cur.append(f); acc += f.area_mu
-    if cur:
-        batches.append(Batch(index=len(batches)+1, fields=list(cur)))
+        # 计算该田块的缺水量
+        field_deficit = _calculate_field_deficit_m3(f)
+        
+        # 如果添加这个田块会超过泵的供水能力，则开始新批次
+        if cur_fields and (cur_deficit_m3 + field_deficit > max_water_m3):
+            batches.append(Batch(index=len(batches)+1, fields=list(cur_fields)))
+            cur_fields = []
+            cur_deficit_m3 = 0.0
+        
+        # 将田块添加到当前批次
+        cur_fields.append(f)
+        cur_deficit_m3 += field_deficit
+    
+    # 添加最后一个批次
+    if cur_fields:
+        batches.append(Batch(index=len(batches)+1, fields=list(cur_fields)))
 
     # 5) 批次统计与步骤（含主渠+支渠节制闸）
     batch_stats: List[BatchStat] = []
@@ -729,7 +794,9 @@ def build_concurrent_plan(cfg: FarmConfig) -> Plan:
     pumps_off_order = list(reversed(cfg.active_pumps))
 
     for b in batches:
-        need_m3 = b.area_mu * per_mu_m3
+        # 使用动态计算：基于实际水位计算缺水量
+        # 逻辑：如果 wl_mm < wl_low，灌溉到 wl_opt
+        need_m3 = _calculate_batch_deficit_m3(b.fields)
         eta_h   = (need_m3 / q_av) if q_av > 0 else 0.0
         batch_stats.append(BatchStat(deficit_vol_m3=need_m3, cap_vol_m3=q_av * cfg.t_win_h, eta_hours=eta_h))
 

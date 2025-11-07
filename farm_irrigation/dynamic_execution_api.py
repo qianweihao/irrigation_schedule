@@ -96,10 +96,17 @@ class WaterLevelUpdateResponse(BaseModel):
     update_timestamp: str
     data_quality_summary: Dict[str, int] = {}
 
+class FieldWaterLevelStandard(BaseModel):
+    """田块水位标准"""
+    wl_low: Optional[float] = None   # 低水位阈值（mm）
+    wl_opt: Optional[float] = None   # 最优水位（mm）
+    wl_high: Optional[float] = None  # 高水位阈值（mm）
+
 class ManualRegenerationRequest(BaseModel):
     """手动重新生成请求模型"""
     batch_index: int
-    custom_water_levels: Optional[Dict[str, float]] = None
+    custom_water_levels: Optional[Dict[str, float]] = None  # 田块实际水位
+    custom_water_level_standards: Optional[Dict[str, FieldWaterLevelStandard]] = None  # 田块水位标准（可选）
     force_regeneration: bool = False
 
 class ManualRegenerationResponse(BaseModel):
@@ -114,6 +121,12 @@ class ManualRegenerationResponse(BaseModel):
     water_usage_adjustment_m3: float = 0.0  # 用水量调整（立方米）
     change_summary: str = ""  # 变更摘要描述
     output_file: Optional[str] = None  # 保存的JSON文件路径
+    # 水位标准参数（返回给前端用于显示参考值）
+    wl_low: float = 80.0  # 低水位阈值（mm），触发灌溉的判断标准（全局默认值）
+    wl_opt: float = 100.0  # 最优水位（mm），理想的田间持水量（全局默认值）
+    wl_high: float = 140.0  # 高水位阈值（mm），超过则不需要灌溉（全局默认值）
+    d_target_mm: float = 90.0  # 目标灌溉水深（mm），每次灌溉增加的水深
+    field_water_level_standards: Optional[Dict[str, Dict[str, float]]] = None  # 田块级水位标准（如果有自定义）
 
 class ExecutionHistoryResponse(BaseModel):
     """执行历史响应模型"""
@@ -659,6 +672,35 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             if abs(result.total_water_adjustment) > 1:  # 用水量调整超过1立方米
                 actual_changes_count += 1
         
+        # 从配置中获取水位标准参数
+        config_data = getattr(scheduler, 'config_data', {})
+        d_target_mm = config_data.get('d_target_mm', 90.0)
+        
+        # 从配置的第一个田块中获取水位标准（作为代表值）
+        # 如果配置中有多个田块，它们通常使用相同的水位标准
+        wl_low = 80.0  # 默认值
+        wl_opt = 100.0  # 默认值
+        wl_high = 140.0  # 默认值
+        
+        fields = config_data.get('fields', [])
+        if fields and len(fields) > 0:
+            first_field = fields[0]
+            wl_low = first_field.get('wl_low', 80.0)
+            wl_opt = first_field.get('wl_opt', 100.0)
+            wl_high = first_field.get('wl_high', 140.0)
+        
+        # 处理田块级别的自定义水位标准
+        field_standards = None
+        if request.custom_water_level_standards:
+            field_standards = {}
+            for field_id, standards in request.custom_water_level_standards.items():
+                field_standards[field_id] = {
+                    'wl_low': standards.wl_low if standards.wl_low is not None else wl_low,
+                    'wl_opt': standards.wl_opt if standards.wl_opt is not None else wl_opt,
+                    'wl_high': standards.wl_high if standards.wl_high is not None else wl_high
+                }
+            logger.info(f"使用自定义水位标准：{len(field_standards)} 个田块")
+        
         # 构建更准确的消息
         output_file_name = str(output_file.name) if updated_plan else None
         if scenario_count > 1:
@@ -671,6 +713,10 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         if output_file_name:
             message += f"，已保存到 {output_file_name}"
         
+        # 如果使用了自定义标准，在消息中提示
+        if field_standards:
+            message += f"（使用了 {len(field_standards)} 个田块的自定义水位标准）"
+        
         return ManualRegenerationResponse(
             success=True,
             message=message,
@@ -681,7 +727,12 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             execution_time_adjustment_seconds=result.execution_time_adjustment,
             water_usage_adjustment_m3=result.total_water_adjustment,
             change_summary=change_summary.get("summary", ""),
-            output_file=str(output_file) if updated_plan else None
+            output_file=str(output_file) if updated_plan else None,
+            wl_low=wl_low,
+            wl_opt=wl_opt,
+            wl_high=wl_high,
+            d_target_mm=d_target_mm,
+            field_water_level_standards=field_standards  # 返回田块级别的标准（如果有）
         )
         
     except HTTPException:

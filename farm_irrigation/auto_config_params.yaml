@@ -1,0 +1,89 @@
+# 灌溉系统配置参数
+# 此文件用于自动生成 config.json 时的默认值
+
+# 基础配置
+default_farm_id: "13944136728576"
+default_time_window_h: 20.0
+default_target_depth_mm: 90.0
+default_canal_id: "C_A"
+
+# ⭐ 水位标准参数（重要：下次生成 config.json 会使用这些值）
+default_water_levels:
+  wl_low: 30.0    # 低水位阈值（mm）- 触发灌溉的判断标准
+  wl_opt: 80.0    # 最优水位（mm）- 灌溉的目标水位
+  wl_high: 140.0  # 高水位阈值（mm）- 超过则不需要灌溉
+
+# 田块默认配置
+default_field_config:
+  has_drain_gate: true
+  rel_to_regulator: "downstream"
+
+# 默认泵配置
+default_pump:
+  name: "AUTO"
+  q_rated_m3ph: 300.0
+  efficiency: 0.8
+  power_kw: 60.0
+  electricity_price: 0.6
+
+# 多泵配置（用于多泵方案对比）
+default_pumps:
+  - name: "P1"
+    q_rated_m3ph: 300.0
+    efficiency: 0.8
+    power_kw: 60.0
+    electricity_price: 0.6
+  - name: "P2"
+    q_rated_m3ph: 300.0
+    efficiency: 0.8
+    power_kw: 60.0
+    electricity_price: 0.6
+
+# 泵时间约束（可选）
+default_pump_time_constraints:
+  - pump_name: "P1"
+    start_hour: 0
+    end_hour: 8
+  - pump_name: "P2"
+    start_hour: 8
+    end_hour: 16
+
+# 坐标系配置
+crs_config:
+  geographic_crs:
+    - "EPSG:4326"
+    - "EPSG:4490"
+    - "WGS84"
+  sqm_to_mu_factor: 666.6667
+
+# 文件搜索路径
+file_search_paths:
+  data_paths:
+    - "gzp_farm"
+    - "/mnt/data"
+  waterlevels_paths:
+    - "waterlevels.json"
+    - "gzp_farm/waterlevels.json"
+    - "/mnt/data/waterlevels.json"
+
+# 默认文件名
+default_filenames:
+  segments: "港中坪水路_code.geojson"
+  gates: "港中坪阀门与节制闸_code.geojson"
+  fields: "港中坪田块_code.geojson"
+
+# 输出配置
+output_config:
+  config_file: "config.json"
+  labeled_dir: "labeled_output"
+
+# 环境变量映射
+env_vars:
+  farm_id:
+    - "RICE_IRRIGATION_FARM_ID"
+    - "FARM_ID"
+    - "FARMID"
+
+# 其他默认值
+default_distance_rank: 9999
+

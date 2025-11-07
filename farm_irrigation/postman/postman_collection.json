@@ -287,7 +287,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"batch_index\": 1,\n  \"custom_water_levels\": {\n    \"S3-G5-F3\": 95.0\n  },\n  \"force_regeneration\": true\n}"
+              "raw": "{\n  \"batch_index\": 1,\n  \"custom_water_levels\": {\n    \"S3-G5-F3\": {{custom_water_level}}\n  },\n  \"custom_water_level_standards\": {\n    \"S3-G5-F3\": {\n      \"wl_low\": {{custom_wl_low}},\n      \"wl_opt\": {{custom_wl_opt}},\n      \"wl_high\": {{custom_wl_high}}\n    }\n  },\n  \"force_regeneration\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/regeneration/manual",
@@ -304,6 +304,32 @@
                   "    pm.response.to.have.status(200);",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含水位标准参数\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('wl_low');",
+                  "    pm.expect(jsonData).to.have.property('wl_opt');",
+                  "    pm.expect(jsonData).to.have.property('wl_high');",
+                  "    pm.expect(jsonData).to.have.property('d_target_mm');",
+                  "    ",
+                  "    console.log('\\n=== 全局水位标准参数 ===');",
+                  "    console.log('低水位阈值 (wl_low): ' + jsonData.wl_low + ' mm - 触发灌溉的判断标准');",
+                  "    console.log('最优水位 (wl_opt): ' + jsonData.wl_opt + ' mm - 理想的田间持水量');",
+                  "    console.log('高水位阈值 (wl_high): ' + jsonData.wl_high + ' mm - 超过则不需要灌溉');",
+                  "    console.log('目标灌溉水深 (d_target_mm): ' + jsonData.d_target_mm + ' mm - 每次灌溉增加的水深');",
+                  "    ",
+                  "    // 检查田块级水位标准（如果有自定义）",
+                  "    if (jsonData.field_water_level_standards) {",
+                  "        console.log('\\n=== 田块级水位标准（自定义） ===');",
+                  "        Object.keys(jsonData.field_water_level_standards).forEach(function(fieldId) {",
+                  "            var standards = jsonData.field_water_level_standards[fieldId];",
+                  "            console.log('田块 ' + fieldId + ':');",
+                  "            console.log('  - wl_low: ' + standards.wl_low + ' mm');",
+                  "            console.log('  - wl_opt: ' + standards.wl_opt + ' mm');",
+                  "            console.log('  - wl_high: ' + standards.wl_high + ' mm');",
+                  "        });",
+                  "    }",
                   "});"
                 ]
               }

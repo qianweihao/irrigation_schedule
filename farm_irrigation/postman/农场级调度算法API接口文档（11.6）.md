@@ -52,11 +52,34 @@
 ### 灌溉相关
 | 术语 | 英文 | 说明 | 单位 |
 |------|------|------|------|
-| **water_level_mm** | Water Level | 田块当前水位深度 | 毫米 (mm) |
-| **target_depth_mm** | Target Depth | 目标灌溉深度，灌溉后期望达到的水位 | 毫米 (mm) |
+| **wl_mm** | Current Water Level | 田块当前实际水位深度 | 毫米 (mm) |
+| **wl_low** | Low Water Level | 低水位阈值，**触发灌溉的判断标准** | 毫米 (mm) |
+| **wl_opt** | Optimal Water Level | 最优水位，**灌溉的目标水位** | 毫米 (mm) |
+| **wl_high** | High Water Level | 高水位阈值，超过则不需要灌溉 | 毫米 (mm) |
+| **d_target_mm** | Target Irrigation Depth | 目标灌溉水深（参考值，实际使用动态计算） | 毫米 (mm) |
 | **area_mu** | Area | 田块面积 | 亩 (mu) |
-| **deficit_vol_m3** | Deficit Volume | 缺水量，需要灌溉的水量 | 立方米 (m³) |
-| **eta_hours** | ETA Hours | 预计完成时间 | 小时 (h) |
+| **deficit_vol_m3** | Deficit Volume | **动态计算的缺水量**（= 田块数量 × 缺水深度 × 0.666667） | 立方米 (m³) |
+| **eta_hours** | ETA Hours | 预计完成时间（基于实际缺水量动态计算） | 小时 (h) |
+
+**💡 灌溉量动态计算逻辑：**
+```
+判断条件：if wl_mm < wl_low → 需要灌溉
+缺水深度：deficit_mm = wl_opt - wl_mm
+缺水量：deficit_m3 = area_mu × deficit_mm × 0.666667
+灌溉目标：从当前水位 (wl_mm) 灌溉到最优水位 (wl_opt)
+```
+
+**示例：**
+- 田块面积 = 10亩
+- wl_low = 80mm, wl_opt = 100mm
+- 当前水位 = 75mm
+
+```
+判断：75 < 80 ✅ 需要灌溉
+缺水深度：100 - 75 = 25mm
+缺水量：10 × 25 × 0.666667 = 167 m³
+灌溉后：75 + 25 = 100mm (达到最优水位)
+```
 
 ### 设备相关
 | 术语 | 英文 | 说明 | 示例值 |
@@ -1234,7 +1257,7 @@ Content-Type: application/json
 
 #### 8.2 手动重新生成（水位）
 
-**接口说明**: 基于新的水位数据重新生成指定批次
+**接口说明**: 基于新的水位数据重新生成指定批次，支持为特定田块设置自定义的水位标准
 
 **请求**
 ```
@@ -1247,35 +1270,73 @@ Content-Type: application/json
 {
   "batch_index": 1,
   "custom_water_levels": {
-    "S3-G5-F3": 95.0,
-    "S3-G6-F4": 88.5
+    "S3-G5-F3": 25.0,
+    "S3-G6-F4": 28.5
+  },
+  "custom_water_level_standards": {
+    "S3-G5-F3": {
+      "wl_low": 20.0,
+      "wl_opt": 70.0,
+      "wl_high": 130.0
+    }
   },
   "force_regeneration": true
 }
 ```
 
 **参数说明**
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| batch_index | integer | 是 | 批次索引 |
-| custom_water_levels | object | 否 | 自定义水位数据（田块ID: 水位值） |
-| force_regeneration | boolean | 否 | 是否强制重新生成，默认false |
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| batch_index | integer | ✅ 是 | - | 批次索引号（**从1开始**）。<br>**业务含义**: 指定要重新生成的批次。<br>**示例**: `1` |
+| custom_water_levels | object | ❌ 否 | `{}` | 自定义田块实际水位。<br>**业务含义**: 为指定田块设置当前实际水位值，格式为 `{"田块ID": 水位值(mm)}`。<br>**使用场景**: 传感器数据更新后，手动触发重新计算。<br>**示例**: `{"S3-G5-F3": 25.0}` |
+| custom_water_level_standards | object | ❌ 否 | `null` | **🆕 新功能** 自定义田块级水位标准。<br>**业务含义**: 为特定田块设置独立的水位标准（低水位阈值、最优水位、高水位阈值），覆盖全局默认值。算法将使用这些自定义标准重新计算该田块的灌溉需求。<br>**格式**: `{"田块ID": {"wl_low": 值, "wl_opt": 值, "wl_high": 值}}`<br>**使用场景**: <br>• 不同作物生长阶段需要不同水位<br>• 特殊田块土壤条件差异<br>• 精准灌溉试验对比<br>**字段说明**:<br>• `wl_low`: 低水位阈值(mm)，可选<br>• `wl_opt`: 最优水位(mm)，可选<br>• `wl_high`: 高水位阈值(mm)，可选<br>**⚠️ 注意**: <br>• 未指定的字段使用全局默认值<br>• 仅在本次计算生效，不会修改 config.json<br>• 未指定标准的田块使用全局默认值<br>**示例**: `{"S3-G5-F3": {"wl_low": 20.0, "wl_opt": 70.0, "wl_high": 130.0}}` |
+| force_regeneration | boolean | ❌ 否 | `false` | 是否强制重新生成。<br>**业务含义**: `true`时即使变化很小也重新生成，`false`时系统判断是否需要重新生成。<br>**示例**: `true` |
 
 **响应示例**
 ```json
 {
   "success": true,
-  "message": "批次重新生成成功",
-  "data": {
-    "batch_index": 1,
-    "regenerated_at": "2025-01-09T12:34:56.789Z",
-    "changes": {
-      "fields_updated": 2,
-      "duration_change_h": 1.5
+  "message": "批次 1 重新生成成功 (基于scenario 'P1单泵方案')",
+  "batch_index": 1,
+  "scenario_name": "P1单泵方案",
+  "scenario_count": 3,
+  "changes_count": 5,
+  "execution_time_adjustment_seconds": 180.0,
+  "water_usage_adjustment_m3": 12.5,
+  "change_summary": "共有5项变更：持续时间调整3项，流量调整2项",
+  "output_file": "/app/output/irrigation_plan_manual_regen_1762349810.json",
+  "wl_low": 30.0,
+  "wl_opt": 80.0,
+  "wl_high": 140.0,
+  "d_target_mm": 90.0,
+  "field_water_level_standards": {
+    "S3-G5-F3": {
+      "wl_low": 20.0,
+      "wl_opt": 70.0,
+      "wl_high": 130.0
     }
   }
 }
 ```
+
+**响应字段说明**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| success | boolean | 操作是否成功 |
+| message | string | 详细消息 |
+| batch_index | integer | 批次索引 |
+| scenario_name | string | 当前使用的scenario名称 |
+| scenario_count | integer | 计划中包含的scenario总数 |
+| changes_count | integer | 实际变更项目数量 |
+| execution_time_adjustment_seconds | float | 执行时间调整（秒） |
+| water_usage_adjustment_m3 | float | 用水量调整（立方米） |
+| change_summary | string | 变更摘要描述 |
+| output_file | string | 保存的JSON文件路径 |
+| **wl_low** | **float** | **全局低水位阈值（mm）**。<br>**业务含义**: 系统默认的低水位阈值，当田块水位低于此值时触发灌溉。<br>**数据来源**: 来自 config.json 的全局配置。<br>**示例**: `30.0` |
+| **wl_opt** | **float** | **全局最优水位（mm）**。<br>**业务含义**: 系统默认的最优水位目标，灌溉的目标是将田块水位提升到此值。<br>**数据来源**: 来自 config.json 的全局配置。<br>**灌溉逻辑**: 缺水深度 = wl_opt - wl_mm<br>**示例**: `80.0` |
+| **wl_high** | **float** | **全局高水位阈值（mm）**。<br>**业务含义**: 系统默认的高水位阈值，当田块水位超过此值时不需要灌溉。<br>**数据来源**: 来自 config.json 的全局配置。<br>**示例**: `140.0` |
+| **d_target_mm** | **float** | **目标灌溉水深（mm）**。<br>**业务含义**: 参考值，实际灌溉深度由动态计算决定（wl_opt - wl_mm）。<br>**示例**: `90.0` |
+| **field_water_level_standards** | **object\|null** | **🆕 田块级水位标准（如果有自定义）**。<br>**业务含义**: 返回本次计算中使用的田块级自定义水位标准。如果请求中传入了 `custom_water_level_standards`，此字段会返回实际应用的标准。<br>**格式**: `{"田块ID": {"wl_low": 值, "wl_opt": 值, "wl_high": 值}}`<br>**值说明**: <br>• `null`: 没有使用田块级自定义标准<br>• `{...}`: 包含使用了自定义标准的田块<br>**使用场景**: 前端可展示哪些田块使用了特殊的水位标准，便于追踪和验证。<br>**示例**: `{"S3-G5-F3": {"wl_low": 20.0, "wl_opt": 70.0, "wl_high": 130.0}}` |
 
 ---
 
