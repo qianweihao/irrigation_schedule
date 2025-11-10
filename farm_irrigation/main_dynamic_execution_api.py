@@ -271,6 +271,22 @@ class BatchAdjustmentResponse(BaseModel):
     validation: Dict[str, Any] = {}
     output_file: Optional[str] = None
 
+class BatchReorderRequest(BaseModel):
+    """批次顺序调整请求"""
+    plan_id: str
+    new_order: List[int]  # 新的批次顺序，例如 [2, 1, 3] 表示批次2先执行
+    scenario_name: Optional[str] = None  # 可选，指定要调整的scenario名称
+
+class BatchReorderResponse(BaseModel):
+    """批次顺序调整响应"""
+    success: bool
+    message: str
+    original_plan: Optional[Dict[str, Any]] = None
+    reordered_plan: Optional[Dict[str, Any]] = None
+    changes_summary: Dict[str, Any] = {}
+    validation: Dict[str, Any] = {}
+    output_file: Optional[str] = None
+
 # 系统启动时间
 _system_start_time = datetime.now()
 
@@ -1241,6 +1257,74 @@ async def adjust_fields_between_batches(request: BatchAdjustmentRequest):
         import traceback
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"批次调整失败: {str(e)}")
+
+@app.post("/api/batch/reorder", response_model=BatchReorderResponse)
+async def reorder_batches(request: BatchReorderRequest):
+    """
+    批次顺序调整接口
+    
+    调整批次的执行顺序，通过修改批次的开始时间来实现。
+    批次索引保持不变，但执行顺序会按照新顺序重新安排。
+    
+    - **plan_id**: 计划ID或文件路径
+    - **new_order**: 新的批次执行顺序列表，例如 [2, 1, 3] 表示批次2先执行，然后批次1，最后批次3
+    - **scenario_name**: 可选，指定要调整的scenario名称（如"P2单独使用"、"全部水泵(P1+P2)组合使用"等）
+                        如果不指定，则调整所有scenario（要求所有scenario批次数量相同）
+    
+    ⚠️ 重要：不同scenario可能有不同数量的批次
+    - P1单独使用：可能有10个批次
+    - P2单独使用：可能有10个批次  
+    - P1+P2组合使用：可能有5个批次（双泵流量大）
+    
+    建议：明确指定scenario_name参数，避免批次数量不匹配的错误
+    
+    使用场景：
+    - 调整批次执行的先后顺序以优化资源利用
+    - 根据紧急程度调整灌溉优先级
+    - 适应临时的时间安排变化
+    
+    返回包含原始计划、重新排序后计划和变更摘要的响应。
+    """
+    try:
+        logger.info(f"开始批次顺序调整 - plan_id: {request.plan_id}")
+        logger.info(f"新顺序: {request.new_order}")
+        
+        # 导入批次调整服务
+        from batch_adjustment_service import BatchAdjustmentService
+        
+        # 创建服务实例
+        service = BatchAdjustmentService()
+        
+        # 执行批次顺序调整
+        result = service.reorder_batches(
+            plan_id=request.plan_id,
+            new_order=request.new_order,
+            scenario_name=request.scenario_name
+        )
+        
+        logger.info(f"批次顺序调整完成 - {result['message']}")
+        
+        return BatchReorderResponse(
+            success=result["success"],
+            message=result["message"],
+            original_plan=result["original_plan"],
+            reordered_plan=result["reordered_plan"],
+            changes_summary=result["changes_summary"],
+            validation=result["validation"],
+            output_file=result.get("output_file")
+        )
+        
+    except ValueError as ve:
+        logger.error(f"批次顺序调整验证失败: {ve}")
+        raise HTTPException(status_code=400, detail=str(ve))
+    except FileNotFoundError as fnf:
+        logger.error(f"计划文件未找到: {fnf}")
+        raise HTTPException(status_code=404, detail=str(fnf))
+    except Exception as e:
+        logger.error(f"批次顺序调整失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"批次顺序调整失败: {str(e)}")
 
 # ==================== 灌溉计划生成API ====================
 

@@ -14,7 +14,9 @@
    - [批次管理](#6-批次管理)
    - [水位管理](#7-水位管理)
    - [计划重新生成](#8-计划重新生成)
-   - [批次间田块调整](#9-批次间田块调整)
+   - [批次调整](#9-批次调整)
+     - [批次间田块调整](#91-批次间田块调整)
+     - [批次顺序调整](#92-批次顺序调整)
 6. [典型业务流程](#典型业务流程)
 7. [错误码说明](#错误码说明)
 8. [常见问题](#常见问题)
@@ -1549,7 +1551,7 @@ Content-Type: application/json
 
 ---
 
-### 9. 批次间田块调整
+### 9. 批次调整
 
 #### 9.1 批次间田块调整
 
@@ -1724,6 +1726,171 @@ Content-Type: application/json
 4. ⚠️ 调整会生成新的计划文件，原计划文件不会被修改
 5. ✅ 支持多场景计划（如P1单独、P2单独、P1+P2组合），会同时更新所有场景
 6. ✅ 系统会自动更新`batches`、`steps`、`sequence.fields`和`full_order`，确保数据一致
+
+---
+
+#### 9.2 批次顺序调整
+
+**接口说明**: 调整批次的执行顺序，通过修改批次的开始时间来实现顺序变化。批次索引保持不变，只改变执行的先后顺序。
+
+**请求**
+```
+POST /api/batch/reorder
+Content-Type: application/json
+```
+
+**请求参数**
+```json
+{
+  "plan_id": "/app/output/irrigation_plan_20250109_123456.json",
+  "scenario_name": "P2单独使用",
+  "new_order": [2, 1, 3]
+}
+```
+
+**参数说明**
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| plan_id | string | ✅ 是 | 灌溉计划ID或文件路径。<br>**业务含义**: 要调整的计划文件路径。<br>**示例**: `"irrigation_plan_20250109_123456.json"` |
+| scenario_name | string | ❌ 否 | 指定要调整的scenario名称。<br>**业务含义**: 在多方案计划中，指定要调整哪个scenario的批次顺序。<br>**⚠️ 重要**: 不同scenario可能有不同数量的批次：<br>• P1单独使用：10个批次<br>• P2单独使用：10个批次<br>• P1+P2组合使用：5个批次（双泵流量大）<br>**建议**: 建议明确指定scenario_name，避免批次数量不匹配错误<br>**可选值**: `"P1单独使用"`, `"P2单独使用"`, `"全部水泵(P1+P2)组合使用"`, `"省电方案"`, `"省时方案"`, `"均衡方案"`, `"避峰方案"`, `"节水方案"`<br>**特殊值**: 不传或`null` - 调整所有scenario（要求所有scenario批次数量相同）<br>**💡 提示**: 使用 `GET /api/regeneration/scenarios` 接口可查询可用的scenario列表 |
+| new_order | array | ✅ 是 | 新的批次执行顺序列表（索引从1开始）。<br>**业务含义**: 指定批次的新执行顺序，必须包含所有批次索引。<br>**格式**: 整数数组，例如 `[2, 1, 3]` 表示批次2先执行，然后批次1，最后批次3<br>**⚠️ 注意**: <br>• 列表长度必须等于该scenario的总批次数<br>• 必须包含从1到总批次数的所有索引<br>• 不能有重复或遗漏<br>**示例**: `[2, 1, 3]` （3个批次） |
+
+**响应示例**
+```json
+{
+  "success": true,
+  "message": "成功调整批次顺序，共4个批次",
+  "original_plan": {
+    "scenarios": [...]
+  },
+  "reordered_plan": {
+    "scenarios": [...]
+  },
+  "changes_summary": {
+    "order_changed": true,
+    "original_order": [1, 2, 3, 4],
+    "new_order": [2, 1, 3, 4],
+    "total_batches": 4,
+    "batch_changes": [
+      {
+        "batch_index": 1,
+        "batch_name": "批次1",
+        "original_position": 1,
+        "new_position": 2,
+        "position_change": 1,
+        "time_change": {
+          "original_start": 0,
+          "new_start": 18.5,
+          "original_end": 18.5,
+          "new_end": 37.0
+        }
+      },
+      {
+        "batch_index": 2,
+        "batch_name": "批次2",
+        "original_position": 2,
+        "new_position": 1,
+        "position_change": -1,
+        "time_change": {
+          "original_start": 18.5,
+          "new_start": 0,
+          "original_end": 37.0,
+          "new_end": 18.5
+        }
+      }
+    ],
+    "timestamp": "2025-01-10T14:30:25.123Z"
+  },
+  "validation": {
+    "is_valid": true
+  },
+  "output_file": "e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_20250109_123456_reordered_20250110_143025.json"
+}
+```
+
+**关键字段说明**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| original_plan | object | 原始计划数据 |
+| reordered_plan | object | 重新排序后的完整计划数据 |
+| changes_summary | object | 变更摘要信息 |
+| changes_summary.order_changed | boolean | 顺序是否发生变化 |
+| changes_summary.original_order | array | 原始批次顺序 |
+| changes_summary.new_order | array | 新的批次顺序 |
+| changes_summary.batch_changes | array | 每个批次的详细变化 |
+| changes_summary.batch_changes[].batch_index | integer | 批次索引 |
+| changes_summary.batch_changes[].original_position | integer | 原始位置（第几个执行） |
+| changes_summary.batch_changes[].new_position | integer | 新位置（第几个执行） |
+| changes_summary.batch_changes[].position_change | integer | 位置变化（正数=后移，负数=前移） |
+| changes_summary.batch_changes[].time_change | object | 时间变化详情 |
+| validation | object | 验证结果 |
+| output_file | string | 重新排序后计划保存的文件路径 |
+
+**使用场景**
+
+| 场景 | 说明 | 示例 |
+|------|------|------|
+| **优先级调整** | 某个批次需要优先执行 | 批次3的田块缺水严重，调整为第一个执行 |
+| **避峰用电** | 调整顺序以避开用电高峰 | 将高功耗批次调整到夜间谷电时段 |
+| **应急响应** | 根据天气或紧急情况快速调整 | 天气预报明天下雨，把批次4提前到今天 |
+| **资源优化** | 配合人力或设备调度 | 调整批次顺序配合巡检人员的工作安排 |
+
+**典型调用示例**
+```javascript
+// 场景1：调整P2单独使用方案的批次顺序（推荐）
+POST /api/batch/reorder
+{
+  "plan_id": "irrigation_plan_20250109_123456.json",
+  "scenario_name": "P2单独使用",
+  "new_order": [2, 1, 3]  // P2方案：批次2先执行，然后批次1，最后批次3
+}
+
+// 场景2：调整组合水泵方案的顺序
+POST /api/batch/reorder
+{
+  "plan_id": "irrigation_plan_20250109_123456.json",
+  "scenario_name": "全部水泵(P1+P2)组合使用",
+  "new_order": [2, 1]  // 组合方案可能只有2个批次
+}
+
+// 场景3：不指定scenario（要求所有scenario批次数量相同）
+POST /api/batch/reorder
+{
+  "plan_id": "irrigation_plan_20250109_123456.json",
+  "new_order": [2, 1, 3]  // 所有scenario的批次顺序都会调整
+}
+
+// 场景4：批次交换
+POST /api/batch/reorder
+{
+  "plan_id": "irrigation_plan_20250109_123456.json",
+  "scenario_name": "省电方案",
+  "new_order": [1, 2, 4, 3]  // 批次1、2不变，批次3和4交换
+}
+```
+
+**注意事项**
+1. ⚠️ **不同scenario批次数量可能不同**：P1单独使用可能有10个批次，P1+P2组合可能只有5个批次
+2. ⚠️ **建议明确指定scenario_name**：避免"批次数量不匹配"错误
+3. ⚠️ 批次索引不会改变，只是执行顺序调整
+4. ⚠️ 必须提供完整的批次顺序，不能遗漏或重复
+5. ⚠️ 系统会自动重新计算所有批次的开始和结束时间
+6. ⚠️ 每个批次的持续时间保持不变，只是开始时间调整
+7. ✅ 指定scenario_name时只调整该scenario，不指定则调整所有scenario（需批次数量一致）
+8. ✅ 调整会生成新的计划文件，原计划文件不会被修改
+9. 💡 如果新顺序与原顺序相同，系统会返回成功但不生成新文件
+10. 💡 使用 `GET /api/regeneration/scenarios` 查询各scenario的批次数量
+
+**与批次间田块调整的区别**
+
+| 特性 | 批次顺序调整<br>`/api/batch/reorder` | 批次间田块调整<br>`/api/batch/adjust` |
+|------|-------------------------------------|-------------------------------------|
+| **主要功能** | 调整批次执行顺序 | 在批次间移动田块 |
+| **批次索引** | 保持不变 | 保持不变 |
+| **批次内容** | 保持不变 | 会改变（田块重新分配） |
+| **执行顺序** | ✅ 会改变 | 保持不变 |
+| **时间安排** | ✅ 会重新计算 | ✅ 会重新计算 |
+| **适用场景** | • 调整执行优先级<br>• 避峰用电<br>• 应急调度 | • 负载均衡<br>• 田块重新分配<br>• 批次优化 |
 
 ---
 
@@ -2204,20 +2371,24 @@ GET /api/batches/0/details  // 会返回404
 
 ---
 
-### Q7: 批次重新生成和批次间田块调整的区别
+### Q7: 批次相关接口的区别（重新生成 vs 田块调整 vs 顺序调整）
 
-**A**: 这两个接口虽然都涉及批次修改，但应用场景和效果完全不同：
+**A**: 系统提供三个批次修改接口，应用场景和效果完全不同：
 
-| 特性 | 批次重新生成<br>`/api/regeneration/batch` | 批次间田块调整<br>`/api/batch/adjust` |
-|------|------------------------------------------|-------------------------------------|
-| **主要功能** | 修改田块数量，重新生成批次结构 | 在现有批次间移动田块 |
-| **批次数量** | ✅ 可能改变 | ❌ 保持不变 |
-| **田块总数** | ✅ 可能改变（增加/删除田块） | ❌ 保持不变 |
-| **批次结构** | ✅ 可能完全重新划分 | ❌ 只调整分配 |
-| **水泵分配** | ✅ 可以修改 | 🔒 通常保持不变 |
-| **适用场景** | • 增加新田块到计划<br>• 移除某些田块<br>• 大幅调整灌溉范围 | • 优化批次负载均衡<br>• 调整灌溉优先级<br>• 批次间田块交换 |
-| **计算强度** | 🔴 高（重新计算批次划分） | 🟢 低（仅重新计算顺序和时间） |
-| **使用时机** | 计划内容需要改变时 | 计划内容不变，仅优化分配时 |
+| 特性 | 批次重新生成<br>`/api/regeneration/batch` | 批次间田块调整<br>`/api/batch/adjust` | 批次顺序调整<br>`/api/batch/reorder` |
+|------|------------------------------------------|-------------------------------------|-------------------------------------|
+| **主要功能** | 修改田块数量，重新生成批次结构 | 在现有批次间移动田块 | 调整批次执行顺序 |
+| **批次数量** | ✅ 可能改变 | ❌ 保持不变 | ❌ 保持不变 |
+| **批次索引** | 可能改变 | 保持不变 | 保持不变 |
+| **批次内容** | ✅ 可能改变 | ✅ 会改变（田块重新分配） | ❌ 保持不变 |
+| **田块总数** | ✅ 可能改变（增加/删除田块） | ❌ 保持不变 | ❌ 保持不变 |
+| **执行顺序** | 保持不变 | 保持不变 | ✅ 会改变 |
+| **水泵分配** | ✅ 可以修改 | 🔒 通常保持不变 | 保持不变 |
+| **时间安排** | ✅ 重新计算 | ✅ 重新计算 | ✅ 重新计算 |
+| **scenario支持** | ✅ 支持指定 | ✅ 所有同步 | ✅ 支持指定（推荐） |
+| **适用场景** | • 增加新田块到计划<br>• 移除某些田块<br>• 修改水泵分配<br>• 大幅调整灌溉范围 | • 优化批次负载均衡<br>• 调整灌溉优先级<br>• 批次间田块交换 | • 调整执行优先级<br>• 避峰用电<br>• 应急调度 |
+| **计算强度** | 🔴 高（重新计算批次划分） | 🟢 低（仅重新计算顺序和时间） | 🟢 低（仅调整时间） |
+| **使用时机** | 计划内容需要改变时 | 计划内容不变，仅优化分配时 | 只需改变执行顺序时 |
 
 **推荐使用场景**:
 
@@ -2269,6 +2440,35 @@ GET /api/batches/0/details  // 会返回404
   ]
 }
 ```
+
+**使用批次顺序调整** (`/api/batch/reorder`)：
+```javascript
+// 场景1: 批次2优先执行（推荐指定scenario）
+{
+  plan_id: "irrigation_plan_20250109_123456.json",
+  scenario_name: "P2单独使用",
+  new_order: [2, 1, 3]  // 批次2先执行
+}
+
+// 场景2: 避峰用电调整
+{
+  plan_id: "irrigation_plan_20250109_123456.json",
+  scenario_name: "全部水泵(P1+P2)组合使用",
+  new_order: [2, 1]  // 组合方案可能只有2个批次
+}
+
+// 场景3: 应急调度
+{
+  plan_id: "irrigation_plan_20250109_123456.json",
+  scenario_name: "省电方案",
+  new_order: [3, 1, 2, 4]  // 批次3最紧急，调到第一位
+}
+```
+
+**⚠️ 重要提示**：
+- 批次顺序调整：不同scenario批次数量可能不同，建议明确指定`scenario_name`
+- 批次间田块调整：所有scenario同步调整，确保一致性
+- 批次重新生成：可指定scenario，灵活性最高
 
 ---
 
@@ -2455,6 +2655,7 @@ interface ExecutionStatus {
 | 批次详情 | GET | `/api/batches/{index}/details` | `batch_index` | 批次索引（从1开始） |
 | 更新水位 | POST | `/api/water-levels/update` | `field_id`, `water_level_mm` | 田块ID，水位值(mm) |
 | 批次间田块调整 | POST | `/api/batch/adjust` | `plan_id`, `field_adjustments`, `options` | 计划ID，田块调整列表，调整选项 |
+| 批次顺序调整 | POST | `/api/batch/reorder` | `plan_id`, `scenario_name`, `new_order` | 计划ID，scenario名称，新顺序列表 |
 
 **重要ID类型对照**
 

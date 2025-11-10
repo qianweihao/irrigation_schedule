@@ -456,4 +456,286 @@ class BatchAdjustmentService:
         
         logger.info(f"调整后的计划已保存: {output_file}")
         return output_file
+    
+    def reorder_batches(
+        self,
+        plan_id: str,
+        new_order: List[int],
+        scenario_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        调整批次执行顺序
+        
+        Args:
+            plan_id: 计划ID或文件路径
+            new_order: 新的批次顺序列表（索引从1开始）
+                      例如：[2, 1, 3] 表示批次2先执行，然后批次1，最后批次3
+            scenario_name: 可选，指定要调整的scenario名称
+                          如果不指定，则调整所有scenario（要求所有scenario批次数量相同）
+        
+        Returns:
+            调整结果字典
+        """
+        try:
+            # 加载原始计划
+            original_plan = self.load_plan(plan_id)
+            
+            # 深拷贝计划以避免修改原始数据
+            reordered_plan = copy.deepcopy(original_plan)
+            
+            # 如果指定了scenario_name，只处理该scenario
+            if scenario_name:
+                target_scenario = self._find_scenario_by_name(original_plan, scenario_name)
+                if not target_scenario:
+                    raise ValueError(f"未找到scenario: {scenario_name}")
+                
+                # 从目标scenario获取批次数量
+                batches = target_scenario.get("plan", {}).get("batches", [])
+                total_batches = len(batches)
+            else:
+                # 未指定scenario，获取第一个scenario的批次数量，并验证所有scenario批次数量一致
+                batches = self._get_batches_from_plan(original_plan)
+                total_batches = len(batches)
+                
+                # 验证所有scenario的批次数量是否一致
+                if "scenarios" in original_plan:
+                    for scenario in original_plan["scenarios"]:
+                        scenario_batches = scenario.get("plan", {}).get("batches", [])
+                        if len(scenario_batches) != total_batches:
+                            raise ValueError(
+                                f"不同scenario的批次数量不一致。"
+                                f"请使用scenario_name参数指定要调整的scenario。"
+                                f"可选值：{', '.join([s.get('scenario_name', '') for s in original_plan['scenarios']])}"
+                            )
+            
+            # 验证新顺序
+            if len(new_order) != total_batches:
+                scenario_info = f"（scenario: {scenario_name}）" if scenario_name else ""
+                raise ValueError(
+                    f"新顺序长度({len(new_order)})与批次数量({total_batches})不匹配{scenario_info}"
+                )
+            
+            if sorted(new_order) != list(range(1, total_batches + 1)):
+                raise ValueError(f"新顺序必须包含1到{total_batches}的所有批次索引")
+            
+            # 检查是否有实际变化
+            original_order = list(range(1, total_batches + 1))
+            if new_order == original_order:
+                logger.info("批次顺序未改变，无需调整")
+                return {
+                    "success": True,
+                    "message": "批次顺序未改变",
+                    "original_plan": original_plan,
+                    "reordered_plan": original_plan,
+                    "changes_summary": {
+                        "order_changed": False,
+                        "original_order": original_order,
+                        "new_order": new_order
+                    },
+                    "output_file": None
+                }
+            
+            # 处理多场景计划或单场景计划
+            if scenario_name:
+                # 只调整指定的scenario
+                target_scenario = self._find_scenario_by_name(reordered_plan, scenario_name)
+                if target_scenario and "plan" in target_scenario:
+                    self._reorder_batches_in_scenario(target_scenario["plan"], new_order)
+                    logger.info(f"已调整scenario '{scenario_name}' 的批次顺序")
+            elif "scenarios" in reordered_plan and isinstance(reordered_plan["scenarios"], list):
+                # 调整所有scenario
+                for scenario in reordered_plan["scenarios"]:
+                    if "plan" in scenario:
+                        self._reorder_batches_in_scenario(scenario["plan"], new_order)
+                logger.info(f"已调整所有{len(reordered_plan['scenarios'])}个scenario的批次顺序")
+            else:
+                # 单场景计划
+                self._reorder_batches_in_scenario(reordered_plan, new_order)
+            
+            # 生成变更摘要
+            changes_summary = self._generate_reorder_summary(original_plan, reordered_plan, original_order, new_order)
+            
+            # 保存调整后的计划
+            output_file = self._save_reordered_plan(reordered_plan, plan_id)
+            
+            return {
+                "success": True,
+                "message": f"成功调整批次顺序，共{total_batches}个批次",
+                "original_plan": original_plan,
+                "reordered_plan": reordered_plan,
+                "changes_summary": changes_summary,
+                "output_file": str(output_file),
+                "validation": {"is_valid": True}
+            }
+        
+        except Exception as e:
+            logger.error(f"批次顺序调整失败: {e}")
+            raise
+    
+    def _reorder_batches_in_scenario(self, plan: Dict[str, Any], new_order: List[int]):
+        """
+        在单个场景中重新排序批次
+        通过调整时间来实现顺序变化
+        """
+        if "batches" not in plan:
+            return
+        
+        batches = plan["batches"]
+        
+        # 收集每个批次的持续时间
+        batch_durations = {}
+        for batch in batches:
+            batch_idx = batch.get("index")
+            # 从stats中获取持续时间，如果没有则根据田块计算
+            if "stats" in batch and "eta_hours" in batch["stats"]:
+                duration = batch["stats"]["eta_hours"]
+            else:
+                # 默认持续时间（如果无法获取）
+                duration = 10.0
+            batch_durations[batch_idx] = duration
+        
+        # 根据新顺序重新分配时间
+        current_time = 0.0
+        new_batch_times = {}
+        
+        for batch_idx in new_order:
+            duration = batch_durations.get(batch_idx, 10.0)
+            new_batch_times[batch_idx] = {
+                "start_time": current_time,
+                "end_time": current_time + duration,
+                "duration": duration
+            }
+            current_time += duration
+        
+        # 更新steps中的时间
+        if "steps" in plan:
+            for step in plan["steps"]:
+                # 找到这个step对应的批次
+                label = step.get("label", "")
+                if "批次" in label or "Batch" in label.lower():
+                    # 提取批次索引
+                    import re
+                    match = re.search(r'(\d+)', label)
+                    if match:
+                        batch_idx = int(match.group(1))
+                        if batch_idx in new_batch_times:
+                            times = new_batch_times[batch_idx]
+                            step["t_start_h"] = times["start_time"]
+                            step["t_end_h"] = times["end_time"]
+                            
+                            # 更新step中所有commands的时间
+                            if "commands" in step:
+                                for cmd in step["commands"]:
+                                    cmd["t_start_h"] = times["start_time"]
+                                    cmd["t_end_h"] = times["end_time"]
+        
+        # 更新sequence（如果存在）
+        if "sequence" in plan:
+            for seq_item in plan["sequence"]:
+                batch_idx = seq_item.get("batch_index")
+                if batch_idx in new_batch_times:
+                    times = new_batch_times[batch_idx]
+                    seq_item["t_start_h"] = times["start_time"]
+                    seq_item["t_end_h"] = times["end_time"]
+        
+        logger.info(f"成功重新排序批次: {new_order}")
+    
+    def _generate_reorder_summary(
+        self,
+        original_plan: Dict[str, Any],
+        reordered_plan: Dict[str, Any],
+        original_order: List[int],
+        new_order: List[int]
+    ) -> Dict[str, Any]:
+        """生成批次重排序的变更摘要"""
+        
+        # 获取批次信息
+        original_batches = self._get_batches_from_plan(original_plan)
+        reordered_batches = self._get_batches_from_plan(reordered_plan)
+        
+        # 构建批次变化列表
+        batch_changes = []
+        for new_position, batch_idx in enumerate(new_order, 1):
+            old_position = original_order.index(batch_idx) + 1
+            
+            # 获取批次名称（如果有）
+            batch_name = f"批次{batch_idx}"
+            
+            # 获取时间变化
+            original_batch = next((b for b in original_batches if b.get("index") == batch_idx), None)
+            reordered_batch = next((b for b in reordered_batches if b.get("index") == batch_idx), None)
+            
+            time_change = {}
+            if original_batch and reordered_batch:
+                # 从steps获取时间信息
+                orig_step = self._get_step_for_batch(original_plan, batch_idx)
+                new_step = self._get_step_for_batch(reordered_plan, batch_idx)
+                
+                if orig_step and new_step:
+                    time_change = {
+                        "original_start": orig_step.get("t_start_h", 0),
+                        "new_start": new_step.get("t_start_h", 0),
+                        "original_end": orig_step.get("t_end_h", 0),
+                        "new_end": new_step.get("t_end_h", 0)
+                    }
+            
+            batch_changes.append({
+                "batch_index": batch_idx,
+                "batch_name": batch_name,
+                "original_position": old_position,
+                "new_position": new_position,
+                "position_change": new_position - old_position,
+                "time_change": time_change
+            })
+        
+        return {
+            "order_changed": True,
+            "original_order": original_order,
+            "new_order": new_order,
+            "total_batches": len(original_order),
+            "batch_changes": batch_changes,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    def _get_step_for_batch(self, plan: Dict[str, Any], batch_idx: int) -> Optional[Dict[str, Any]]:
+        """获取指定批次的step信息"""
+        # 从第一个场景或主计划获取steps
+        steps = None
+        if "scenarios" in plan and isinstance(plan["scenarios"], list) and len(plan["scenarios"]) > 0:
+            first_scenario = plan["scenarios"][0]
+            if "plan" in first_scenario and "steps" in first_scenario["plan"]:
+                steps = first_scenario["plan"]["steps"]
+        elif "steps" in plan:
+            steps = plan["steps"]
+        
+        if not steps:
+            return None
+        
+        # 查找对应批次的step
+        for step in steps:
+            label = step.get("label", "")
+            if f"批次 {batch_idx}" in label or f"批次{batch_idx}" in label or f"Batch {batch_idx}" in label.lower():
+                return step
+        
+        return None
+    
+    def _save_reordered_plan(self, plan: Dict[str, Any], original_plan_id: str) -> Path:
+        """保存重新排序后的计划"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        original_name = Path(original_plan_id).stem
+        output_file = self.output_dir / f"{original_name}_reordered_{timestamp}.json"
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(plan, f, ensure_ascii=False, indent=2)
+        
+        logger.info(f"重新排序后的计划已保存: {output_file}")
+        return output_file
+    
+    def _find_scenario_by_name(self, plan: Dict[str, Any], scenario_name: str) -> Optional[Dict[str, Any]]:
+        """根据名称查找scenario"""
+        if "scenarios" in plan and isinstance(plan["scenarios"], list):
+            for scenario in plan["scenarios"]:
+                if scenario.get("scenario_name") == scenario_name:
+                    return scenario
+        return None
 
