@@ -137,6 +137,11 @@ def set_cache(cache_key: str, data: Dict[str, Any]):
             'timestamp': time.time()
         }
 
+def clear_cache():
+    """清除所有缓存"""
+    with _cache_lock:
+        _cache.clear()
+
 class SystemStatusResponse(BaseModel):
     """系统状态响应模型"""
     system_status: str
@@ -220,6 +225,7 @@ class TimeModification(BaseModel):
 class BatchModificationRequest(BaseModel):
     """批次修改请求"""
     original_plan_id: str
+    scenario_name: Optional[str] = None
     field_modifications: Optional[List[FieldModification]] = []
     pump_assignments: Optional[List[PumpAssignment]] = []
     time_modifications: Optional[List[TimeModification]] = []
@@ -229,8 +235,11 @@ class BatchRegenerationResponse(BaseModel):
     """批次重新生成响应"""
     success: bool
     message: str
-    original_plan: Optional[Dict[str, Any]] = None
-    modified_plan: Optional[Dict[str, Any]] = None
+    scenario_name: Optional[str] = None  # 指定scenario时返回
+    original_scenario: Optional[Dict[str, Any]] = None  # 指定scenario时返回
+    modified_scenario: Optional[Dict[str, Any]] = None  # 指定scenario时返回
+    original_plan: Optional[Dict[str, Any]] = None  # 未指定scenario时返回
+    modified_plan: Optional[Dict[str, Any]] = None  # 未指定scenario时返回
     modifications_summary: Dict[str, Any] = {}
 
 class FieldAdjustment(BaseModel):
@@ -748,47 +757,68 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
         
         # 处理田块修改
         if request.field_modifications:
-            for mod in request.field_modifications:
-                try:
-                    if mod.action == "add":
-                        # 添加田块到合适的批次
-                        result = service._add_field_to_plan(modified_plan, mod.field_id, mod.custom_water_level)
-                        modifications_summary["field_modifications"].append({
-                            "field_id": mod.field_id,
-                            "action": "add",
-                            "result": result
-                        })
-                    elif mod.action == "remove":
-                        # 从计划中移除田块
-                        result = service._remove_field_from_plan(modified_plan, mod.field_id)
-                        modifications_summary["field_modifications"].append({
-                            "field_id": mod.field_id,
-                            "action": "remove",
-                            "result": result
-                        })
+            try:
+                modified_plan = service.apply_field_modifications(
+                    modified_plan,
+                    request.field_modifications,
+                    request.scenario_name  # 传递scenario_name
+                )
+                
+                # 从tracking信息中获取修改统计
+                tracking = modified_plan.get('modification_tracking', {}).get('field_modifications', {})
+                
+                for mod in request.field_modifications:
+                    modifications_summary["field_modifications"].append({
+                        "field_id": mod.field_id,
+                        "action": mod.action,
+                        "scenarios_affected": tracking.get('modified_scenarios', []),
+                        "result": "success"
+                    })
                     modifications_summary["total_changes"] += 1
-                except Exception as e:
-                    logger.warning(f"田块修改失败 {mod.field_id}: {e}")
+            except Exception as e:
+                logger.warning(f"田块修改失败: {e}")
+                modifications_summary["field_modifications"].append({
+                    "error": str(e)
+                })
         
         # 处理水泵分配修改
         if request.pump_assignments:
-            for assignment in request.pump_assignments:
-                try:
-                    result = service._update_pump_assignment(modified_plan, assignment.batch_index, assignment.pump_ids)
+            try:
+                modified_plan = service.apply_pump_modifications(
+                    modified_plan, 
+                    request.pump_assignments,
+                    request.scenario_name  # 传递scenario_name
+                )
+                
+                # 从tracking信息中获取修改统计
+                tracking = modified_plan.get('modification_tracking', {}).get('pump_modifications', {})
+                
+                for assignment in request.pump_assignments:
                     modifications_summary["pump_assignments"].append({
                         "batch_index": assignment.batch_index,
                         "pump_ids": assignment.pump_ids,
-                        "result": result
+                        "scenarios_affected": tracking.get('modified_scenarios', []),
+                        "result": "success"
                     })
                     modifications_summary["total_changes"] += 1
-                except Exception as e:
-                    logger.warning(f"水泵分配修改失败 batch {assignment.batch_index}: {e}")
+            except Exception as e:
+                logger.warning(f"水泵分配修改失败: {e}")
+                modifications_summary["pump_assignments"].append({
+                    "error": str(e)
+                })
         
         # 处理时间修改
         if request.time_modifications:
             try:
                 # 使用apply_time_modifications批量处理所有时间修改（包含级联更新）
-                modified_plan = service.apply_time_modifications(modified_plan, request.time_modifications)
+                modified_plan = service.apply_time_modifications(
+                    modified_plan, 
+                    request.time_modifications,
+                    request.scenario_name  # 传递scenario_name
+                )
+                
+                # 从tracking信息中获取修改统计
+                tracking = modified_plan.get('modification_tracking', {}).get('time_modifications', {})
                 
                 # 记录修改摘要
                 for time_mod in request.time_modifications:
@@ -796,6 +826,7 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
                         "batch_index": time_mod.batch_index,
                         "start_time_h": time_mod.start_time_h,
                         "duration_h": time_mod.duration_h,
+                        "scenarios_affected": tracking.get('modified_scenarios', []),
                         "result": "success"
                     })
                 modifications_summary["total_changes"] += len(request.time_modifications)
@@ -814,13 +845,41 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
             raise HTTPException(status_code=500, detail=f"保存修改后的计划失败: {str(e)}")
         
         # 准备响应数据
-        response_data = {
-            "success": True,
-            "message": f"批次计划重新生成成功，共进行了 {modifications_summary['total_changes']} 项修改",
-            "original_plan": original_plan,
-            "modified_plan": modified_plan,
-            "modifications_summary": modifications_summary
-        }
+        # 如果指定了scenario_name，只返回该scenario的数据
+        if request.scenario_name:
+            # 提取指定scenario的数据
+            original_scenario = None
+            modified_scenario = None
+            
+            # 从原始计划中提取指定scenario
+            for scenario in original_plan.get('scenarios', []):
+                if scenario.get('scenario_name') == request.scenario_name:
+                    original_scenario = scenario
+                    break
+            
+            # 从修改后的计划中提取指定scenario
+            for scenario in modified_plan.get('scenarios', []):
+                if scenario.get('scenario_name') == request.scenario_name:
+                    modified_scenario = scenario
+                    break
+            
+            response_data = {
+                "success": True,
+                "message": f"批次计划重新生成成功，共进行了 {modifications_summary['total_changes']} 项修改",
+                "scenario_name": request.scenario_name,
+                "original_scenario": original_scenario,
+                "modified_scenario": modified_scenario,
+                "modifications_summary": modifications_summary
+            }
+        else:
+            # 未指定scenario_name，返回完整计划
+            response_data = {
+                "success": True,
+                "message": f"批次计划重新生成成功，共进行了 {modifications_summary['total_changes']} 项修改",
+                "original_plan": original_plan,
+                "modified_plan": modified_plan,
+                "modifications_summary": modifications_summary
+            }
         
         # 将结果保存到缓存
         set_cache(cache_key, response_data)
@@ -852,6 +911,68 @@ async def regeneration_summary(farm_id: str):
     except Exception as e:
         logger.error(f"获取重新生成摘要失败: {e}")
         raise HTTPException(status_code=500, detail=f"获取重新生成摘要失败: {str(e)}")
+
+@app.get("/api/regeneration/scenarios")
+async def get_available_scenarios(plan_id: Optional[str] = None):
+    """
+    获取计划中所有可用的scenarios
+    
+    Args:
+        plan_id: 计划ID或文件路径（可选，不提供则使用最新的计划文件）
+        
+    Returns:
+        包含所有scenario信息的响应
+    """
+    try:
+        from batch_regeneration_api import BatchRegenerationService
+        service = BatchRegenerationService()
+        
+        # 如果没有提供plan_id，使用最新的计划文件
+        if not plan_id:
+            plan_id = service._find_latest_plan_file()
+            if not plan_id:
+                raise HTTPException(status_code=404, detail="未找到任何计划文件")
+        
+        result = service.get_available_scenarios(plan_id)
+        
+        return {
+            "success": True,
+            "message": f"成功获取 {result['total_scenarios']} 个scenario信息",
+            "data": result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取可用scenarios失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取可用scenarios失败: {str(e)}")
+
+@app.post("/api/regeneration/clear-cache")
+async def clear_regeneration_cache():
+    """
+    清除批次重新生成和计划生成的所有缓存
+    
+    使用场景：
+    - 需要强制重新生成计划时
+    - 调试时需要查看实时结果
+    - 缓存数据异常时
+    
+    Returns:
+        清除结果信息
+    """
+    try:
+        clear_cache()
+        logger.info("所有缓存已清除")
+        
+        return {
+            "success": True,
+            "message": "所有缓存已清除",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"清除缓存失败: {e}")
+        raise HTTPException(status_code=500, detail=f"清除缓存失败: {str(e)}")
 
 # ==================== 批次管理API ====================
 

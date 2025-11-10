@@ -1144,6 +1144,7 @@ Content-Type: application/json
 ```json
 {
   "original_plan_id": "/app/output/irrigation_plan_20250109_123456.json",
+  "scenario_name": "省电方案",
   "field_modifications": [
     {
       "field_id": "S3-G5-F1",
@@ -1179,9 +1180,10 @@ Content-Type: application/json
 | 参数 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
 | original_plan_id | string | ✅ 是 | - | 原始灌溉计划ID。<br>**业务含义**: 要修改的计划文件路径，使用"生成灌溉计划"接口返回的`plan_id`。<br>**示例**: `"/app/output/irrigation_plan_20250109_123456.json"` |
+| scenario_name | string | ❌ 否 | `null` | 指定要修改的scenario名称。<br>**业务含义**: 在多方案计划中，可以指定只修改某个特定方案，或者不指定则修改所有方案。<br>**多泵方案可选值**:<br>• `"P1单独使用"`<br>• `"P2单独使用"`<br>• `"全部水泵(P1+P2)组合使用"`<br>**优化方案可选值**:<br>• `"省电方案"` (cost_minimization)<br>• `"省时方案"` (time_minimization)<br>• `"均衡方案"` (balanced)<br>• `"避峰方案"` (off_peak)<br>• `"节水方案"` (water_saving)<br>**特殊值**: `null` 或不传 - 修改所有scenario<br>**💡 提示**: 使用 `GET /api/regeneration/scenarios?plan_id={plan_id}` 接口可查询可用的scenario列表 |
 | field_modifications | array | ❌ 否 | `[]` | 田块修改列表。<br>**业务含义**: 指定要添加或删除的田块。常用于:<br>• 临时增加灌溉田块<br>• 排除故障田块<br>• 调整灌溉优先级<br>**格式**: 见下方详细说明 |
-| pump_assignments | array | ❌ 否 | `[]` | 水泵分配列表。<br>**业务含义**: 为特定批次指定使用的水泵组合。常用于:<br>• 某台水泵故障，切换备用<br>• 多泵协同作业<br>• 负载均衡<br>**格式**: `[{"batch_index": 1, "pump_ids": ["P1", "P2"]}]` |
-| time_modifications | array | ❌ 否 | `[]` | 时间修改列表。<br>**业务含义**: 调整批次的开始时间或持续时长。常用于:<br>• 避开用电高峰<br>• 适应天气变化<br>• 优化人力调度<br>**格式**: `[{"batch_index": 1, "start_time_h": 2.0, "duration_h": 10.0}]`<br>**⚠️ 注意**: 修改时间会自动级联调整后续批次 |
+| pump_assignments | array | ❌ 否 | `[]` | 水泵分配列表。<br>**业务含义**: 为特定批次指定使用的水泵组合。常用于:<br>• 某台水泵故障，切换备用<br>• 多泵协同作业<br>• 负载均衡<br>**格式**: `[{"batch_index": 1, "pump_ids": ["P1", "P2"]}]`<br>**⚠️ 注意**: 如果指定了`scenario_name`，只会修改该scenario的水泵配置 |
+| time_modifications | array | ❌ 否 | `[]` | 时间修改列表。<br>**业务含义**: 调整批次的开始时间或持续时长。常用于:<br>• 避开用电高峰<br>• 适应天气变化<br>• 优化人力调度<br>**格式**: `[{"batch_index": 1, "start_time_h": 2.0, "duration_h": 10.0}]`<br>**⚠️ 注意**: 修改时间会自动级联调整后续批次；如果指定了`scenario_name`，只会修改该scenario的时间 |
 | regeneration_params | object | ❌ 否 | `{}` | 重新生成参数。<br>**业务含义**: 控制重新生成的行为。<br>**子字段**:<br>• `force_regeneration`: 强制重新生成（即使变化很小）<br>• `optimize_schedule`: 是否优化调度顺序 |
 
 **field_modifications 详细说明**
@@ -1207,36 +1209,46 @@ Content-Type: application/json
 | start_time_h | number | 新的开始时间（小时）<br>**格式**: 相对时间，`0`为计划起始点<br>**示例**: `2.0` (计划开始后2小时) |
 | duration_h | number | 新的持续时长（小时）<br>**⚠️ 注意**: 系统会自动验证水泵流量是否足够<br>**示例**: `10.0` (执行10小时) |
 
-**响应示例**
+**响应格式说明**
+
+💡 **响应内容根据是否指定scenario_name自动优化**：
+- **指定scenario_name**：只返回该scenario的数据（推荐，数据量小）
+- **未指定scenario_name**：返回完整计划的所有scenarios
+
+**响应示例1：指定scenario（推荐）**
 ```json
 {
   "success": true,
-  "message": "批次计划重新生成成功，共进行了 3 项修改",
-  "original_plan": {
-    "batches": [],
-    "steps": []
+  "message": "批次计划重新生成成功，共进行了 2 项修改",
+  "scenario_name": "省电方案",
+  "original_scenario": {
+    "scenario_name": "省电方案",
+    "pumps_used": ["P2"],
+    "total_batches": 10,
+    "total_eta_h": 61.6,
+    "total_electricity_cost": 2217.71,
+    "plan": {
+      "batches": [...],
+      "steps": [...]
+    }
   },
-  "modified_plan": {
-    "batches": [],
-    "steps": []
+  "modified_scenario": {
+    "scenario_name": "省电方案",
+    "pumps_used": ["P1"],  // 已修改
+    "total_batches": 10,
+    "total_eta_h": 61.6,
+    "total_electricity_cost": 2217.71,
+    "plan": {
+      "batches": [...],
+      "steps": [...]
+    }
   },
   "modifications_summary": {
-    "field_modifications": [
-      {
-        "field_id": "S3-G5-F1",
-        "action": "add",
-        "result": "success"
-      },
-      {
-        "field_id": "S3-G5-F2",
-        "action": "remove",
-        "result": "success"
-      }
-    ],
     "pump_assignments": [
       {
         "batch_index": 1,
-        "pump_ids": ["P1", "P2"],
+        "pump_ids": ["P1"],
+        "scenarios_affected": ["省电方案"],
         "result": "success"
       }
     ],
@@ -1245,17 +1257,168 @@ Content-Type: application/json
         "batch_index": 1,
         "start_time_h": 2.0,
         "duration_h": 10.0,
+        "scenarios_affected": ["省电方案"],
         "result": "success"
       }
     ],
+    "scenarios_modified": ["省电方案"],
+    "scenarios_unchanged": ["P1单独使用", "P2单独使用", "全部水泵(P1+P2)组合使用"],
+    "total_changes": 2
+  }
+}
+```
+
+**响应示例2：未指定scenario（修改所有）**
+```json
+{
+  "success": true,
+  "message": "批次计划重新生成成功，共进行了 3 项修改",
+  "original_plan": {
+    "scenarios": [
+      {"scenario_name": "P1单独使用", ...},
+      {"scenario_name": "P2单独使用", ...},
+      {"scenario_name": "全部水泵(P1+P2)组合使用", ...}
+    ]
+  },
+  "modified_plan": {
+    "scenarios": [
+      {"scenario_name": "P1单独使用", ...},  // 已修改
+      {"scenario_name": "P2单独使用", ...},  // 已修改
+      {"scenario_name": "全部水泵(P1+P2)组合使用", ...}  // 已修改
+    ]
+  },
+  "modifications_summary": {
+    "scenarios_modified": ["P1单独使用", "P2单独使用", "全部水泵(P1+P2)组合使用"],
     "total_changes": 3
   }
 }
 ```
 
+**响应字段说明**
+
+| 字段 | 类型 | 条件 | 说明 |
+|------|------|------|------|
+| success | boolean | 总是返回 | 是否成功 |
+| message | string | 总是返回 | 响应消息 |
+| **scenario_name** | string | 指定scenario时 | 被修改的scenario名称 |
+| **original_scenario** | object | 指定scenario时 | 修改前的scenario数据 |
+| **modified_scenario** | object | 指定scenario时 | 修改后的scenario数据 |
+| **original_plan** | object | 未指定scenario时 | 修改前的完整计划（包含所有scenarios） |
+| **modified_plan** | object | 未指定scenario时 | 修改后的完整计划（包含所有scenarios） |
+| modifications_summary | object | 总是返回 | 修改摘要 |
+
 ---
 
-#### 8.2 手动重新生成（水位）
+#### 8.2 查询可用Scenarios
+
+**接口说明**: 获取计划中所有可用的scenario列表，包括多泵方案和优化方案
+
+**请求**
+```
+GET /api/regeneration/scenarios?plan_id={plan_id}
+```
+
+**请求参数**
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| plan_id | string | ✅ | 计划ID或文件路径<br>**示例**: `irrigation_plan_20251105_214020.json` |
+
+**响应示例**
+```json
+{
+  "success": true,
+  "message": "成功获取 3 个scenario信息",
+  "data": {
+    "plan_id": "irrigation_plan_20251105_214020.json",
+    "total_scenarios": 3,
+    "available_scenarios": [
+      {
+        "scenario_name": "P2单独使用",
+        "pumps_used": ["P2"],
+        "total_batches": 10,
+        "total_eta_h": 61.6,
+        "total_electricity_cost": 2217.71,
+        "total_pump_runtime_hours": {
+          "P2": 61.6
+        },
+        "coverage_info": {
+          "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+          "total_covered_segments": 6
+        },
+        "optimization_goal": null
+      },
+      {
+        "scenario_name": "P1单独使用",
+        "pumps_used": ["P1"],
+        "total_batches": 10,
+        "total_eta_h": 61.6,
+        "total_electricity_cost": 2217.71,
+        "total_pump_runtime_hours": {
+          "P1": 61.6
+        },
+        "coverage_info": {
+          "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+          "total_covered_segments": 6
+        },
+        "optimization_goal": null
+      },
+      {
+        "scenario_name": "全部水泵(P1+P2)组合使用",
+        "pumps_used": ["P1", "P2"],
+        "total_batches": 5,
+        "total_eta_h": 30.8,
+        "total_electricity_cost": 2217.71,
+        "total_pump_runtime_hours": {
+          "P1": 30.8,
+          "P2": 30.8
+        },
+        "coverage_info": {
+          "covered_segments": ["S3", "S4", "S5", "S6", "S7", "S8"],
+          "total_covered_segments": 6
+        },
+        "optimization_goal": null
+      }
+    ]
+  }
+}
+```
+
+**响应字段说明**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| scenario_name | string | Scenario名称。多泵方案如"P1单独使用"，优化方案如"省电方案" |
+| pumps_used | array | 该scenario使用的水泵列表 |
+| total_batches | integer | 总批次数 |
+| total_eta_h | number | 预计总执行时长（小时） |
+| total_electricity_cost | number | 预计总电费（元） |
+| total_pump_runtime_hours | object | 各水泵运行时长统计 |
+| coverage_info | object | 覆盖范围信息 |
+| optimization_goal | string/null | 优化目标（优化方案）：cost_minimization、time_minimization、balanced、off_peak、water_saving。多泵方案为null |
+
+**使用场景**
+1. **前端界面展示**: 在批次修改界面显示所有可选的scenario
+2. **选择性修改**: 用户选择某个scenario后，调用批次重新生成接口时传入`scenario_name`
+3. **方案对比**: 展示不同scenario的成本、时长等指标，帮助用户决策
+
+**示例使用流程**
+```javascript
+// 1. 获取可用scenarios
+GET /api/regeneration/scenarios?plan_id=irrigation_plan_20251105_214020.json
+
+// 2. 用户从返回的available_scenarios中选择要修改的scenario
+
+// 3. 调用批次重新生成接口，传入选中的scenario_name
+POST /api/regeneration/batch
+{
+  "original_plan_id": "irrigation_plan_20251105_214020.json",
+  "scenario_name": "省电方案",  // 用户选择的scenario
+  "pump_assignments": [...]
+}
+```
+
+---
+
+#### 8.3 手动重新生成（水位）
 
 **接口说明**: 基于新的水位数据重新生成指定批次，支持为特定田块设置自定义的水位标准
 

@@ -349,7 +349,7 @@
           }
         },
         {
-          "name": "批次重新生成（田块、水泵、时间）",
+          "name": "批次重新生成（田块、时间）-ALL",
           "request": {
             "method": "POST",
             "header": [
@@ -360,7 +360,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"original_plan_id\": \"{{plan_id}}\",\n  \"field_modifications\": [\n    {\n      \"field_id\": \"{{test_field_add}}\",\n      \"action\": \"add\",\n      \"custom_water_level\": {{custom_water_level}}\n    },\n    {\n      \"field_id\": \"{{test_field_remove}}\",\n      \"action\": \"remove\"\n    }\n  ],\n  \"pump_assignments\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"pump_ids\": [\"{{pump_id_1}}\", \"{{pump_id_2}}\"]\n    }\n  ],\n  \"time_modifications\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"start_time_h\": {{start_time_h}},\n      \"duration_h\": {{duration_h}}\n    }\n  ],\n  \"regeneration_params\": {\n    \"force_regeneration\": true,\n    \"optimize_schedule\": true\n  }\n}"
+              "raw": "{\n  \"original_plan_id\": \"{{plan_id}}\",\n  \"scenario_name\": null,\n  \"field_modifications\": [\n    {\n      \"field_id\": \"{{test_field_add}}\",\n      \"action\": \"add\",\n      \"custom_water_level\": {{custom_water_level}}\n    },\n    {\n      \"field_id\": \"{{test_field_remove}}\",\n      \"action\": \"remove\"\n    }\n  ],\n  \"time_modifications\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"start_time_h\": {{start_time_h}},\n      \"duration_h\": {{duration_h}}\n    }\n  ],\n  \"regeneration_params\": {\n    \"force_regeneration\": true,\n    \"optimize_schedule\": true\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/regeneration/batch",
@@ -386,9 +386,175 @@
                   "    var jsonData = pm.response.json();",
                   "    var summary = jsonData.modifications_summary;",
                   "    pm.expect(summary.field_modifications).to.be.an('array');",
-                  "    pm.expect(summary.pump_assignments).to.be.an('array');",
                   "    pm.expect(summary.time_modifications).to.be.an('array');",
                   "    pm.expect(summary.total_changes).to.be.a('number');",
+                  "    console.log('\\n=== 接口1-ALL: 只修改田块和时间，不涉及水泵 ===');",
+                  "});",
+                  "",
+                  "pm.test(\"修改摘要包含scenario统计信息\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var summary = jsonData.modifications_summary;",
+                  "    ",
+                  "    console.log('\\n=== Scenario修改统计 ===');",
+                  "    if (summary.scenarios_modified) {",
+                  "        console.log('已修改的scenarios:', summary.scenarios_modified.join(', '));",
+                  "    }",
+                  "    if (summary.scenarios_unchanged) {",
+                  "        console.log('未修改的scenarios:', summary.scenarios_unchanged.join(', '));",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "批次重新生成-scenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"original_plan_id\": \"{{plan_id}}\",\n  \"scenario_name\": \"{{scenario_name}}\",\n  \"pump_assignments\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"pump_ids\": [\"{{pump_id_1}}\"]\n    }\n  ],\n  \"time_modifications\": [\n    {\n      \"batch_index\": {{batch_index}},\n      \"start_time_h\": {{start_time_h}},\n      \"duration_h\": {{duration_h}}\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/regeneration/batch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "regeneration", "batch"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"批次重新生成成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"只修改了指定的scenario\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var summary = jsonData.modifications_summary;",
+                  "    ",
+                  "    console.log('\\n=== 接口2-scenario: 水泵+时间修改（只影响指定scenario） ===');",
+                  "    console.log('指定修改:', pm.environment.get('scenario_name'));",
+                  "    ",
+                  "    if (summary.scenarios_modified) {",
+                  "        console.log('实际修改的scenarios:', summary.scenarios_modified);",
+                  "        pm.expect(summary.scenarios_modified).to.include(pm.environment.get('scenario_name'));",
+                  "    }",
+                  "    ",
+                  "    if (summary.scenarios_unchanged) {",
+                  "        console.log('未修改的scenarios:', summary.scenarios_unchanged);",
+                  "    }",
+                  "    ",
+                  "    // 验证水泵分配中包含scenarios_affected字段",
+                  "    if (summary.pump_assignments && summary.pump_assignments.length > 0) {",
+                  "        pm.expect(summary.pump_assignments[0]).to.have.property('scenarios_affected');",
+                  "        console.log('\\n受影响的scenarios:', summary.pump_assignments[0].scenarios_affected);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "查询可用Scenarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/regeneration/scenarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "regeneration", "scenarios"],
+              "query": [
+                {
+                  "key": "plan_id",
+                  "value": "{{plan_id}}",
+                  "description": "可选：指定计划ID或文件路径。不提供则自动使用最新的计划文件",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"查询scenarios成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "    pm.expect(jsonData.data.available_scenarios).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"显示所有可用scenarios\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var scenarios = jsonData.data.available_scenarios;",
+                  "    ",
+                  "    console.log('\\n=== 可用的Scenarios ===');",
+                  "    console.log('总数:', jsonData.data.total_scenarios);",
+                  "    console.log('');",
+                  "    ",
+                  "    scenarios.forEach(function(scenario, index) {",
+                  "        console.log(`${index + 1}. ${scenario.scenario_name}`);",
+                  "        console.log(`   水泵: ${scenario.pumps_used.join(', ')}`);",
+                  "        console.log(`   批次数: ${scenario.total_batches}`);",
+                  "        console.log(`   总时长: ${scenario.total_eta_h.toFixed(1)}h`);",
+                  "        console.log(`   总电费: ¥${scenario.total_electricity_cost.toFixed(2)}`);",
+                  "        if (scenario.optimization_goal) {",
+                  "            console.log(`   优化目标: ${scenario.optimization_goal}`);",
+                  "        }",
+                  "        console.log('');",
+                  "    });",
+                  "    ",
+                  "    // 自动保存第一个scenario名称到环境变量",
+                  "    if (scenarios.length > 0) {",
+                  "        pm.environment.set('scenario_name', scenarios[0].scenario_name);",
+                  "        console.log('✅ 已自动设置scenario_name为:', scenarios[0].scenario_name);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "清除缓存",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/regeneration/clear-cache",
+              "host": ["{{base_url}}"],
+              "path": ["api", "regeneration", "clear-cache"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"清除缓存成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    console.log('✅', jsonData.message);",
                   "});"
                 ]
               }
