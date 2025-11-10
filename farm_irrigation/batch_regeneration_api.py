@@ -51,6 +51,7 @@ class BatchRegenerationResponse(BaseModel):
     """批次重新生成响应"""
     success: bool = Field(..., description="是否成功")
     message: str = Field(..., description="响应消息")
+    modified_plan_path: Optional[str] = Field(None, description="修改后的计划文件路径")
     original_plan: Optional[Dict[str, Any]] = Field(None, description="原始计划数据")
     modified_plan: Optional[Dict[str, Any]] = Field(None, description="修改后的计划数据")
     modifications_summary: Dict[str, Any] = Field(default_factory=dict, description="修改摘要")
@@ -84,7 +85,7 @@ class BatchRegenerationService:
             return None
         except Exception:
             return None
-    
+        
     def load_original_plan(self, plan_id: str) -> Dict[str, Any]:
         """加载原始计划数据"""
         # 尝试多种方式加载计划
@@ -178,28 +179,28 @@ class BatchRegenerationService:
             batches = scenario_plan.get('batches', [])
             
             # 应用田块修改
-            for mod in modifications:
-                if mod.action == "add":
+        for mod in modifications:
+            if mod.action == "add":
                     # 查找田块信息
-                    field_info = self._find_field_info(available_fields, mod.field_id)
-                    if field_info:
-                        # 如果指定了自定义水位，更新水位信息
-                        if mod.custom_water_level is not None:
-                            field_info['wl_mm'] = mod.custom_water_level
-                        
+                field_info = self._find_field_info(available_fields, mod.field_id)
+                if field_info:
+                    # 如果指定了自定义水位，更新水位信息
+                    if mod.custom_water_level is not None:
+                        field_info['wl_mm'] = mod.custom_water_level
+                    
                         # 检查是否已在计划中
                         if not self._is_field_in_batches(batches, mod.field_id):
                             # 添加到合适的批次（根据segment_id）
                             self._add_field_to_batches(batches, field_info)
                             if mod.field_id not in added_fields:
                                 added_fields.append(mod.field_id)
-                            
-                elif mod.action == "remove":
-                    # 从批次中移除田块
-                    if self._remove_field_from_batches(batches, mod.field_id):
-                        if mod.field_id not in removed_fields:
-                            removed_fields.append(mod.field_id)
-            
+                        
+                    elif mod.action == "remove":
+                        # 从批次中移除田块
+                        if self._remove_field_from_batches(batches, mod.field_id):
+                            if mod.field_id not in removed_fields:
+                                removed_fields.append(mod.field_id)
+        
             # 重新生成steps和commands
             self._regenerate_scenario_execution(scenario)
             
@@ -1006,11 +1007,30 @@ class BatchRegenerationService:
                 actual_start_change = new_start - original_start
                 time_offset = max(actual_duration_change, actual_start_change)
                 
-                # 更新对应batch的统计信息中的时间
+                # 更新对应batch的统计信息（时间、水量等）
                 for batch in batches:
                     if batch.get('index') == batch_index:
                         if 'stats' in batch:
+                            # 更新时长
                             batch['stats']['eta_hours'] = new_duration
+                            
+                            # 获取流量信息（从scenario_plan.calc中获取）
+                            calc_info = scenario_plan.get('calc', {})
+                            flow_rate = calc_info.get('q_avail_m3ph', 240.0)  # 默认240 m³/h
+                            
+                            # 重新计算该批次能供应的最大水量
+                            max_water_volume = flow_rate * new_duration
+                            
+                            # 更新cap_vol_m3和deficit_vol_m3
+                            # 强制时长模式：能供多少算多少
+                            batch['stats']['cap_vol_m3'] = max_water_volume
+                            batch['stats']['deficit_vol_m3'] = max_water_volume
+                            
+                            self.logger.info(
+                                f"[时间修改] 批次 {batch_index} 时长调整: "
+                                f"{original_duration:.2f}h -> {new_duration:.2f}h, "
+                                f"供水量: {max_water_volume:.2f} m³"
+                            )
                 
                 modified_batches.append(batch_index)
             
@@ -1046,6 +1066,22 @@ class BatchRegenerationService:
                                     cmd['t_start_h'] = new_start
                                     cmd['t_end_h'] = new_end
                             
+                            # 同时更新对应batch的stats中的cap_vol_m3和deficit_vol_m3
+                            for batch in batches:
+                                if batch.get('index') == batch_idx:
+                                    if 'stats' in batch:
+                                        # 获取流量信息
+                                        calc_info = scenario_plan.get('calc', {})
+                                        flow_rate = calc_info.get('q_avail_m3ph', 240.0)
+                                        
+                                        # 根据持续时间重新计算水量
+                                        max_water_volume = flow_rate * original_duration
+                                        
+                                        # 更新cap_vol_m3和deficit_vol_m3
+                                        batch['stats']['cap_vol_m3'] = max_water_volume
+                                        batch['stats']['deficit_vol_m3'] = max_water_volume
+                                    break
+                            
                             cumulative_time = new_end
             
             # 重新计算scenario的总时长和水泵运行时间
@@ -1053,6 +1089,7 @@ class BatchRegenerationService:
                 # 重新计算每个水泵的运行时间
                 pump_runtime_dict = {}
                 total_duration = 0.0
+                total_deficit = 0.0  # 重新计算总缺水量
                 
                 self.logger.info(f"[时间修改] 重新计算scenario统计数据，共有 {len(steps)} 个批次")
                 
@@ -1072,13 +1109,19 @@ class BatchRegenerationService:
                         if pump not in pump_runtime_dict:
                             pump_runtime_dict[pump] = 0.0
                         pump_runtime_dict[pump] += step_duration
+                    
+                    # 累计总缺水量（从对应的batch中获取）
+                    if step_idx < len(batches):
+                        batch_deficit = batches[step_idx].get('stats', {}).get('deficit_vol_m3', 0.0)
+                        total_deficit += batch_deficit
                 
-                self.logger.info(f"[时间修改] 计算完成 - total_duration={total_duration:.2f}h, pump_runtime={pump_runtime_dict}")
+                self.logger.info(f"[时间修改] 计算完成 - total_duration={total_duration:.2f}h, total_deficit={total_deficit:.2f}m³, pump_runtime={pump_runtime_dict}")
                 
                 # 更新scenario的total_eta_h
                 scenario['total_eta_h'] = total_duration
                 if scenario_plan:
                     scenario_plan['total_eta_h'] = total_duration
+                    scenario_plan['total_deficit_m3'] = total_deficit
                 
                 # 更新total_pump_runtime_hours
                 scenario['total_pump_runtime_hours'] = pump_runtime_dict.copy()

@@ -866,6 +866,7 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
             response_data = {
                 "success": True,
                 "message": f"批次计划重新生成成功，共进行了 {modifications_summary['total_changes']} 项修改",
+                "modified_plan_path": output_file,
                 "scenario_name": request.scenario_name,
                 "original_scenario": original_scenario,
                 "modified_scenario": modified_scenario,
@@ -876,6 +877,7 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
             response_data = {
                 "success": True,
                 "message": f"批次计划重新生成成功，共进行了 {modifications_summary['total_changes']} 项修改",
+                "modified_plan_path": output_file,
                 "original_plan": original_plan,
                 "modified_plan": modified_plan,
                 "modifications_summary": modifications_summary
@@ -1247,8 +1249,10 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
     """生成灌溉计划（支持多水泵方案对比和缓存）"""
     try:
         logger.info(f"开始生成灌溉计划 - farm_id: {request.farm_id}")
+        logger.info(f"请求参数: output_dir={request.output_dir}, config_path={request.config_path}, multi_pump_scenarios={request.multi_pump_scenarios}")
         
         # 生成缓存键
+        logger.info("步骤1: 生成缓存键...")
         cache_key = generate_cache_key(
             farm_id=request.farm_id,
             target_depth_mm=90.0,  # 默认值
@@ -1258,28 +1262,39 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
             print_summary=True,
             multi_pump_scenarios=request.multi_pump_scenarios or False
         )
+        logger.info(f"缓存键生成成功: {cache_key}")
         
         # 尝试从缓存获取结果
+        logger.info("步骤2: 检查缓存...")
         cached_result = get_from_cache(cache_key)
         if cached_result:
             logger.info(f"从缓存返回灌溉计划结果 - cache_key: {cache_key}")
             return IrrigationPlanResponse(**cached_result)
+        logger.info("缓存未命中，继续执行...")
         
         # 导入pipeline模块
+        logger.info("步骤3: 导入pipeline模块...")
         try:
             from pipeline import IrrigationPipeline
+            logger.info("pipeline模块导入成功")
         except ImportError as e:
             logger.error(f"导入pipeline模块失败: {e}")
             raise HTTPException(status_code=500, detail="系统模块导入失败")
         
         # 设置默认参数
+        logger.info("步骤4: 设置默认参数...")
         output_dir = request.output_dir or os.path.join(os.path.dirname(__file__), "output")
         config_path = request.config_path or os.path.join(os.path.dirname(__file__), "config.json")
+        logger.info(f"output_dir: {output_dir}")
+        logger.info(f"config_path: {config_path}")
         
         # 确保输出目录存在
+        logger.info("步骤5: 确保输出目录存在...")
         os.makedirs(output_dir, exist_ok=True)
+        logger.info(f"输出目录已创建/确认: {output_dir}")
         
         # 构建pipeline参数
+        logger.info("步骤6: 构建pipeline参数...")
         kwargs = {
             'input_dir': os.path.join(os.path.dirname(__file__), "gzp_farm"),
             'output_dir': output_dir,
@@ -1292,12 +1307,17 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
         logger.info(f"Pipeline参数: {kwargs}")
         
         # 运行灌溉计划生成
+        logger.info("步骤7: 创建Pipeline实例...")
         try:
             pipeline = IrrigationPipeline()
+            logger.info("Pipeline实例创建成功")
+            logger.info("步骤8: 运行Pipeline...")
             success = pipeline.run_pipeline(**kwargs)
             logger.info(f"Pipeline执行结果: success={success}")
         except Exception as pipeline_error:
             logger.error(f"Pipeline执行异常: {pipeline_error}")
+            import traceback
+            logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=f"灌溉计划生成异常: {str(pipeline_error)}")
         
         if not success:
