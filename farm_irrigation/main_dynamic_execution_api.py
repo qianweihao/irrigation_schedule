@@ -271,11 +271,17 @@ class BatchAdjustmentResponse(BaseModel):
     validation: Dict[str, Any] = {}
     output_file: Optional[str] = None
 
+class ScenarioReorderConfig(BaseModel):
+    """单个scenario的顺序调整配置"""
+    scenario_name: Optional[str] = None  # scenario名称，None表示所有scenario
+    new_order: List[int]  # 新的批次执行顺序
+
 class BatchReorderRequest(BaseModel):
-    """批次顺序调整请求"""
+    """批次顺序调整请求（支持多scenario）"""
     plan_id: str
-    new_order: List[int]  # 新的批次顺序，例如 [2, 1, 3] 表示批次2先执行
-    scenario_name: Optional[str] = None  # 可选，指定要调整的scenario名称
+    new_order: Optional[List[int]] = None  # 新的批次顺序（兼容旧版）
+    scenario_name: Optional[str] = None  # 指定要调整的scenario名称（兼容旧版）
+    reorder_configs: Optional[List[ScenarioReorderConfig]] = None  # 多scenario调整配置（新功能）
 
 class BatchReorderResponse(BaseModel):
     """批次顺序调整响应"""
@@ -1295,11 +1301,23 @@ async def reorder_batches(request: BatchReorderRequest):
         # 创建服务实例
         service = BatchAdjustmentService()
         
+        # 转换reorder_configs为字典格式
+        reorder_configs = None
+        if request.reorder_configs:
+            reorder_configs = [
+                {
+                    "scenario_name": config.scenario_name,
+                    "new_order": config.new_order
+                }
+                for config in request.reorder_configs
+            ]
+        
         # 执行批次顺序调整
         result = service.reorder_batches(
             plan_id=request.plan_id,
             new_order=request.new_order,
-            scenario_name=request.scenario_name
+            scenario_name=request.scenario_name,
+            reorder_configs=reorder_configs
         )
         
         logger.info(f"批次顺序调整完成 - {result['message']}")

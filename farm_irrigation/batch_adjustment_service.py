@@ -460,18 +460,23 @@ class BatchAdjustmentService:
     def reorder_batches(
         self,
         plan_id: str,
-        new_order: List[int],
-        scenario_name: Optional[str] = None
+        new_order: Optional[List[int]] = None,
+        scenario_name: Optional[str] = None,
+        reorder_configs: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """
-        调整批次执行顺序
+        调整批次执行顺序（支持多scenario）
         
         Args:
             plan_id: 计划ID或文件路径
-            new_order: 新的批次顺序列表（索引从1开始）
-                      例如：[2, 1, 3] 表示批次2先执行，然后批次1，最后批次3
-            scenario_name: 可选，指定要调整的scenario名称
-                          如果不指定，则调整所有scenario（要求所有scenario批次数量相同）
+            new_order: 新的批次顺序列表（兼容旧版，与scenario_name配合使用）
+            scenario_name: 指定要调整的scenario名称（兼容旧版）
+            reorder_configs: 多scenario调整配置列表（新功能）
+                格式：[
+                    {"scenario_name": "P1单独使用", "new_order": [2, 1, 3, ...]},
+                    {"scenario_name": "P2单独使用", "new_order": [3, 1, 2, ...]},
+                    {"scenario_name": None, "new_order": [2, 1, 3, ...]}  # None表示所有scenario
+                ]
         
         Returns:
             调整结果字典
@@ -482,6 +487,16 @@ class BatchAdjustmentService:
             
             # 深拷贝计划以避免修改原始数据
             reordered_plan = copy.deepcopy(original_plan)
+            
+            # 新版：使用reorder_configs进行多scenario调整
+            if reorder_configs:
+                return self._reorder_multiple_scenarios(
+                    original_plan, reordered_plan, plan_id, reorder_configs
+                )
+            
+            # 兼容旧版：使用new_order和scenario_name
+            if new_order is None:
+                raise ValueError("必须提供new_order或reorder_configs参数")
             
             # 如果指定了scenario_name，只处理该scenario
             if scenario_name:
@@ -738,4 +753,166 @@ class BatchAdjustmentService:
                 if scenario.get("scenario_name") == scenario_name:
                     return scenario
         return None
+    
+    def _reorder_multiple_scenarios(
+        self,
+        original_plan: Dict[str, Any],
+        reordered_plan: Dict[str, Any],
+        plan_id: str,
+        reorder_configs: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """
+        同时调整多个scenarios的批次顺序
+        
+        Args:
+            original_plan: 原始计划
+            reordered_plan: 要修改的计划副本
+            plan_id: 计划ID
+            reorder_configs: 调整配置列表
+        
+        Returns:
+            调整结果字典
+        """
+        scenarios_modified = []
+        scenarios_unchanged = []
+        scenario_changes = {}
+        
+        for config in reorder_configs:
+            scenario_name = config.get("scenario_name")
+            new_order = config.get("new_order")
+            
+            if not new_order:
+                raise ValueError(f"配置缺少new_order: {config}")
+            
+            # scenario_name为None表示调整所有scenarios
+            if scenario_name is None:
+                logger.info("调整所有scenarios使用相同顺序")
+                
+                if "scenarios" not in reordered_plan:
+                    raise ValueError("计划中没有scenarios字段")
+                
+                for scenario in reordered_plan["scenarios"]:
+                    s_name = scenario.get("scenario_name", "Unknown")
+                    
+                    # 验证批次数量
+                    batches = scenario.get("plan", {}).get("batches", [])
+                    if len(batches) != len(new_order):
+                        raise ValueError(
+                            f"Scenario '{s_name}' 的批次数量({len(batches)})与new_order长度({len(new_order)})不匹配"
+                        )
+                    
+                    # 检查是否有变化
+                    original_order = list(range(1, len(batches) + 1))
+                    if new_order != original_order:
+                        # 执行调整
+                        if "plan" in scenario:
+                            self._reorder_batches_in_scenario(scenario["plan"], new_order)
+                        
+                        scenarios_modified.append(s_name)
+                        scenario_changes[s_name] = self._get_batch_changes(
+                            original_order, new_order, len(batches)
+                        )
+                    else:
+                        scenarios_unchanged.append(s_name)
+                
+                logger.info(f"已调整所有scenarios，修改了{len(scenarios_modified)}个")
+            else:
+                # 调整指定的scenario
+                target_scenario = self._find_scenario_by_name(reordered_plan, scenario_name)
+                if not target_scenario:
+                    raise ValueError(f"未找到scenario: {scenario_name}")
+                
+                # 验证批次数量
+                batches = target_scenario.get("plan", {}).get("batches", [])
+                if len(batches) != len(new_order):
+                    raise ValueError(
+                        f"Scenario '{scenario_name}' 的批次数量({len(batches)})与new_order长度({len(new_order)})不匹配"
+                    )
+                
+                # 验证new_order有效性
+                if sorted(new_order) != list(range(1, len(batches) + 1)):
+                    raise ValueError(
+                        f"Scenario '{scenario_name}' 的new_order必须包含1到{len(batches)}的所有批次索引"
+                    )
+                
+                # 检查是否有变化
+                original_order = list(range(1, len(batches) + 1))
+                if new_order != original_order:
+                    # 执行调整
+                    if "plan" in target_scenario:
+                        self._reorder_batches_in_scenario(target_scenario["plan"], new_order)
+                    
+                    scenarios_modified.append(scenario_name)
+                    scenario_changes[scenario_name] = self._get_batch_changes(
+                        original_order, new_order, len(batches)
+                    )
+                    logger.info(f"已调整scenario '{scenario_name}' 的批次顺序")
+                else:
+                    scenarios_unchanged.append(scenario_name)
+                    logger.info(f"Scenario '{scenario_name}' 的批次顺序未改变")
+        
+        # 如果没有任何修改
+        if not scenarios_modified:
+            return {
+                "success": True,
+                "message": "所有scenarios的批次顺序均未改变",
+                "original_plan": original_plan,
+                "reordered_plan": original_plan,
+                "changes_summary": {
+                    "total_scenarios_modified": 0,
+                    "scenarios_modified": [],
+                    "scenarios_unchanged": scenarios_unchanged,
+                    "scenario_changes": {}
+                },
+                "output_file": None
+            }
+        
+        # 生成变更摘要
+        changes_summary = {
+            "total_scenarios_modified": len(scenarios_modified),
+            "scenarios_modified": scenarios_modified,
+            "scenarios_unchanged": scenarios_unchanged,
+            "scenario_changes": scenario_changes,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # 保存调整后的计划
+        output_file = self._save_reordered_plan(reordered_plan, plan_id)
+        
+        return {
+            "success": True,
+            "message": f"成功调整{len(scenarios_modified)}个scenario的批次顺序",
+            "original_plan": original_plan,
+            "reordered_plan": reordered_plan,
+            "changes_summary": changes_summary,
+            "output_file": str(output_file),
+            "validation": {"is_valid": True}
+        }
+    
+    def _get_batch_changes(
+        self,
+        original_order: List[int],
+        new_order: List[int],
+        total_batches: int
+    ) -> Dict[str, Any]:
+        """生成单个scenario的批次变化详情"""
+        batch_movements = []
+        
+        for new_position, batch_idx in enumerate(new_order, 1):
+            old_position = original_order.index(batch_idx) + 1
+            if old_position != new_position:
+                batch_movements.append({
+                    "batch_index": batch_idx,
+                    "from_position": old_position,
+                    "to_position": new_position,
+                    "position_change": new_position - old_position
+                })
+        
+        return {
+            "order_changed": True,
+            "original_order": original_order,
+            "new_order": new_order,
+            "total_batches": total_batches,
+            "batch_movements": batch_movements
+        }
 
