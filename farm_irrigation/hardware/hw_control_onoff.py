@@ -1,164 +1,69 @@
-import hmac
-import hashlib
-import time
-import json
-import requests
-import urllib.parse
-from collections.abc import Iterable
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+物联网平台设备控制
+控制设备开关和闸门开度
+"""
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from hw_iot_client import IoTClient
 
 # 物联网平台控制设备的接口
-url = " https://ziot-web.zoomlion.com/api/app/openApi/device/deviceMsg/thingProperty.sync.invoke"
+API_URL = "https://ziot-web.zoomlion.com/api/app/openApi/device/deviceMsg/thingProperty.sync.invoke"
 
 
-def is_simple_data_type(obj):
-    """判断对象是否为基本数据类型"""
-    return isinstance(obj, (int, float, str, bool)) or obj is None
-
-
-def map_to_query_params(param):
+def set_gate_degree(app_id: str, secret: str, unique_no: str, degree: float, verbose: bool = False) -> dict:
     """
-    将字典转换为查询参数字符串
+    设置闸门开度
     
-    :param param: 输入的字典参数
-    :return: 查询参数字符串
-    """
-    if not param:
-        return ""
+    Args:
+        app_id: 应用ID
+        secret: 密钥
+        unique_no: 设备唯一编号
+        degree: 目标开度（0-100）
+        verbose: 是否打印详细信息
         
-    def build_value(val):
-        if val is None:
-            return None
-        elif isinstance(val, dict):
-            nested_result = map_to_query_params(val)
-            return '{' + nested_result + '}' if nested_result else None
-        elif isinstance(val, (list, tuple)):
-            items = []
-            for item in val:
-                if is_simple_data_type(item):
-                    items.append(str(item))
-                else:
-                    nested_result = map_to_query_params(item if isinstance(item, dict) else vars(item))
-                    items.append('{' + nested_result + '}')
-            return '[' + ','.join(items) + ']'
-        elif not is_simple_data_type(val):
-            # 对象转字典后再处理
-            return '{' + map_to_query_params(vars(val)) + '}'
-        else:
-            return str(val)
-    # 排除特定key并排序
-    filtered_items = [(k, v) for k, v in param.items() if k not in ('sign', 'signType') and v is not None]
-    sorted_items = sorted(filtered_items, key=lambda x: x[0])
-
-    parts = []
-    for key, value in sorted_items:
-        formatted_value = build_value(value)
-        if formatted_value is not None and formatted_value.strip():
-            parts.append(f"{key}={formatted_value}")
-    
-    return '&'.join(parts)
-
-def generate_signature(app_id, secret, timestamp, payload_query_str):
-
-    sign_content = payload_query_str + "\n" + secret + "\n" + str(timestamp)
-    
-    secret_bytes = secret.encode('utf-8')
-    content_bytes = sign_content.encode('utf-8')
-    
-    signature = hmac.new(
-        secret_bytes,
-        content_bytes,
-        hashlib.sha256
-    ).hexdigest().upper()
-    
-    return signature, sign_content
-
-def send_request(app_id, secret, unique_no, target_gate_degree):
-    timestamp = int(time.time() * 1000)
-    
-    payload_dict = {"uniqueNo": unique_no,"identifier":"gateDegree","params":{"gateDegree": target_gate_degree}}
-    
-    # 将payload转换为QueryParam格式的字符串
-    payload_query_str = map_to_query_params(payload_dict)
-    
-    if payload_query_str is None:
-        payload_query_str = ""
-    else:
-        payload_query_str = payload_query_str.strip()
-
-    if payload_query_str is not None and len(payload_query_str) > 1000:
-        payload_query_str = payload_query_str[:1000]
-    
-    signature, signed_content = generate_signature(app_id, secret, timestamp, payload_query_str)
-    
-    headers = {
-        "AppId": app_id,
-        "timestamp": str(timestamp),
-        "AppSign": signature,
-        "Content-Type": "application/json"
+    Returns:
+        dict: 响应数据
+    """
+    client = IoTClient(app_id, secret)
+    payload = {
+        "uniqueNo": unique_no,
+        "identifier": "gateDegree",
+        "params": {"gateDegree": degree}
     }
-    
-    print("=== 请求详情 ===")
-    print(f"URL: {url}")
-    print(f"Headers: {json.dumps(headers, indent=2, ensure_ascii=False)}")
-    print(f"Payload (JSON): {json.dumps(payload_dict, ensure_ascii=False)}")
-    print(f"Payload (QueryParam): {payload_query_str}")
-    print(f"签名字符串: {signed_content}")
-    print(f"签名: {signature}")
-    print("================\n")
-    
-    try:
-        response = requests.post(
-            url=url,
-            json=payload_dict,  # 使用JSON格式的payload
-            headers=headers,
-            timeout=30
-        )
-        
-        print("=== 响应详情 ===")
-        print(f"状态码: {response.status_code}")
-        
-        try:
-            response_json = response.json()
-            print("响应体 (JSON):")
-            print(json.dumps(response_json, indent=2, ensure_ascii=False))
-            return response_json
-        except json.JSONDecodeError:
-            print("响应体 (文本):")
-            print(response.text)
-            return response.text
-            
-    except requests.exceptions.Timeout:
-        print("请求超时 (30秒)")
-        return None
-    except requests.exceptions.ConnectionError:
-        print("连接错误 - 请检查URL和网络连接")
-        return None
-    except requests.exceptions.RequestException as e:
-        print(f"请求失败: {e}")
-        return None
+    return client.send_request(API_URL, payload, verbose=verbose)
 
-# 使用示例
+
+def close_gate(app_id: str, secret: str, unique_no: str, verbose: bool = False) -> dict:
+    """关闭闸门（开度设为0）"""
+    return set_gate_degree(app_id, secret, unique_no, 0, verbose)
+
+
+def open_gate(app_id: str, secret: str, unique_no: str, verbose: bool = False) -> dict:
+    """完全打开闸门（开度设为100）"""
+    return set_gate_degree(app_id, secret, unique_no, 100, verbose)
+
+
 if __name__ == "__main__":
-    # 使用指定的参数值
-    app_id = "siotextend"
-    secret = "!iWu$fyUgOSH+mc_nSirKpL%+zZ%)%cL"
-    unique_no = "477379421064159253"
+    # 配置参数
+    APP_ID = "siotextend"
+    SECRET = "!iWu$fyUgOSH+mc_nSirKpL%+zZ%)%cL"
+    UNIQUE_NO = "477379421064159253"
     
-    print("使用指定参数发送请求:")
-    print(f"AppId: {app_id}")
-    print(f"unique_no: {unique_no}")
-    print(f"secret: {secret[:5]}...{secret[-5:]}")
+    # 关闭闸门
+    print("关闭闸门...")
+    result = close_gate(APP_ID, SECRET, UNIQUE_NO, verbose=True)
+    print("✅ 关闭闸门完成\n" if result else "❌ 关闭闸门失败\n")
     
-    # -------- 发送关闭设备请求 --------
-    result = send_request(app_id, secret, unique_no, 0)
-    if result is None:
-        print("\n❌ 发送关闭设备请求失败")
-    else:
-        print("\n✅ 发送关闭设备请求完成")
-
-    # -------- 发送打开设备请求 --------
-    # result = send_request(app_id, secret, unique_no, 100)
-    # if result is None:
-    #     print("\n❌ 发送打开设备请求失败")
-    # else:
-    #     print("\n✅ 发送打开设备请求完成")
+    # 打开闸门（取消注释以使用）
+    # print("打开闸门...")
+    # result = open_gate(APP_ID, SECRET, UNIQUE_NO, verbose=True)
+    # print("✅ 打开闸门完成" if result else "❌ 打开闸门失败")
+    
+    # 设置特定开度（取消注释以使用）
+    # print("设置闸门开度为50%...")
+    # result = set_gate_degree(APP_ID, SECRET, UNIQUE_NO, 50, verbose=True)
+    # print("✅ 设置开度完成" if result else "❌ 设置开度失败")
