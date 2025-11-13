@@ -7,7 +7,7 @@ import urllib.parse
 import pprint
 
 # 物联网平台查看设备属性的接口
-url = "http://ziot-web.zvos.zoomlion.com/api/app/openApi/device/properties.newest"
+url = " https://ziot-web.zoomlion.com/api/app/openApi/device/properties.newest"
 
 
 def generate_signature(app_id, secret, timestamp, payload_query_str):

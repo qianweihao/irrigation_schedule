@@ -7,7 +7,7 @@ import urllib.parse
 from collections.abc import Iterable
 
 # 物联网平台控制设备的接口
-url = "http://ziot-web.zvos.zoomlion.com/api/app/openApi/device/deviceMsg/thingProperty.sync.invoke"
+url = " https://ziot-web.zoomlion.com/api/app/openApi/device/deviceMsg/thingProperty.sync.invoke"
 
 
 def is_simple_data_type(obj):
