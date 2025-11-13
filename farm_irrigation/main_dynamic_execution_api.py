@@ -723,6 +723,100 @@ async def water_level_history(farm_id: str, field_id: str, hours: int = 24):
     """获取田块水位历史数据"""
     return await get_water_level_history(farm_id, field_id, hours)
 
+@app.get("/api/water-levels/targets")
+async def get_water_level_targets(
+    farm_id: str = Query(..., description="农场ID"),
+    field_id: Optional[str] = Query(None, description="田块ID（可选，不提供则返回所有田块）")
+):
+    """
+    获取田块的目标水位值
+    
+    返回所有田块或指定田块的水位标准参数：
+    - wl_low: 低水位阈值（mm），触发灌溉的判断标准
+    - wl_opt: 最优水位（mm），灌溉的目标水位
+    - wl_high: 高水位阈值（mm），超过则不需要灌溉
+    - d_target_mm: 目标灌溉水深（mm）
+    
+    参数:
+    - farm_id: 农场ID
+    - field_id: 田块ID（可选）
+    """
+    try:
+        logger.info(f"获取水位目标值 - farm_id: {farm_id}, field_id: {field_id}")
+        
+        # 读取配置文件获取全局水位标准
+        config_path = os.path.join(os.path.dirname(__file__), "config.json")
+        if not os.path.exists(config_path):
+            raise HTTPException(status_code=404, detail="配置文件不存在")
+        
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        # 获取全局水位标准（从config.json或使用默认值）
+        global_wl_low = config_data.get('wl_low', 30.0)
+        global_wl_opt = config_data.get('wl_opt', 80.0)
+        global_wl_high = config_data.get('wl_high', 140.0)
+        
+        # 读取田块数据
+        from farm_irr_full_device_modified import farmcfg_from_json_select
+        
+        try:
+            cfg = farmcfg_from_json_select(config_data)
+        except Exception as e:
+            logger.error(f"加载农场配置失败: {e}")
+            raise HTTPException(status_code=500, detail=f"加载农场配置失败: {str(e)}")
+        
+        # 构建响应数据
+        response_data = {
+            "success": True,
+            "farm_id": farm_id,
+            "global_standards": {
+                "wl_low": global_wl_low,
+                "wl_opt": global_wl_opt,
+                "wl_high": global_wl_high,
+                "description": "全局默认水位标准"
+            },
+            "fields": {}
+        }
+        
+        # 如果指定了field_id，只返回该田块的数据
+        if field_id:
+            if field_id in cfg.fields:
+                field = cfg.fields[field_id]
+                response_data["fields"][field_id] = {
+                    "wl_low": field.wl_low,
+                    "wl_opt": field.wl_opt,
+                    "wl_high": field.wl_high,
+                    "area_mu": field.area_mu,
+                    "segment_id": field.segment_id,
+                    "source": "field_config" if (field.wl_low != global_wl_low or field.wl_opt != global_wl_opt or field.wl_high != global_wl_high) else "global_default"
+                }
+            else:
+                raise HTTPException(status_code=404, detail=f"田块不存在: {field_id}")
+        else:
+            # 返回所有田块的数据
+            for fid, field in cfg.fields.items():
+                response_data["fields"][fid] = {
+                    "wl_low": field.wl_low,
+                    "wl_opt": field.wl_opt,
+                    "wl_high": field.wl_high,
+                    "area_mu": field.area_mu,
+                    "segment_id": field.segment_id,
+                    "source": "field_config" if (field.wl_low != global_wl_low or field.wl_opt != global_wl_opt or field.wl_high != global_wl_high) else "global_default"
+                }
+        
+        response_data["total_fields"] = len(response_data["fields"])
+        response_data["timestamp"] = datetime.now().isoformat()
+        
+        logger.info(f"成功获取 {response_data['total_fields']} 个田块的水位目标值")
+        return response_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取水位目标值失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取水位目标值失败: {str(e)}")
+
 # ==================== 计划重新生成API ====================
 
 @app.post("/api/regeneration/manual", response_model=ManualRegenerationResponse)

@@ -341,6 +341,104 @@
               }
             }
           ]
+        },
+        {
+          "name": "获取水位目标值",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/water-levels/targets?farm_id={{farm_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "water-levels", "targets"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}",
+                  "description": "农场ID"
+                },
+                {
+                  "key": "field_id",
+                  "value": "{{field_id}}",
+                  "description": "田块ID（可选，不提供则返回所有田块）",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "获取所有田块或指定田块的目标水位值\n\n**返回字段说明**:\n- wl_low: 低水位阈值（mm），触发灌溉的判断标准\n- wl_opt: 最优水位（mm），灌溉的目标水位\n- wl_high: 高水位阈值（mm），超过则不需要灌溉\n- source: 数据来源（global_default=使用全局默认值，field_config=田块自定义配置）\n\n**使用场景**:\n- 前端展示田块的水位标准\n- 判断田块是否需要灌溉（当前水位 < wl_low）\n- 计算灌溉需水量（wl_opt - 当前水位）"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取水位目标值成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('global_standards');",
+                  "    pm.expect(jsonData).to.have.property('fields');",
+                  "    pm.expect(jsonData).to.have.property('total_fields');",
+                  "});",
+                  "",
+                  "pm.test(\"全局水位标准包含必要字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var global = jsonData.global_standards;",
+                  "    pm.expect(global).to.have.property('wl_low');",
+                  "    pm.expect(global).to.have.property('wl_opt');",
+                  "    pm.expect(global).to.have.property('wl_high');",
+                  "    ",
+                  "    console.log('\\n=== 全局水位标准 ===');",
+                  "    console.log('低水位阈值 (wl_low): ' + global.wl_low + ' mm - 低于此值触发灌溉');",
+                  "    console.log('最优水位 (wl_opt): ' + global.wl_opt + ' mm - 灌溉的目标水位');",
+                  "    console.log('高水位阈值 (wl_high): ' + global.wl_high + ' mm - 超过此值不需要灌溉');",
+                  "    console.log('\\n💡 实际灌溉深度 = wl_opt - 当前水位（动态计算）');",
+                  "});",
+                  "",
+                  "pm.test(\"田块数据包含必要字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    ",
+                  "    if (Object.keys(fields).length > 0) {",
+                  "        var firstFieldId = Object.keys(fields)[0];",
+                  "        var firstField = fields[firstFieldId];",
+                  "        ",
+                  "        pm.expect(firstField).to.have.property('wl_low');",
+                  "        pm.expect(firstField).to.have.property('wl_opt');",
+                  "        pm.expect(firstField).to.have.property('wl_high');",
+                  "        pm.expect(firstField).to.have.property('area_mu');",
+                  "        pm.expect(firstField).to.have.property('source');",
+                  "        ",
+                  "        console.log('\\n=== 田块水位标准示例 ===');",
+                  "        console.log('田块ID: ' + firstFieldId);",
+                  "        console.log('低水位阈值: ' + firstField.wl_low + ' mm');",
+                  "        console.log('最优水位（目标）: ' + firstField.wl_opt + ' mm');",
+                  "        console.log('高水位阈值: ' + firstField.wl_high + ' mm');",
+                  "        console.log('田块面积: ' + firstField.area_mu + ' 亩');",
+                  "        console.log('数据来源: ' + firstField.source);",
+                  "        ",
+                  "        // 统计使用自定义配置的田块数量",
+                  "        var customCount = 0;",
+                  "        var defaultCount = 0;",
+                  "        Object.keys(fields).forEach(function(fid) {",
+                  "            if (fields[fid].source === 'field_config') {",
+                  "                customCount++;",
+                  "            } else {",
+                  "                defaultCount++;",
+                  "            }",
+                  "        });",
+                  "        ",
+                  "        console.log('\\n=== 统计信息 ===');",
+                  "        console.log('总田块数: ' + jsonData.total_fields);",
+                  "        console.log('使用全局默认值: ' + defaultCount + ' 个');",
+                  "        console.log('使用自定义配置: ' + customCount + ' 个');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     },
