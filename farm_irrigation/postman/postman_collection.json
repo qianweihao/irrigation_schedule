@@ -253,22 +253,94 @@
           }
         },
         {
-          "name": "获取水位汇总",
+          "name": "获取水位汇总（数字ID）",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/water-levels/summary?farm_id={{farm_id}}",
+              "raw": "{{base_url}}/api/water-levels/summary?farm_id={{farm_id}}&use_sgf_format=false",
               "host": ["{{base_url}}"],
               "path": ["api", "water-levels", "summary"],
               "query": [
                 {
                   "key": "farm_id",
                   "value": "{{farm_id}}"
+                },
+                {
+                  "key": "use_sgf_format",
+                  "value": "false",
+                  "description": "使用数字ID格式"
                 }
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取水位汇总成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('total_fields');",
+                  "    pm.expect(jsonData).to.have.property('field_details');",
+                  "    ",
+                  "    // 验证返回的是数字ID格式",
+                  "    var firstFieldId = Object.keys(jsonData.field_details)[0];",
+                  "    pm.expect(firstFieldId).to.match(/^\\d+$/);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取水位汇总（SGF格式）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/water-levels/summary?farm_id={{farm_id}}&use_sgf_format=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "water-levels", "summary"],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                },
+                {
+                  "key": "use_sgf_format",
+                  "value": "true",
+                  "description": "使用SGF格式（如S1-G2-F03）"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取水位汇总成功（SGF格式）\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('total_fields');",
+                  "    pm.expect(jsonData).to.have.property('field_details');",
+                  "    ",
+                  "    // 验证返回的是SGF格式",
+                  "    var firstFieldId = Object.keys(jsonData.field_details)[0];",
+                  "    pm.expect(firstFieldId).to.match(/^S\\d+-G\\d+-F\\d+$/);",
+                  "    ",
+                  "    // 验证包含numeric_id字段",
+                  "    var firstField = jsonData.field_details[firstFieldId];",
+                  "    pm.expect(firstField).to.have.property('numeric_id');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     },

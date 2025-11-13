@@ -697,10 +697,21 @@ async def update_water_level_data(request: WaterLevelUpdateRequest):
     return await update_water_levels(request)
 
 @app.get("/api/water-levels/summary")
-async def water_level_summary(farm_id: str, field_ids: Optional[str] = None):
-    """获取水位数据摘要"""
+async def water_level_summary(
+    farm_id: str, 
+    field_ids: Optional[str] = None,
+    use_sgf_format: bool = Query(False, description="是否使用SGF格式的田块ID（如S1-G2-F03）")
+):
+    """
+    获取水位数据摘要
+    
+    参数:
+    - farm_id: 农场ID
+    - field_ids: 田块ID列表，用逗号分隔（可选）
+    - use_sgf_format: 是否使用SGF格式的田块ID，默认False使用数字ID
+    """
     field_id_list = field_ids.split(",") if field_ids else None
-    return await get_water_level_summary(farm_id, field_id_list)
+    return await get_water_level_summary(farm_id, field_id_list, use_sgf_format)
 
 @app.get("/api/water-levels/trend/{field_id}")
 async def field_trend_analysis(field_id: str, hours: int = 48):

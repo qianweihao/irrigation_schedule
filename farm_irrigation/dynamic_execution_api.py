@@ -789,20 +789,21 @@ async def get_execution_history(limit: int = 10) -> ExecutionHistoryResponse:
             detail=f"获取执行历史失败: {str(e)}"
         )
 
-async def get_water_level_summary(farm_id: str, field_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+async def get_water_level_summary(farm_id: str, field_ids: Optional[List[str]] = None, use_sgf_format: bool = False) -> Dict[str, Any]:
     """
     获取水位数据摘要
     
     Args:
         farm_id: 农场ID
         field_ids: 田块ID列表
+        use_sgf_format: 是否使用SGF格式的田块ID（如S1-G2-F03），默认False使用数字ID
         
     Returns:
         Dict[str, Any]: 水位摘要数据
     """
     try:
         wl_manager = get_waterlevel_manager()
-        summary = wl_manager.get_water_level_summary(field_ids)
+        summary = wl_manager.get_water_level_summary(field_ids, use_sgf_format)
         
         # 添加农场信息
         summary["farm_id"] = farm_id

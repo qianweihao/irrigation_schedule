@@ -1012,39 +1012,119 @@ Content-Type: application/json
 
 **请求**
 ```
-GET /api/water-levels/summary?farm_id=13944136728576&field_ids=S3-G2-F1,S3-G3-F2
+GET /api/water-levels/summary?farm_id=13944136728576&field_ids=S3-G2-F1,S3-G3-F2&use_sgf_format=true
 ```
 
 **参数说明**
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | farm_id | string | 是 | 农场ID |
-| field_ids | string | 否 | 田块ID列表（逗号分隔） |
+| field_ids | string | 否 | 田块ID列表（逗号分隔），支持数字ID或SGF格式 |
+| use_sgf_format | boolean | 否 | 是否使用SGF格式的田块ID（如S1-G2-F03），默认false使用数字ID |
 
-**响应示例**
+**响应示例（use_sgf_format=false，默认）**
 ```json
 {
-  "success": true,
-  "data": {
-    "total_fields": 36,
-    "fields_with_data": 30,
-    "last_update": "2025-01-09T12:00:00Z",
-    "average_level": 15.5,
-    "quality_summary": {
-      "good": 25,
-      "fair": 4,
-      "poor": 1
-    },
-    "field_summaries": {
-      "S3-G2-F1": {
-        "current_level": 25.5,
-        "last_update": "2025-01-09T12:00:00Z",
-        "quality": "good"
-      }
+  "farm_id": "13944136728576",
+  "total_fields": 29,
+  "fields_with_data": 29,
+  "fields_without_data": [],
+  "quality_distribution": {
+    "excellent": 29,
+    "good": 0,
+    "fair": 0,
+    "poor": 0,
+    "invalid": 0
+  },
+  "source_distribution": {
+    "api": 29,
+    "manual": 0,
+    "config": 0,
+    "interpolated": 0,
+    "cached": 0
+  },
+  "field_details": {
+    "1901482103712129024": {
+      "water_level_mm": 0.8,
+      "quality": "excellent",
+      "source": "api",
+      "confidence": 0.72,
+      "age_hours": 0.5,
+      "timestamp": "2025-11-13T09:22:43.284200",
+      "readings_count": 1
     }
-  }
+  },
+  "coverage_rate": 1.0,
+  "last_updated": "2025-11-13T09:52:53.238923",
+  "query_time": "2025-11-13T09:52:53.238923"
 }
 ```
+
+**响应示例（use_sgf_format=true）**
+```json
+{
+  "farm_id": "13944136728576",
+  "total_fields": 29,
+  "fields_with_data": 29,
+  "fields_without_data": [],
+  "quality_distribution": {
+    "excellent": 29,
+    "good": 0,
+    "fair": 0,
+    "poor": 0,
+    "invalid": 0
+  },
+  "source_distribution": {
+    "api": 29,
+    "manual": 0,
+    "config": 0,
+    "interpolated": 0,
+    "cached": 0
+  },
+  "field_details": {
+    "S6-G43-F29": {
+      "water_level_mm": 0.8,
+      "quality": "excellent",
+      "source": "api",
+      "confidence": 0.72,
+      "age_hours": 0.5,
+      "timestamp": "2025-11-13T09:22:43.284200",
+      "readings_count": 1,
+      "numeric_id": "1901482103712129024"
+    },
+    "S3-G2-F1": {
+      "water_level_mm": 1.8,
+      "quality": "excellent",
+      "source": "api",
+      "confidence": 0.72,
+      "age_hours": 0.0,
+      "timestamp": "2025-11-13T09:52:43.284200",
+      "readings_count": 2,
+      "numeric_id": "1901477857038049280"
+    }
+  },
+  "coverage_rate": 1.0,
+  "last_updated": "2025-11-13T09:52:53.238923",
+  "query_time": "2025-11-13T09:52:53.238923"
+}
+```
+
+**字段说明**
+- `total_fields`: 总田块数
+- `fields_with_data`: 有水位数据的田块数
+- `fields_without_data`: 没有数据的田块列表
+- `quality_distribution`: 数据质量分布统计
+- `source_distribution`: 数据来源分布统计
+- `field_details`: 各田块详细信息
+  - `water_level_mm`: 当前水位（毫米）
+  - `quality`: 数据质量等级（excellent/good/fair/poor/invalid）
+  - `source`: 数据来源（api/manual/config/interpolated/cached）
+  - `confidence`: 置信度（0-1）
+  - `age_hours`: 数据年龄（小时）
+  - `timestamp`: 数据时间戳
+  - `readings_count`: 历史读数数量
+  - `numeric_id`: 数字ID（仅在use_sgf_format=true时返回）
+- `coverage_rate`: 数据覆盖率（0-1）
 
 ---
 

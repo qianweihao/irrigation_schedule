@@ -170,8 +170,44 @@ class DynamicWaterLevelManager:
         self.last_api_call: Optional[datetime] = None
         self.api_call_interval_minutes = 5  # API调用间隔
         
+        # 田块ID映射表（数字ID -> SGF格式）
+        self.field_id_mapping: Dict[str, str] = {}
+        
+        # 加载田块ID映射
+        self._load_field_id_mapping()
+        
         # 加载缓存数据
         self._load_cache()
+    
+    def _load_field_id_mapping(self):
+        """从GeoJSON文件加载田块ID映射"""
+        try:
+            # 尝试从labeled_output目录加载
+            geojson_path = Path(__file__).parent / "labeled_output" / "fields_labeled.geojson"
+            
+            if not geojson_path.exists():
+                # 尝试从gzp_farm目录加载
+                geojson_path = Path(__file__).parent / "gzp_farm" / "fields_labeled.geojson"
+            
+            if geojson_path.exists():
+                with open(geojson_path, 'r', encoding='utf-8') as f:
+                    geojson_data = json.load(f)
+                
+                # 提取映射关系
+                for feature in geojson_data.get("features", []):
+                    props = feature.get("properties", {})
+                    numeric_id = str(props.get("id", ""))
+                    sgf_id = props.get("F_id", "")
+                    
+                    if numeric_id and sgf_id:
+                        self.field_id_mapping[numeric_id] = sgf_id
+                
+                logger.info(f"加载了 {len(self.field_id_mapping)} 个田块ID映射")
+            else:
+                logger.warning(f"未找到田块GeoJSON文件: {geojson_path}")
+                
+        except Exception as e:
+            logger.error(f"加载田块ID映射失败: {e}")
     
     def _load_cache(self):
         """加载缓存数据"""
@@ -475,12 +511,13 @@ class DynamicWaterLevelManager:
             logger.info(f"清理了 {cleaned_count} 条过期水位数据")
             self._save_cache()
     
-    def get_water_level_summary(self, field_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+    def get_water_level_summary(self, field_ids: Optional[List[str]] = None, use_sgf_format: bool = False) -> Dict[str, Any]:
         """
         获取水位数据摘要
         
         Args:
             field_ids: 指定田块ID列表，如果为None则返回所有田块的摘要
+            use_sgf_format: 是否使用SGF格式的田块ID（如S1-G2-F03），默认False使用数字ID
             
         Returns:
             Dict[str, Any]: 水位摘要数据
@@ -512,7 +549,12 @@ class DynamicWaterLevelManager:
                         # 计算数据年龄
                         age_hours = (datetime.now() - latest_reading.timestamp).total_seconds() / 3600
                         
-                        summary["field_details"][field_id] = {
+                        # 决定使用哪种格式的田块ID
+                        display_field_id = field_id
+                        if use_sgf_format and field_id in self.field_id_mapping:
+                            display_field_id = self.field_id_mapping[field_id]
+                        
+                        field_detail = {
                             "water_level_mm": latest_reading.water_level_mm,
                             "quality": latest_reading.quality.value,
                             "source": latest_reading.source.value,
@@ -521,10 +563,22 @@ class DynamicWaterLevelManager:
                             "timestamp": latest_reading.timestamp.isoformat(),
                             "readings_count": len(history.readings)
                         }
+                        
+                        # 如果使用SGF格式，同时保留原始数字ID
+                        if use_sgf_format:
+                            field_detail["numeric_id"] = field_id
+                        
+                        summary["field_details"][display_field_id] = field_detail
                     else:
-                        summary["fields_without_data"].append(field_id)
+                        display_field_id = field_id
+                        if use_sgf_format and field_id in self.field_id_mapping:
+                            display_field_id = self.field_id_mapping[field_id]
+                        summary["fields_without_data"].append(display_field_id)
                 else:
-                    summary["fields_without_data"].append(field_id)
+                    display_field_id = field_id
+                    if use_sgf_format and field_id in self.field_id_mapping:
+                        display_field_id = self.field_id_mapping[field_id]
+                    summary["fields_without_data"].append(display_field_id)
             
             # 计算统计信息
             summary["coverage_rate"] = summary["fields_with_data"] / summary["total_fields"] if summary["total_fields"] > 0 else 0
