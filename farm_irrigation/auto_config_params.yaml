@@ -75,7 +75,7 @@ default_filenames:
 # 输出配置
 output_config:
   config_file: "config.json"
-  labeled_dir: "labeled_output"
+  labeled_dir: "data/labeled_output"
 
 # 环境变量映射
 env_vars:

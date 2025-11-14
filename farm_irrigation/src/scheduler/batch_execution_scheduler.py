@@ -40,13 +40,16 @@ from .execution_status_manager import ExecutionStatusManager, ExecutionStatus, g
 
 # 配置日志（修复编码问题）
 import os
-os.makedirs('data/execution_logs', exist_ok=True)
+# 基于项目根目录计算日志路径
+_log_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'execution_logs')
+_log_dir = os.path.abspath(_log_dir)
+os.makedirs(_log_dir, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('data/execution_logs/batch_execution_scheduler.log', encoding='utf-8')
+        logging.FileHandler(os.path.join(_log_dir, 'batch_execution_scheduler.log'), encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
@@ -82,7 +85,7 @@ class BatchExecutionScheduler:
     """批次执行调度器"""
     
     def __init__(self, 
-                 config_path: str = "config.json",
+                 config_path: str = None,
                  farm_id: str = "default_farm",
                  enable_realtime_waterlevels: bool = True,
                  pre_execution_buffer_minutes: int = 5):
@@ -90,11 +93,16 @@ class BatchExecutionScheduler:
         初始化调度器
         
         Args:
-            config_path: 配置文件路径
+            config_path: 配置文件路径（如果为None，则基于项目根目录计算）
             farm_id: 农场ID，用于获取水位数据
             enable_realtime_waterlevels: 是否启用实时水位获取
             pre_execution_buffer_minutes: 批次执行前的缓冲时间（分钟）
         """
+        # 如果未指定路径，基于项目根目录计算
+        if config_path is None:
+            project_root = Path(__file__).parent.parent.parent
+            config_path = str(project_root / "config.json")
+        
         self.config_path = Path(config_path)
         self.farm_id = farm_id
         self.enable_realtime_waterlevels = enable_realtime_waterlevels

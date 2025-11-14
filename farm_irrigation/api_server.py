@@ -27,13 +27,15 @@ import uvicorn
 
 # 配置日志（修复编码问题）
 import os
-os.makedirs('data/execution_logs', exist_ok=True)
+# 基于项目根目录计算日志路径
+_log_dir = os.path.join(os.path.dirname(__file__), 'data', 'execution_logs')
+os.makedirs(_log_dir, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('data/execution_logs/api_server.log', encoding='utf-8')
+        logging.FileHandler(os.path.join(_log_dir, 'api_server.log'), encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)

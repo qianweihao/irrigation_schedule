@@ -351,8 +351,10 @@ class BatchRegenerationService:
     def _get_available_fields_from_config(self) -> List[Dict[str, Any]]:
         """从config.json或最新计划中获取所有可用田块"""
         try:
-            # 先尝试从config.json获取
-            config_path = Path(__file__).parent / 'config.json'
+            # 先尝试从config.json获取（config.json在项目根目录）
+            current_file = Path(__file__)
+            project_root = current_file.parent.parent.parent  # src/api -> src -> 项目根目录
+            config_path = project_root / 'config.json'
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
             
@@ -631,7 +633,10 @@ class BatchRegenerationService:
     def _get_valid_pump_ids(self) -> List[str]:
         """从配置文件获取有效的水泵ID列表"""
         try:
-            config_path = Path(__file__).parent / 'config.json'
+            # config.json在项目根目录
+            current_file = Path(__file__)
+            project_root = current_file.parent.parent.parent  # src/api -> src -> 项目根目录
+            config_path = project_root / 'config.json'
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
             

@@ -74,17 +74,25 @@ class DynamicPlanRegenerator:
     """动态计划重新生成器"""
     
     def __init__(self, 
-                 config_path: str = "config.json",
-                 plan_template_path: str = "irrigation_plan_template.json",
+                 config_path: str = None,
+                 plan_template_path: str = None,
                  regeneration_rules: Optional[Dict[str, Any]] = None):
         """
         初始化计划重新生成器
         
         Args:
-            config_path: 配置文件路径
-            plan_template_path: 计划模板路径
+            config_path: 配置文件路径（如果为None，则基于项目根目录计算）
+            plan_template_path: 计划模板路径（如果为None，则基于项目根目录计算）
             regeneration_rules: 重新生成规则配置
         """
+        # 如果未指定路径，基于项目根目录计算
+        if config_path is None:
+            project_root = Path(__file__).parent.parent.parent
+            config_path = str(project_root / "config.json")
+        if plan_template_path is None:
+            project_root = Path(__file__).parent.parent.parent
+            plan_template_path = str(project_root / "irrigation_plan_template.json")
+        
         self.config_path = Path(config_path)
         self.plan_template_path = Path(plan_template_path)
         

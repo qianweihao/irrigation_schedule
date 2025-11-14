@@ -20,7 +20,10 @@ class BatchAdjustmentService:
     """批次间田块调整服务"""
     
     def __init__(self):
-        self.output_dir = Path(__file__).parent / "output"
+        # 从当前文件位置（src/optimizer/）向上两级到项目根目录，然后指向 data/output
+        current_file = Path(__file__)
+        project_root = current_file.parent.parent.parent  # src/optimizer -> src -> 项目根目录
+        self.output_dir = project_root / "data" / "output"
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
     def load_plan(self, plan_id: str) -> Dict[str, Any]:

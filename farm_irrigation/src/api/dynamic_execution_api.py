@@ -478,8 +478,10 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         else:
             # 如果调度器没有raw_plan_data，尝试从最新计划文件读取
             scenarios = []
-            script_dir = Path(__file__).parent
-            output_dir = script_dir / "output"
+            # 从当前文件位置（src/api/）向上两级到项目根目录，然后指向 data/output
+            current_file = Path(__file__)
+            project_root = current_file.parent.parent.parent  # src/api -> src -> 项目根目录
+            output_dir = project_root / "data" / "output"
             
             if output_dir.exists():
                 plan_patterns = [
@@ -559,8 +561,10 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         
         # 保存修改后的计划到JSON文件
         from pathlib import Path
-        script_dir = Path(__file__).parent
-        output_dir = script_dir / "output"
+        # 从当前文件位置（src/api/）向上两级到项目根目录，然后指向 data/output
+        current_file = Path(__file__)
+        project_root = current_file.parent.parent.parent  # src/api -> src -> 项目根目录
+        output_dir = project_root / "data" / "output"
         output_dir.mkdir(parents=True, exist_ok=True)
         
         # 获取更新后的完整计划

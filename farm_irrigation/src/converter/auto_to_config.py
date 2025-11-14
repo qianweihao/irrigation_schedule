@@ -47,7 +47,7 @@ def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]
             "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
             "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
             "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
-            "output_config": {"config_file": "config.json", "labeled_dir": "labeled_output"},
+            "output_config": {"config_file": "config.json", "labeled_dir": "data/labeled_output"},
             "env_vars": {"farm_id": ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]},
             "default_distance_rank": 9999
         }
@@ -69,7 +69,7 @@ def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]
                     "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
                     "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
                     "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
-                    "output_config": {"config_file": "config.json", "labeled_dir": "labeled_output"},
+                    "output_config": {"config_file": "config.json", "labeled_dir": "data/labeled_output"},
                     "env_vars": {"farm_id": ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]},
                     "default_distance_rank": 9999
                 }
@@ -89,7 +89,7 @@ def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]
             "crs_config": {"geographic_crs": ["EPSG:4326", "EPSG:4490", "WGS84"], "sqm_to_mu_factor": 666.6667},
             "file_search_paths": {"data_paths": ["gzp_farm", "/mnt/data"], "waterlevels_paths": ["waterlevels.json", "gzp_farm/waterlevels.json", "/mnt/data/waterlevels.json"]},
             "default_filenames": {"segments": "港中坪水路_code.geojson", "gates": "港中坪阀门与节制闸_code.geojson", "fields": "港中坪田块_code.geojson"},
-            "output_config": {"config_file": "config.json", "labeled_dir": "labeled_output"},
+            "output_config": {"config_file": "config.json", "labeled_dir": "data/labeled_output"},
             "env_vars": {"farm_id": ["RICE_IRRIGATION_FARM_ID", "FARM_ID", "FARMID"]},
             "default_distance_rank": 9999
         }

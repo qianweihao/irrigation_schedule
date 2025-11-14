@@ -47,7 +47,10 @@ class IntelligentBatchOptimizer:
     """智能批次优化器"""
     
     def __init__(self):
-        self.output_dir = Path(__file__).parent / "output"
+        # 从当前文件位置（src/optimizer/）向上两级到项目根目录，然后指向 data/output
+        current_file = Path(__file__)
+        project_root = current_file.parent.parent.parent  # src/optimizer -> src -> 项目根目录
+        self.output_dir = project_root / "data" / "output"
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # 初始化缓存

@@ -25,12 +25,15 @@ import yaml
 
 # 配置日志
 import os
-os.makedirs('data/execution_logs', exist_ok=True)
+# 基于项目根目录计算日志路径
+_log_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'execution_logs')
+_log_dir = os.path.abspath(_log_dir)
+os.makedirs(_log_dir, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('data/execution_logs/pipeline.log', encoding='utf-8'),
+        logging.FileHandler(os.path.join(_log_dir, 'pipeline.log'), encoding='utf-8'),
         logging.StreamHandler(sys.stdout)
     ],
     force = True,

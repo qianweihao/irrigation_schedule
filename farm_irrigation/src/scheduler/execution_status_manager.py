@@ -99,17 +99,27 @@ class BatchExecutionStatus:
 class ExecutionStatusManager:
     """执行状态管理器"""
     
-    def __init__(self, db_path: str = "data/execution_status.db", log_path: str = "data/execution_logs"):
+    def __init__(self, db_path: str = None, log_path: str = None):
         """
         初始化状态管理器
         
         Args:
-            db_path: 数据库文件路径
-            log_path: 日志文件目录路径
+            db_path: 数据库文件路径（如果为None，则基于项目根目录计算）
+            log_path: 日志文件目录路径（如果为None，则基于项目根目录计算）
         """
+        # 如果未指定路径，基于项目根目录计算
+        if db_path is None:
+            # 从当前文件位置（src/scheduler/）向上两级到项目根目录
+            project_root = Path(__file__).parent.parent.parent
+            db_path = str(project_root / "data" / "execution_status.db")
+        if log_path is None:
+            # 从当前文件位置（src/scheduler/）向上两级到项目根目录
+            project_root = Path(__file__).parent.parent.parent
+            log_path = str(project_root / "data" / "execution_logs")
+        
         self.db_path = db_path
         self.log_path = Path(log_path)
-        self.log_path.mkdir(exist_ok=True)
+        self.log_path.mkdir(parents=True, exist_ok=True)
         
         # 当前执行状态
         self.current_status = BatchExecutionStatus(

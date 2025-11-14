@@ -138,19 +138,27 @@ class DynamicWaterLevelManager:
     """动态水位管理器"""
     
     def __init__(self, 
-                 config_path: str = "config.json",
-                 cache_file: str = "waterlevel_cache.json",
+                 config_path: str = None,
+                 cache_file: str = None,
                  max_cache_age_hours: int = 24,
                  quality_thresholds: Optional[Dict[str, float]] = None):
         """
         初始化水位管理器
         
         Args:
-            config_path: 配置文件路径
-            cache_file: 缓存文件路径
+            config_path: 配置文件路径（如果为None，则基于项目根目录计算）
+            cache_file: 缓存文件路径（如果为None，则基于项目根目录计算）
             max_cache_age_hours: 缓存最大年龄（小时）
             quality_thresholds: 质量阈值配置
         """
+        # 如果未指定路径，基于项目根目录计算
+        if config_path is None:
+            project_root = Path(__file__).parent.parent.parent
+            config_path = str(project_root / "config.json")
+        if cache_file is None:
+            project_root = Path(__file__).parent.parent.parent
+            cache_file = str(project_root / "data" / "waterlevel_cache.json")
+        
         self.config_path = Path(config_path)
         self.cache_file = Path(cache_file)
         self.max_cache_age_hours = max_cache_age_hours

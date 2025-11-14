@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 物联网平台设备控制
 控制设备开关和闸门开度

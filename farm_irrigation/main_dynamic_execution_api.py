@@ -66,12 +66,14 @@ _executor = ThreadPoolExecutor(max_workers=2)  # 限制并发数
 
 # 配置日志
 import os
-os.makedirs('data/execution_logs', exist_ok=True)
+# 基于项目根目录计算日志路径
+_log_dir = os.path.join(os.path.dirname(__file__), 'data', 'execution_logs')
+os.makedirs(_log_dir, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('data/execution_logs/main_dynamic_execution.log', encoding='utf-8'),
+        logging.FileHandler(os.path.join(_log_dir, 'main_dynamic_execution.log'), encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -552,28 +554,55 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         logger.info("开始初始化系统组件...")
         
         # 初始化执行状态管理器
+        # 如果路径是相对路径，基于项目根目录计算
+        if request.database_path and not os.path.isabs(request.database_path):
+            db_path = os.path.join(os.path.dirname(__file__), request.database_path)
+        else:
+            db_path = request.database_path
+        
+        log_path = os.path.join(os.path.dirname(__file__), "data", "execution_logs")
+        
         _status_manager = ExecutionStatusManager(
-            db_path=request.database_path,
-            log_path="data/execution_logs"
+            db_path=db_path,
+            log_path=log_path
         )
         logger.info("执行状态管理器初始化完成")
         
         # 初始化水位管理器
+        # 如果路径是相对路径，基于项目根目录计算
+        config_path = request.config_path
+        if config_path and not os.path.isabs(config_path):
+            config_path = os.path.join(os.path.dirname(__file__), config_path)
+        
+        cache_file = request.cache_file_path
+        if cache_file and not os.path.isabs(cache_file):
+            cache_file = os.path.join(os.path.dirname(__file__), cache_file)
+        
         _waterlevel_manager = DynamicWaterLevelManager(
-            config_path=request.config_path,
-            cache_file=request.cache_file_path
+            config_path=config_path,
+            cache_file=cache_file
         )
         logger.info("水位管理器初始化完成")
         
         # 初始化计划重新生成器
+        # 如果路径是相对路径，基于项目根目录计算
+        config_path = request.config_path
+        if config_path and not os.path.isabs(config_path):
+            config_path = os.path.join(os.path.dirname(__file__), config_path)
+        
         _plan_regenerator = DynamicPlanRegenerator(
-            config_path=request.config_path
+            config_path=config_path
         )
         logger.info("计划重新生成器初始化完成")
         
         # 初始化批次执行调度器
+        # 如果路径是相对路径，基于项目根目录计算
+        config_path = request.config_path
+        if config_path and not os.path.isabs(config_path):
+            config_path = os.path.join(os.path.dirname(__file__), config_path)
+        
         _scheduler = BatchExecutionScheduler(
-            config_path=request.config_path,
+            config_path=config_path,
             farm_id=request.farm_id,
             enable_realtime_waterlevels=request.enable_realtime_waterlevels,
             pre_execution_buffer_minutes=5
