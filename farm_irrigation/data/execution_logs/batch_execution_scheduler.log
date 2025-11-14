@@ -1,0 +1,906 @@
+2025-11-14 15:45:18,654 - __main__ - INFO - 启动智能灌溉动态执行系统服务器...
+2025-11-14 15:45:19,859 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:45:19,859 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:45:19,860 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:45:19,861 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:45:19,861 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:45:19,862 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:45:19,862 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:45:19,862 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:45:19,863 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:45:19,863 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:45:19,864 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:45:19,864 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:45:19,865 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:45:19,865 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:45:19,865 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:45:19,865 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:45:30,519 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 15:45:30,520 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 15:45:30,520 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 15:45:30,520 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 15:45:30,520 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 15:45:30,520 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 15:45:30,520 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 15:46:24,616 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:46:24,616 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:46:24,617 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:24,618 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:24,618 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:46:24,618 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:46:24,619 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:46:24,619 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:24,619 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:46:24,619 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:46:24,620 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:24,620 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:24,621 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:24,621 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:46:24,621 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:46:24,621 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:46:33,535 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:46:33,535 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:46:34,989 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:46:34,989 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:46:34,990 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:34,991 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:34,991 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:46:34,991 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:46:34,992 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:46:34,992 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:34,992 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:46:34,992 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:46:34,993 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:34,993 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:34,993 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:34,994 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:46:34,994 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:46:34,994 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:46:38,121 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:46:38,121 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:46:39,530 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:46:39,530 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:46:39,531 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:39,531 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:39,531 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:46:39,532 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:46:39,532 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:46:39,533 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:39,533 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:46:39,533 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:46:39,534 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:39,534 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:39,535 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:39,535 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:46:39,535 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:46:39,535 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:46:54,317 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:46:54,317 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:46:55,741 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:46:55,741 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:46:55,742 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:55,742 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:55,742 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:46:55,743 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:46:55,743 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:46:55,744 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:55,744 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:46:55,744 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:46:55,745 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:46:55,745 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:46:55,746 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:46:55,746 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:46:55,746 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:46:55,746 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:48:06,813 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:48:06,814 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:48:08,273 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:48:08,273 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:48:08,274 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:48:08,274 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:48:08,274 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:48:08,275 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:48:08,275 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:48:08,276 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:48:08,276 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:48:08,276 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:48:08,277 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:48:08,277 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:48:08,278 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:48:08,278 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:48:08,278 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:48:08,278 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:48:56,076 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:48:56,077 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:48:57,496 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:48:57,496 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:48:57,497 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:48:57,497 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:48:57,498 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:48:57,498 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:48:57,499 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:48:57,499 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:48:57,499 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:48:57,499 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:48:57,500 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:48:57,500 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:48:57,501 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:48:57,501 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:48:57,501 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:48:57,502 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 15:49:02,372 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 15:49:41,106 - __main__ - INFO - 启动智能灌溉动态执行系统服务器...
+2025-11-14 15:49:42,332 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:49:42,333 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:49:42,334 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:49:42,334 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:49:42,334 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:49:42,335 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:49:42,335 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:49:42,335 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:49:42,336 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:49:42,336 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:49:42,336 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:49:42,337 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:49:42,337 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:49:42,337 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:49:42,337 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:49:42,338 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:49:49,430 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 15:49:49,430 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 15:49:49,431 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 15:49:49,431 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 15:49:49,431 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 15:49:49,431 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 15:49:49,431 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 15:53:10,128 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:53:10,128 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:53:10,129 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:53:10,130 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:53:10,130 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:53:10,131 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:53:10,131 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:53:10,131 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:53:10,131 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:53:10,132 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:53:10,132 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:53:10,133 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:53:10,133 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:53:10,133 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:53:10,133 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:53:10,133 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:54:19,658 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:54:19,658 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:54:21,151 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:54:21,151 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:54:21,152 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:54:21,152 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:54:21,152 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:54:21,153 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:54:21,153 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:54:21,154 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:54:21,154 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:54:21,154 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:54:21,155 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:54:21,155 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:54:21,156 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:54:21,156 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:54:21,156 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:54:21,156 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 15:54:33,320 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 15:55:53,848 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:55:53,849 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:55:53,850 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:55:53,850 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:55:53,850 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:55:53,851 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:55:53,851 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:55:53,852 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:55:53,852 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:55:53,852 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:55:53,853 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:55:53,853 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:55:53,853 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:55:53,854 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:55:53,854 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:55:53,854 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:57:15,827 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:57:15,827 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:57:17,257 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:57:17,258 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:57:17,259 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:57:17,259 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:57:17,260 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:57:17,260 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:57:17,261 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:57:17,261 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:57:17,261 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:57:17,261 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:57:17,262 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:57:17,262 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:57:17,263 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:57:17,263 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:57:17,263 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:57:17,263 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:58:17,203 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:58:17,203 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:58:18,685 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:58:18,686 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:58:18,687 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:58:18,687 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:58:18,687 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:58:18,688 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:58:18,688 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:58:18,688 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:58:18,689 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:58:18,689 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:58:18,689 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:58:18,690 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:58:18,690 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:58:18,690 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:58:18,691 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:58:18,691 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:58:25,445 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 15:58:25,445 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 15:58:52,688 - __main__ - INFO - 启动智能灌溉动态执行系统服务器...
+2025-11-14 15:58:53,920 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 15:58:53,920 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 15:58:53,921 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:58:53,922 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:58:53,922 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 15:58:53,922 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 15:58:53,923 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 15:58:53,923 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 15:58:53,923 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 15:58:53,924 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 15:58:53,924 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 15:58:53,924 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 15:58:53,925 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 15:58:53,925 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 15:58:53,925 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 15:58:53,925 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 15:58:59,435 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 15:58:59,435 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 15:58:59,435 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 15:58:59,436 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 15:58:59,436 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 15:58:59,436 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 15:58:59,436 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 16:07:03,756 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:07:03,756 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:07:03,757 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:07:03,757 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:07:03,757 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:07:03,758 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:07:03,758 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:07:03,759 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:07:03,759 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:07:03,759 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:07:03,760 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:07:03,760 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:07:03,761 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:07:03,761 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:07:03,761 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:07:03,761 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:07:07,483 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:07:07,483 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:07:08,930 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:07:08,930 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:07:08,930 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:07:08,931 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:07:08,931 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:07:08,932 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:07:08,932 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:07:08,932 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:07:08,933 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:07:08,933 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:07:08,933 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:07:08,934 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:07:08,934 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:07:08,934 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:07:08,935 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:07:08,935 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:07:29,693 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:07:29,693 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:07:31,144 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:07:31,144 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:07:31,145 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:07:31,146 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:07:31,146 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:07:31,147 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:07:31,147 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:07:31,147 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:07:31,147 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:07:31,148 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:07:31,148 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:07:31,148 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:07:31,149 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:07:31,149 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:07:31,149 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:07:31,149 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:08:27,174 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:08:27,174 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:08:28,601 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:08:28,601 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:08:28,602 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:08:28,602 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:08:28,603 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:08:28,603 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:08:28,604 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:08:28,604 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:08:28,605 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:08:28,605 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:08:28,605 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:08:28,606 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:08:28,606 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:08:28,607 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:08:28,607 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:08:28,607 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:08:33,194 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:08:33,194 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:08:34,619 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:08:34,620 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:08:34,620 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:08:34,621 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:08:34,621 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:08:34,622 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:08:34,622 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:08:34,622 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:08:34,623 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:08:34,623 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:08:34,623 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:08:34,624 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:08:34,624 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:08:34,624 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:08:34,624 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:08:34,624 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:08:43,946 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:08:43,946 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:08:45,348 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:08:45,349 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:08:45,349 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:08:45,350 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:08:45,350 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:08:45,351 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:08:45,351 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:08:45,351 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:08:45,352 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:08:45,352 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:08:45,352 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:08:45,352 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:08:45,353 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:08:45,353 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:08:45,353 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:08:45,354 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:09:02,549 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:09:02,549 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:09:04,056 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:09:04,057 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:09:04,057 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:09:04,058 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:09:04,058 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:09:04,059 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:09:04,059 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:09:04,059 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:09:04,060 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:09:04,060 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:09:04,061 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:09:04,061 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:09:04,061 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:09:04,062 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:09:04,062 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:09:04,062 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:09:09,243 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 16:09:09,243 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 16:09:09,244 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 16:09:09,244 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 16:09:09,244 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 16:09:09,244 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 16:09:09,244 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 16:12:01,533 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:12:01,533 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:12:01,534 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:12:01,534 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:12:01,534 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:12:01,535 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:12:01,535 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:12:01,536 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:12:01,536 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:12:01,536 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:12:01,537 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:12:01,537 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:12:01,537 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:12:01,537 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:12:01,538 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:12:01,538 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:12:43,494 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:12:43,494 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:12:44,968 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:12:44,968 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:12:44,969 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:12:44,970 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:12:44,970 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:12:44,970 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:12:44,971 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:12:44,971 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:12:44,971 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:12:44,971 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:12:44,972 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:12:44,972 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:12:44,973 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:12:44,973 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:12:44,973 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:12:44,973 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:12:54,085 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:12:54,085 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:12:55,638 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:12:55,638 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:12:55,639 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:12:55,639 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:12:55,640 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:12:55,640 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:12:55,640 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:12:55,641 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:12:55,641 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:12:55,641 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:12:55,642 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:12:55,642 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:12:55,643 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:12:55,643 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:12:55,643 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:12:55,643 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:12:59,540 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:12:59,540 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:13:01,044 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:13:01,045 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:13:01,046 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:13:01,046 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:13:01,046 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:13:01,047 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:13:01,048 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:13:01,048 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:01,048 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:13:01,049 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:13:01,049 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:13:01,050 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:13:01,050 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:01,050 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:13:01,050 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:13:01,050 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:13:05,306 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:13:05,306 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:13:06,836 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:13:06,837 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:13:06,838 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:13:06,838 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:13:06,838 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:13:06,839 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:13:06,840 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:13:06,840 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:06,840 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:13:06,840 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:13:06,841 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:13:06,841 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:13:06,842 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:06,842 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:13:06,842 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:13:06,842 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:13:35,554 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:13:35,554 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:13:36,972 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:13:36,973 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:13:36,973 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:13:36,974 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:13:36,974 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:13:36,975 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:13:36,975 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:13:36,976 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:36,976 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:13:36,976 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:13:36,977 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:13:36,977 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:13:36,978 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:36,978 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:13:36,978 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:13:36,978 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:13:44,839 - main_dynamic_execution_api - INFO - 获取水位目标值 - farm_id: 13944136728576, field_id: None
+2025-11-14 16:13:44,840 - main_dynamic_execution_api - INFO - 成功获取 36 个田块的水位目标值
+2025-11-14 16:13:58,766 - src.api.dynamic_execution_api - INFO - 手动重新生成批次 1
+2025-11-14 16:13:58,766 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:58,767 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:13:58,767 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:13:58,767 - src.api.dynamic_execution_api - INFO - 当前没有执行计划，尝试加载默认计划文件
+2025-11-14 16:13:58,768 - src.api.dynamic_execution_api - WARNING - output目录中没有找到计划文件，尝试加载根目录的plan.json
+2025-11-14 16:13:58,768 - src.scheduler.batch_execution_scheduler - ERROR - 计划文件不存在: plan.json
+2025-11-14 16:14:06,304 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 16:14:06,304 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 16:14:06,304 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 16:14:06,304 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 16:14:06,304 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 16:14:06,305 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 16:14:06,305 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 16:15:05,495 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:15:05,495 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:15:05,496 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:15:05,496 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:15:05,496 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:15:05,497 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:15:05,497 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:15:05,498 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:15:05,498 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:15:05,498 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:15:05,499 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:15:05,499 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:15:05,500 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:15:05,500 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:15:05,500 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:15:05,500 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:15:22,957 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:15:22,957 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:15:24,411 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:15:24,411 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:15:24,412 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:15:24,413 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:15:24,413 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:15:24,413 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:15:24,414 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:15:24,414 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:15:24,414 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:15:24,414 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:15:24,415 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:15:24,415 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:15:24,416 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:15:24,416 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:15:24,416 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:15:24,416 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:15:44,896 - main_dynamic_execution_api - INFO - 找到最新计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161407.json
+2025-11-14 16:16:02,909 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:16:02,909 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:16:04,391 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:16:04,391 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:16:04,392 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:16:04,392 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:16:04,392 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:16:04,393 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:16:04,393 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:16:04,394 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:16:04,394 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:16:04,394 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:16:04,395 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:16:04,395 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:16:04,395 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:16:04,395 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:16:04,396 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:16:04,396 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:16:08,851 - main_dynamic_execution_api - INFO - 找到最新计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161407.json
+2025-11-14 16:16:19,605 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:16:19,605 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:16:21,100 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:16:21,100 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:16:21,101 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:16:21,101 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:16:21,102 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:16:21,102 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:16:21,103 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:16:21,103 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:16:21,103 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:16:21,103 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:16:21,104 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:16:21,104 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:16:21,105 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:16:21,105 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:16:21,105 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:16:21,105 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:16:27,236 - src.api.dynamic_execution_api - INFO - 手动重新生成批次 1
+2025-11-14 16:16:27,237 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:16:27,237 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:16:27,238 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:16:27,238 - src.api.dynamic_execution_api - INFO - 当前没有执行计划，尝试加载默认计划文件
+2025-11-14 16:16:27,238 - src.api.dynamic_execution_api - WARNING - output目录中没有找到计划文件，尝试加载根目录的plan.json
+2025-11-14 16:16:27,238 - src.scheduler.batch_execution_scheduler - ERROR - 计划文件不存在: plan.json
+2025-11-14 16:16:31,331 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 16:16:31,331 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 16:16:31,332 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 16:16:31,332 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 16:16:31,332 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 16:16:31,332 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 16:16:31,332 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 16:18:13,177 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:18:13,178 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:18:13,178 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:18:13,179 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:18:13,179 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:18:13,180 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:18:13,180 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:18:13,180 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:18:13,181 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:18:13,181 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:18:13,181 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:18:13,182 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:18:13,182 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:18:13,182 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:18:13,183 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:18:13,183 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:18:34,771 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:18:34,771 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:18:36,261 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:18:36,262 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:18:36,263 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:18:36,263 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:18:36,263 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:18:36,264 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:18:36,264 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:18:36,265 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:18:36,265 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:18:36,265 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:18:36,266 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:18:36,266 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:18:36,267 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:18:36,267 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:18:36,267 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:18:36,267 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:18:51,465 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:18:51,465 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:18:52,858 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:18:52,858 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:18:52,859 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:18:52,860 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:18:52,860 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:18:52,861 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:18:52,862 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:18:52,862 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:18:52,863 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:18:52,863 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:18:52,864 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:18:52,864 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:18:52,865 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:18:52,865 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:18:52,865 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:18:52,865 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:19:01,010 - src.api.dynamic_execution_api - INFO - 手动重新生成批次 1
+2025-11-14 16:19:01,011 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:19:01,011 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:19:01,011 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:19:01,012 - src.api.dynamic_execution_api - INFO - 当前没有执行计划，尝试加载默认计划文件
+2025-11-14 16:19:01,013 - src.api.dynamic_execution_api - INFO - 找到计划文件: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161633.json
+2025-11-14 16:19:01,014 - src.scheduler.batch_execution_scheduler - INFO - 使用scenarios格式，选择第一个scenario: P2单独使用
+2025-11-14 16:19:01,015 - src.scheduler.batch_execution_scheduler - INFO - 批次 1: 开始时间 0.00h, 持续时间 18.89h
+2025-11-14 16:19:01,015 - src.scheduler.batch_execution_scheduler - INFO - 批次 2: 开始时间 18.89h, 持续时间 18.24h
+2025-11-14 16:19:01,015 - src.scheduler.batch_execution_scheduler - INFO - 批次 3: 开始时间 37.13h, 持续时间 16.94h
+2025-11-14 16:19:01,015 - src.scheduler.batch_execution_scheduler - INFO - 灌溉计划加载成功: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161633.json
+2025-11-14 16:19:01,015 - src.scheduler.batch_execution_scheduler - INFO - 共有 3 个批次
+2025-11-14 16:19:01,015 - src.api.dynamic_execution_api - INFO - 当前计划包含 3 个scenarios，使用第一个scenario: 'P2单独使用'
+2025-11-14 16:19:01,015 - src.scheduler.dynamic_plan_regenerator - INFO - 开始重新生成批次 1 的计划
+2025-11-14 16:19:01,019 - src.scheduler.dynamic_plan_regenerator - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-14 16:19:01,019 - src.scheduler.batch_execution_scheduler - ERROR - 更新批次 1 计划失败: ExecutionStatusManager.update_execution_status() got an unexpected keyword argument 'batch_id'
+2025-11-14 16:19:01,019 - src.api.dynamic_execution_api - INFO - 原始计划包含 3 个scenarios
+2025-11-14 16:19:01,020 - src.api.dynamic_execution_api - INFO - 已更新scenario: P2单独使用
+2025-11-14 16:19:01,020 - src.api.dynamic_execution_api - INFO - 保留原始scenario: P1单独使用
+2025-11-14 16:19:01,020 - src.api.dynamic_execution_api - INFO - 保留原始scenario: 全部水泵(P1+P2)组合使用
+2025-11-14 16:19:01,020 - src.api.dynamic_execution_api - INFO - 最终保存的计划包含 3 个scenarios
+2025-11-14 16:19:01,028 - src.api.dynamic_execution_api - INFO - 修改后的计划已保存到: e:\irrigation_schedule\farm_irrigation\src\api\output\irrigation_plan_manual_regen_1763108341.json
+2025-11-14 16:19:01,028 - src.api.dynamic_execution_api - INFO - 使用自定义水位标准：1 个田块
+2025-11-14 16:19:14,818 - main_dynamic_execution_api - INFO - 开始批次重新生成 - plan_id: e:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251114_161633.json
+2025-11-14 16:19:14,826 - src.api.batch_regeneration_api - INFO - [时间修改] 批次 1 时长调整: 18.89h -> 10.00h, 供水量: 2400.00 m³
+2025-11-14 16:19:14,826 - src.api.batch_regeneration_api - INFO - [时间修改] 重新计算scenario统计数据，共有 3 个批次
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 1: 时长=10.00h, 水泵=['P2']
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 2: 时长=18.24h, 水泵=['P2']
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 3: 时长=16.94h, 水泵=['P2']
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改] 计算完成 - total_duration=45.19h, total_deficit=10844.50m³, pump_runtime={'P2': 45.18542648159333}
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改] 批次 1 时长调整: 18.89h -> 10.00h, 供水量: 2400.00 m³
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改] 重新计算scenario统计数据，共有 3 个批次
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 1: 时长=10.00h, 水泵=['P1']
+2025-11-14 16:19:14,827 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 2: 时长=18.24h, 水泵=['P1']
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 3: 时长=16.94h, 水泵=['P1']
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改] 计算完成 - total_duration=45.19h, total_deficit=10844.50m³, pump_runtime={'P1': 45.18542648159333}
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改] 批次 1 时长调整: 22.72h -> 10.00h, 供水量: 4800.00 m³
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改] 重新计算scenario统计数据，共有 2 个批次
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 1: 时长=10.00h, 水泵=['P1', 'P2']
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 2: 时长=8.10h, 水泵=['P1', 'P2']
+2025-11-14 16:19:14,828 - src.api.batch_regeneration_api - INFO - [时间修改] 计算完成 - total_duration=18.10h, total_deficit=8686.94m³, pump_runtime={'P1': 18.097796875, 'P2': 18.097796875}
+2025-11-14 16:19:14,833 - main_dynamic_execution_api - INFO - 修改后的计划已保存到: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108354.json
+2025-11-14 16:19:14,834 - main_dynamic_execution_api - INFO - 批次重新生成结果已保存到缓存 - cache_key: f76bd4929463d75903f815c685ca9f94
+2025-11-14 16:19:14,834 - main_dynamic_execution_api - INFO - 批次重新生成完成
+2025-11-14 16:19:26,326 - main_dynamic_execution_api - INFO - 开始批次重新生成 - plan_id: e:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251114_161633.json
+2025-11-14 16:19:26,367 - src.api.batch_regeneration_api - INFO - 开始重新计算scenario统计数据，共有 3 个批次
+2025-11-14 16:19:26,367 - src.api.batch_regeneration_api - INFO -   批次 1: 时长=18.89h, 水泵=['P1']
+2025-11-14 16:19:26,367 - src.api.batch_regeneration_api - INFO -   批次 2: 时长=18.24h, 水泵=['P2']
+2025-11-14 16:19:26,367 - src.api.batch_regeneration_api - INFO -   批次 3: 时长=16.94h, 水泵=['P2']
+2025-11-14 16:19:26,367 - src.api.batch_regeneration_api - INFO - 计算完成 - total_duration=54.08h, pump_runtime={'P1': 18.89186972370792, 'P2': 35.18542648159333}
+2025-11-14 16:19:26,368 - src.api.batch_regeneration_api - INFO - [时间修改] 批次 1 时长调整: 18.89h -> 10.00h, 供水量: 2400.00 m³
+2025-11-14 16:19:26,369 - src.api.batch_regeneration_api - INFO - [时间修改] 重新计算scenario统计数据，共有 3 个批次
+2025-11-14 16:19:26,369 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 1: 时长=10.00h, 水泵=['P1']
+2025-11-14 16:19:26,369 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 2: 时长=18.24h, 水泵=['P2']
+2025-11-14 16:19:26,369 - src.api.batch_regeneration_api - INFO - [时间修改]   批次 3: 时长=16.94h, 水泵=['P2']
+2025-11-14 16:19:26,369 - src.api.batch_regeneration_api - INFO - [时间修改] 计算完成 - total_duration=45.19h, total_deficit=10844.50m³, pump_runtime={'P1': 10.0, 'P2': 35.18542648159333}
+2025-11-14 16:19:26,374 - main_dynamic_execution_api - INFO - 修改后的计划已保存到: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108366.json
+2025-11-14 16:19:26,375 - main_dynamic_execution_api - INFO - 批次重新生成结果已保存到缓存 - cache_key: d87911cdf9bdc9105b9a43eda29f3657
+2025-11-14 16:19:26,375 - main_dynamic_execution_api - INFO - 批次重新生成完成
+2025-11-14 16:20:10,285 - main_dynamic_execution_api - INFO - 开始批次间田块调整 - plan_id: e:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251114_161633.json
+2025-11-14 16:20:10,285 - main_dynamic_execution_api - INFO - 调整数量: 2
+2025-11-14 16:20:10,288 - src.optimizer.batch_adjustment_service - INFO - 成功加载计划: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161633.json
+2025-11-14 16:20:10,290 - src.optimizer.batch_adjustment_service - INFO - 处理场景 1: P2单独使用
+2025-11-14 16:20:10,290 - src.optimizer.batch_adjustment_service - INFO - 成功移动田块 S3-G5-F3: 批次1 -> 批次2
+2025-11-14 16:20:10,290 - src.optimizer.batch_adjustment_service - INFO - 成功移动田块 S5-G27-F19: 批次2 -> 批次1
+2025-11-14 16:20:10,290 - src.optimizer.batch_adjustment_service - INFO - 批次 1 内田块已重新排序，共 16 个田块
+2025-11-14 16:20:10,290 - src.optimizer.batch_adjustment_service - INFO - 批次 1 时间已重新计算: 0h -> 19.755654333333332h
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 批次 2 内田块已重新排序，共 11 个田块
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 批次 2 时间已重新计算: 0h -> 17.828978033333332h
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 处理场景 2: P1单独使用
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 成功移动田块 S3-G5-F3: 批次1 -> 批次2
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 成功移动田块 S5-G27-F19: 批次2 -> 批次1
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 批次 1 内田块已重新排序，共 16 个田块
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 批次 1 时间已重新计算: 0h -> 19.755654333333332h
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 批次 2 内田块已重新排序，共 11 个田块
+2025-11-14 16:20:10,291 - src.optimizer.batch_adjustment_service - INFO - 批次 2 时间已重新计算: 0h -> 17.828978033333332h
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 处理场景 3: 全部水泵(P1+P2)组合使用
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 成功移动田块 S3-G5-F3: 批次1 -> 批次2
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 批次 1 内田块已重新排序，共 27 个田块
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 批次 1 时间已重新计算: 0h -> 19.612542506666667h
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 批次 2 内田块已重新排序，共 9 个田块
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 批次 2 时间已重新计算: 0h -> 7.7667055000000005h
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 重新生成受影响批次的命令: [1, 2]
+2025-11-14 16:20:10,292 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 1 的 sequence.fields，共 16 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 1 的 full_order，共 16 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 2 的 sequence.fields，共 11 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 2 的 full_order，共 11 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 1 的 sequence.fields，共 16 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 1 的 full_order，共 16 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 2 的 sequence.fields，共 11 个田块
+2025-11-14 16:20:10,293 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 2 的 full_order，共 11 个田块
+2025-11-14 16:20:10,294 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 1 的 sequence.fields，共 27 个田块
+2025-11-14 16:20:10,294 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 1 的 full_order，共 27 个田块
+2025-11-14 16:20:10,294 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 2 的 sequence.fields，共 9 个田块
+2025-11-14 16:20:10,294 - src.optimizer.batch_adjustment_service - INFO - 已更新批次 2 的 full_order，共 9 个田块
+2025-11-14 16:20:10,299 - src.optimizer.batch_adjustment_service - INFO - 调整后的计划已保存: e:\irrigation_schedule\farm_irrigation\src\optimizer\output\irrigation_plan_20251114_161633_adjusted_20251114_162010.json
+2025-11-14 16:20:10,300 - main_dynamic_execution_api - INFO - 批次调整完成 - 成功调整 2 个田块
+2025-11-14 16:20:15,005 - main_dynamic_execution_api - INFO - 开始批次顺序调整 - plan_id: e:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251114_161633.json
+2025-11-14 16:20:15,005 - main_dynamic_execution_api - INFO - 新顺序: None
+2025-11-14 16:20:15,006 - src.optimizer.batch_adjustment_service - INFO - 成功加载计划: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161633.json
+2025-11-14 16:20:15,008 - src.optimizer.batch_adjustment_service - ERROR - 批次顺序调整失败: Scenario 'P1单独使用' 的批次数量(3)与new_order长度(10)不匹配
+2025-11-14 16:20:15,008 - main_dynamic_execution_api - ERROR - 批次顺序调整验证失败: Scenario 'P1单独使用' 的批次数量(3)与new_order长度(10)不匹配
+2025-11-14 16:20:30,723 - main_dynamic_execution_api - INFO - 开始批次顺序调整 - plan_id: e:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251114_161633.json
+2025-11-14 16:20:30,723 - main_dynamic_execution_api - INFO - 新顺序: None
+2025-11-14 16:20:30,724 - src.optimizer.batch_adjustment_service - INFO - 成功加载计划: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161633.json
+2025-11-14 16:20:30,726 - src.optimizer.batch_adjustment_service - INFO - 成功重新排序批次: [2, 1, 3]
+2025-11-14 16:20:30,726 - src.optimizer.batch_adjustment_service - INFO - 已调整scenario 'P1单独使用' 的批次顺序
+2025-11-14 16:20:30,726 - src.optimizer.batch_adjustment_service - INFO - 成功重新排序批次: [3, 1, 2]
+2025-11-14 16:20:30,726 - src.optimizer.batch_adjustment_service - INFO - 已调整scenario 'P2单独使用' 的批次顺序
+2025-11-14 16:20:30,727 - src.optimizer.batch_adjustment_service - INFO - 成功重新排序批次: [2, 1]
+2025-11-14 16:20:30,727 - src.optimizer.batch_adjustment_service - INFO - 已调整scenario '全部水泵(P1+P2)组合使用' 的批次顺序
+2025-11-14 16:20:30,733 - src.optimizer.batch_adjustment_service - INFO - 重新排序后的计划已保存: e:\irrigation_schedule\farm_irrigation\src\optimizer\output\irrigation_plan_20251114_161633_reordered_20251114_162030.json
+2025-11-14 16:20:30,733 - main_dynamic_execution_api - INFO - 批次顺序调整完成 - 成功调整3个scenario的批次顺序
+2025-11-14 16:20:37,329 - main_dynamic_execution_api - INFO - 找到最新计划文件: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108366.json
+2025-11-14 16:20:37,331 - src.scheduler.batch_execution_scheduler - INFO - 使用scenarios格式，选择第一个scenario: P2单独使用
+2025-11-14 16:20:37,331 - src.scheduler.batch_execution_scheduler - INFO - 批次 1: 开始时间 2.00h, 持续时间 10.00h
+2025-11-14 16:20:37,331 - src.scheduler.batch_execution_scheduler - INFO - 批次 2: 开始时间 12.00h, 持续时间 18.24h
+2025-11-14 16:20:37,331 - src.scheduler.batch_execution_scheduler - INFO - 批次 3: 开始时间 30.24h, 持续时间 16.94h
+2025-11-14 16:20:37,331 - src.scheduler.batch_execution_scheduler - INFO - 灌溉计划加载成功: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108366.json
+2025-11-14 16:20:37,331 - src.scheduler.batch_execution_scheduler - INFO - 共有 3 个批次
+2025-11-14 16:20:37,332 - main_dynamic_execution_api - INFO - 成功加载计划文件: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108366.json
+2025-11-14 16:20:41,683 - src.scheduler.batch_execution_scheduler - ERROR - 获取批次 0 详细信息失败: 0
+2025-11-14 16:20:50,895 - main_dynamic_execution_api - INFO - 开始处理多水泵方案请求 - config_file: config.json
+2025-11-14 16:20:51,285 - main_dynamic_execution_api - INFO - 触发阈值: 1个田块
+2025-11-14 16:20:52,328 - main_dynamic_execution_api - INFO - 多水泵方案生成成功，共 3 个方案
+2025-11-14 16:21:23,764 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 16:21:23,764 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 16:21:23,764 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 16:21:23,764 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 16:21:23,764 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 16:21:23,764 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 16:21:23,765 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 16:22:36,112 - __main__ - INFO - 启动智能灌溉动态执行系统服务器...
+2025-11-14 16:22:37,331 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:22:37,331 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:22:37,332 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:22:37,332 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:22:37,332 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:22:37,333 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:22:37,333 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:22:37,334 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:22:37,334 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:22:37,334 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:22:37,335 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:22:37,335 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:22:37,336 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:22:37,336 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:22:37,336 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:22:37,336 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:22:46,236 - main_dynamic_execution_api - INFO - 获取水位目标值 - farm_id: 13944136728576, field_id: None
+2025-11-14 16:22:46,237 - main_dynamic_execution_api - INFO - 成功获取 36 个田块的水位目标值
+2025-11-14 16:22:50,845 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 16:22:50,845 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 16:22:50,845 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 16:22:50,846 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 16:22:50,846 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 16:22:50,846 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 16:22:50,846 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-14 16:25:35,516 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:25:35,517 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:25:35,518 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:25:35,518 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:25:35,518 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:25:35,519 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:25:35,519 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:25:35,520 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:25:35,520 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:25:35,520 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:25:35,520 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:25:35,521 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:25:35,521 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:25:35,521 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:25:35,522 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:25:35,522 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:25:39,544 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:25:39,544 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:25:40,950 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:25:40,950 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:25:40,951 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:25:40,952 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:25:40,952 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:25:40,953 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:25:40,953 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:25:40,953 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:25:40,954 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:25:40,954 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:25:40,955 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:25:40,956 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:25:40,956 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:25:40,956 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:25:40,956 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:25:40,956 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:25:48,518 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:25:48,518 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:25:49,951 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:25:49,951 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:25:49,952 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:25:49,953 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:25:49,953 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:25:49,954 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:25:49,954 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:25:49,954 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:25:49,954 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:25:49,955 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:25:49,955 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:25:49,955 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:25:49,956 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:25:49,956 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:25:49,956 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:25:49,957 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:26:00,185 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-14 16:26:00,185 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-14 16:26:01,598 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-14 16:26:01,598 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-14 16:26:01,599 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:26:01,600 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:26:01,600 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-14 16:26:01,601 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 36 个田块ID映射
+2025-11-14 16:26:01,601 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-14 16:26:01,601 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: config.json
+2025-11-14 16:26:01,601 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: irrigation_plan_template.json
+2025-11-14 16:26:01,602 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-14 16:26:01,602 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-14 16:26:01,602 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-14 16:26:01,603 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-14 16:26:01,603 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-14 16:26:01,603 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-14 16:26:01,603 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-14 16:26:47,005 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 13944136728576
+2025-11-14 16:26:47,005 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-14 16:26:47,006 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-14 16:26:47,006 - main_dynamic_execution_api - INFO - 缓存键生成成功: 407aa85133e3f440f410a1e2f7904869
+2025-11-14 16:26:47,006 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-14 16:26:47,006 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-14 16:26:47,006 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...

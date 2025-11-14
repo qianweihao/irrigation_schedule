@@ -1,0 +1,9 @@
+{
+  "description": "灌溉计划模板文件",
+  "version": "1.0",
+  "created_by": "irrigation_system",
+  "template_purpose": "用于动态计划重新生成的参考模板",
+  "note": "此文件为可选模板，系统会在运行时使用实际计划数据"
+}
+
+

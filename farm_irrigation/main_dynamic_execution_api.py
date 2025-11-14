@@ -34,13 +34,13 @@ import uvicorn
 import geopandas as gpd
 
 # 导入动态执行相关模块
-from batch_execution_scheduler import BatchExecutionScheduler
-from dynamic_waterlevel_manager import DynamicWaterLevelManager
-from dynamic_plan_regenerator import DynamicPlanRegenerator
-from execution_status_manager import ExecutionStatusManager
+from src.scheduler.batch_execution_scheduler import BatchExecutionScheduler
+from src.scheduler.dynamic_waterlevel_manager import DynamicWaterLevelManager
+from src.scheduler.dynamic_plan_regenerator import DynamicPlanRegenerator
+from src.scheduler.execution_status_manager import ExecutionStatusManager
 
 # 导入API模型和函数
-from dynamic_execution_api import (
+from src.api.dynamic_execution_api import (
     DynamicExecutionRequest, DynamicExecutionResponse,
     ExecutionStatusResponse, WaterLevelUpdateRequest, WaterLevelUpdateResponse,
     ManualRegenerationRequest, ManualRegenerationResponse,
@@ -51,13 +51,13 @@ from dynamic_execution_api import (
 )
 
 # 导入批次重新生成相关模块
-from batch_regeneration_api import (
+from src.api.batch_regeneration_api import (
     BatchModificationRequest, BatchRegenerationResponse,
     create_batch_regeneration_endpoint, generate_batch_cache_key
 )
 
 # 导入多水泵方案相关模块
-from farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
+from src.core.farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
 
 # 全局缓存和线程池
 _cache = {}
@@ -65,11 +65,13 @@ _cache_lock = threading.Lock()
 _executor = ThreadPoolExecutor(max_workers=2)  # 限制并发数
 
 # 配置日志
+import os
+os.makedirs('data/execution_logs', exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('main_dynamic_execution.log', encoding='utf-8'),
+        logging.FileHandler('data/execution_logs/main_dynamic_execution.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -157,8 +159,8 @@ class SystemInitRequest(BaseModel):
     config_path: str = "config.json"
     farm_id: str = "default_farm"
     enable_realtime_waterlevels: bool = True
-    database_path: str = "execution_status.db"
-    cache_file_path: str = "water_level_cache.json"
+    database_path: str = "data/execution_status.db"
+    cache_file_path: str = "data/water_level_cache.json"
 
 class IrrigationPlanRequest(BaseModel):
     """生成灌溉计划请求模型"""
@@ -297,18 +299,18 @@ class BatchReorderResponse(BaseModel):
 _system_start_time = datetime.now()
 
 # 文件上传相关常量
-GZP_FARM_DIR = os.path.join(os.path.dirname(__file__), "gzp_farm")
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+GZP_FARM_DIR = os.path.join(os.path.dirname(__file__), "data", "gzp_farm")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "data", "output")
 
 # GeoJson相关常量
 ROOT = os.path.abspath(os.path.dirname(__file__))
-GEOJSON_DIR = os.path.join(ROOT, "gzp_farm")
+GEOJSON_DIR = os.path.join(ROOT, "data", "gzp_farm")
 VALVE_FILE = "港中坪阀门与节制闸_code.geojson"
 FIELD_FILE = "港中坪田块_code.geojson"
 WATERWAY_FILE = "港中坪水路_code.geojson"
 
 # 标注后的文件（优先使用）
-LABELED_DIR = os.path.join(ROOT, "labeled_output")
+LABELED_DIR = os.path.join(ROOT, "data", "labeled_output")
 LABELED_FIELDS = os.path.join(LABELED_DIR, "fields_labeled.geojson")
 LABELED_GATES = os.path.join(LABELED_DIR, "gates_labeled.geojson")
 LABELED_SEGMENT = os.path.join(LABELED_DIR, "segments_labeled.geojson")
@@ -424,7 +426,7 @@ def find_latest_plan_file(output_dir_path: str = None) -> Optional[str]:
     
     if output_dir_path is None:
         script_dir = Path(__file__).parent
-        output_dir = script_dir / "output"
+        output_dir = script_dir / "data" / "output"
     else:
         output_dir = Path(output_dir_path)
     
@@ -432,10 +434,9 @@ def find_latest_plan_file(output_dir_path: str = None) -> Optional[str]:
         logger.warning(f"输出目录不存在: {output_dir}")
         return None
     
-    # 查找完整计划文件（排除手动重新生成的文件）
+    # 查找完整计划文件（包括所有irrigation_plan开头的文件）
     plan_patterns = [
-        "irrigation_plan_modified_*.json",
-        "irrigation_plan_2*.json",
+        "irrigation_plan_*.json",  # 匹配所有irrigation_plan开头的文件
     ]
     
     all_plan_files = []
@@ -553,7 +554,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         # 初始化执行状态管理器
         _status_manager = ExecutionStatusManager(
             db_path=request.database_path,
-            log_path="execution_logs"
+            log_path="data/execution_logs"
         )
         logger.info("执行状态管理器初始化完成")
         
@@ -566,8 +567,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         
         # 初始化计划重新生成器
         _plan_regenerator = DynamicPlanRegenerator(
-            config_path=request.config_path,
-            plan_template_path="plan_templates"
+            config_path=request.config_path
         )
         logger.info("计划重新生成器初始化完成")
         
@@ -758,7 +758,7 @@ async def get_water_level_targets(
         global_wl_high = config_data.get('wl_high', 140.0)
         
         # 读取田块数据
-        from farm_irr_full_device_modified import farmcfg_from_json_select
+        from src.core.farm_irr_full_device_modified import farmcfg_from_json_select
         
         try:
             cfg = farmcfg_from_json_select(config_data)
@@ -859,7 +859,7 @@ async def regenerate_batch_plan(request: BatchModificationRequest):
             return BatchRegenerationResponse(**cached_result)
         
         # 导入批次重新生成服务
-        from batch_regeneration_api import BatchRegenerationService
+        from src.api.batch_regeneration_api import BatchRegenerationService
         
         # 创建服务实例
         service = BatchRegenerationService()
@@ -1053,7 +1053,7 @@ async def get_available_scenarios(plan_id: Optional[str] = None):
         包含所有scenario信息的响应
     """
     try:
-        from batch_regeneration_api import BatchRegenerationService
+        from src.api.batch_regeneration_api import BatchRegenerationService
         service = BatchRegenerationService()
         
         # 如果没有提供plan_id，使用最新的计划文件
@@ -1128,15 +1128,24 @@ async def get_batch_list():
                         logger.info(f"成功加载计划文件: {latest_plan_file}")
                 
                 if not plan_loaded:
-                    # 如果output目录没有文件，尝试加载根目录的plan.json作为备选
-                    logger.warning("output目录中没有找到计划文件，尝试加载根目录的plan.json")
-                    _scheduler.load_irrigation_plan("plan.json")
-                    plan = _scheduler.get_current_plan()
-                    logger.info("使用根目录plan.json作为备选")
+                    # 如果data/output目录没有文件，尝试查找data/output目录中的任何计划文件
+                    logger.warning("data/output目录中没有找到计划文件")
+                    data_output_dir = Path(__file__).parent / "data" / "output"
+                    if data_output_dir.exists():
+                        import glob
+                        all_plans = glob.glob(str(data_output_dir / "*.json"))
+                        if all_plans:
+                            # 使用最新的文件
+                            latest = max(all_plans, key=lambda x: Path(x).stat().st_mtime)
+                            logger.info(f"尝试加载最新计划文件: {latest}")
+                            _scheduler.load_irrigation_plan(latest)
+                            plan = _scheduler.get_current_plan()
+                            if plan:
+                                logger.info(f"成功加载计划文件: {latest}")
                     
             except Exception as load_error:
                 logger.error(f"加载计划文件失败: {load_error}")
-                raise HTTPException(status_code=404, detail="当前没有执行计划，且无法加载任何计划文件")
+                raise HTTPException(status_code=404, detail="当前没有执行计划，且无法加载任何计划文件。请先生成灌溉计划。")
         
         if not plan:
             raise HTTPException(status_code=404, detail="当前没有执行计划")
@@ -1316,7 +1325,7 @@ async def adjust_fields_between_batches(request: BatchAdjustmentRequest):
         logger.info(f"调整数量: {len(request.field_adjustments)}")
         
         # 导入批次调整服务
-        from batch_adjustment_service import BatchAdjustmentService
+        from src.optimizer.batch_adjustment_service import BatchAdjustmentService
         
         # 创建服务实例
         service = BatchAdjustmentService()
@@ -1401,7 +1410,7 @@ async def reorder_batches(request: BatchReorderRequest):
         logger.info(f"新顺序: {request.new_order}")
         
         # 导入批次调整服务
-        from batch_adjustment_service import BatchAdjustmentService
+        from src.optimizer.batch_adjustment_service import BatchAdjustmentService
         
         # 创建服务实例
         service = BatchAdjustmentService()
@@ -1482,7 +1491,7 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
         # 导入pipeline模块
         logger.info("步骤3: 导入pipeline模块...")
         try:
-            from pipeline import IrrigationPipeline
+            from src.core.pipeline import IrrigationPipeline
             logger.info("pipeline模块导入成功")
         except ImportError as e:
             logger.error(f"导入pipeline模块失败: {e}")
@@ -1490,7 +1499,7 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
         
         # 设置默认参数
         logger.info("步骤4: 设置默认参数...")
-        output_dir = request.output_dir or os.path.join(os.path.dirname(__file__), "output")
+        output_dir = request.output_dir or os.path.join(os.path.dirname(__file__), "data", "output")
         config_path = request.config_path or os.path.join(os.path.dirname(__file__), "config.json")
         logger.info(f"output_dir: {output_dir}")
         logger.info(f"config_path: {config_path}")
@@ -1503,7 +1512,7 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
         # 构建pipeline参数
         logger.info("步骤6: 构建pipeline参数...")
         kwargs = {
-            'input_dir': os.path.join(os.path.dirname(__file__), "gzp_farm"),
+            'input_dir': os.path.join(os.path.dirname(__file__), "data", "gzp_farm"),
             'output_dir': output_dir,
             'config_file': config_path if os.path.exists(config_path) else None,
             'merge_waterlevels': True,
@@ -1560,8 +1569,8 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
                 with open(config_path, 'r', encoding='utf-8') as f:
                     config_data = json.load(f)
                 
-                # 创建农场配置
-                cfg = farmcfg_from_json_select(config_data)
+                # 创建农场配置（启用实时水位，如果API可用）
+                cfg = farmcfg_from_json_select(config_data, use_realtime_wl=True)
                 
                 # 从配置中获取触发条件
                 min_fields_trigger = config_data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
@@ -1652,7 +1661,7 @@ async def generate_irrigation_plan_with_upload(
         
         # 导入pipeline模块
         try:
-            from pipeline import IrrigationPipeline
+            from src.core.pipeline import IrrigationPipeline
         except ImportError as e:
             logger.error(f"导入pipeline模块失败: {e}")
             raise HTTPException(status_code=500, detail="系统模块导入失败")
@@ -1781,8 +1790,8 @@ async def generate_irrigation_plan_with_upload(
                     with open(config_path, 'r', encoding='utf-8') as f:
                         config_data = json.load(f)
                     
-                    # 创建农场配置
-                    cfg = farmcfg_from_json_select(config_data)
+                    # 创建农场配置（启用实时水位，如果API可用）
+                    cfg = farmcfg_from_json_select(config_data, use_realtime_wl=True)
                     
                     # 从配置中获取触发条件
                     min_fields_trigger = config_data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
@@ -2099,8 +2108,8 @@ async def optimize_irrigation_plan(request: OptimizationRequest):
         logger.info(f"优化目标: {request.optimization_goals}")
         
         # 导入批次重新生成服务来加载计划
-        from batch_regeneration_api import BatchRegenerationService
-        from intelligent_batch_optimizer import IntelligentBatchOptimizer
+        from src.api.batch_regeneration_api import BatchRegenerationService
+        from src.optimizer.intelligent_batch_optimizer import IntelligentBatchOptimizer
         
         service = BatchRegenerationService()
         

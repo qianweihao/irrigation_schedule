@@ -26,12 +26,14 @@ from pydantic import BaseModel
 import uvicorn
 
 # 配置日志（修复编码问题）
+import os
+os.makedirs('data/execution_logs', exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('api_server.log', encoding='utf-8')
+        logging.FileHandler('data/execution_logs/api_server.log', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
@@ -40,9 +42,9 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # 导入现有模块
-from pipeline import IrrigationPipeline
-from farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
-from batch_regeneration_api import (
+from src.core.pipeline import IrrigationPipeline
+from src.core.farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
+from src.api.batch_regeneration_api import (
     BatchModificationRequest, 
     BatchRegenerationResponse, 
     PumpAssignment,
@@ -53,7 +55,7 @@ from batch_regeneration_api import (
 )
 
 # 导入动态执行模块
-from dynamic_execution_api import (
+from src.api.dynamic_execution_api import (
     DynamicExecutionRequest,
     DynamicExecutionResponse,
     ExecutionStatusResponse,
@@ -81,8 +83,8 @@ app = FastAPI(
 )
 
 # 配置常量
-GZP_FARM_DIR = os.path.join(os.path.dirname(__file__), "gzp_farm")
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+GZP_FARM_DIR = os.path.join(os.path.dirname(__file__), "data", "gzp_farm")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "data", "output")
 
 class IrrigationRequest(BaseModel):
     """灌溉计划请求模型"""
