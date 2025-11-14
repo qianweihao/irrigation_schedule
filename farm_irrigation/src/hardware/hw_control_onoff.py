@@ -1,11 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 物联网平台设备控制
 控制设备开关和闸门开度
 """
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from .hw_iot_client import IoTClient
 
 # 物联网平台控制设备的接口
@@ -19,13 +17,17 @@ def set_gate_degree(app_id: str, secret: str, unique_no: str, degree: float, ver
     Args:
         app_id: 应用ID
         secret: 密钥
-        unique_no: 设备唯一编号
+        unique_no: 设备唯一编号（从 hw_get_info_by_deviceids 获取）
         degree: 目标开度（0-100）
         verbose: 是否打印详细信息
         
     Returns:
-        dict: 响应数据
+        dict: 响应数据，失败返回 None
     """
+    # 参数验证
+    if not (0 <= degree <= 100):
+        raise ValueError(f"闸门开度必须在 0-100 之间，当前值: {degree}")
+    
     client = IoTClient(app_id, secret)
     payload = {
         "uniqueNo": unique_no,

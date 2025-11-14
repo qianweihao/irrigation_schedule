@@ -29,7 +29,7 @@ from typing import Dict, List, Optional, Any
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Form, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uvicorn
 import geopandas as gpd
 
@@ -58,6 +58,9 @@ from src.api.batch_regeneration_api import (
 
 # 导入多水泵方案相关模块
 from src.core.farm_irr_full_device_modified import farmcfg_from_json_select, generate_multi_pump_scenarios
+
+# 导入硬件批量查询模块
+from src.hardware.hw_batch_field_status import get_all_fields_device_status
 
 # 全局缓存和线程池
 _cache = {}
@@ -274,6 +277,21 @@ class BatchAdjustmentResponse(BaseModel):
     changes_summary: Dict[str, Any] = {}
     validation: Dict[str, Any] = {}
     output_file: Optional[str] = None
+
+class FieldDeviceStatusRequest(BaseModel):
+    """田块设备状态查询请求模型"""
+    farm_id: str = Field(..., description="农场ID")
+    app_id: Optional[str] = Field(None, description="应用ID（如果为None，从环境变量或配置读取）")
+    secret: Optional[str] = Field(None, description="密钥（如果为None，从环境变量或配置读取）")
+    timeout: int = Field(30, description="请求超时时间（秒）")
+    verbose: bool = Field(False, description="是否打印详细信息")
+
+class FieldDeviceStatusResponse(BaseModel):
+    """田块设备状态查询响应模型"""
+    success: bool
+    message: str
+    data: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
 
 class ScenarioReorderConfig(BaseModel):
     """单个scenario的顺序调整配置"""
@@ -2059,6 +2077,79 @@ async def root():
         "docs_url": "/docs",
         "redoc_url": "/redoc"
     }
+
+@app.get("/api/hardware/fields-device-status", response_model=FieldDeviceStatusResponse)
+async def get_fields_device_status(
+    farm_id: str,
+    app_id: Optional[str] = None,
+    secret: Optional[str] = None,
+    timeout: int = 30,
+    verbose: bool = False
+):
+    """
+    根据农场ID获取所有田块对应设备的状态
+    
+    完整流程：
+    1. 根据农场ID获取农场名称（从 farm_id_mapping.json）
+    2. 根据农场名称查找CSV文件，提取田块ID列表
+    3. 对每个田块ID，获取其设备映射（田块ID -> 设备编码 -> 设备信息 -> uniqueNo）
+    4. 对每个设备的uniqueNo，查询设备状态（闸门开度等）
+    
+    Args:
+        farm_id: 农场ID（如：13944136728576 港中坪）
+        app_id: 应用ID（可选，如果为None则从环境变量读取）
+        secret: 密钥（可选，如果为None则从环境变量读取）
+        timeout: 请求超时时间（秒）
+        verbose: 是否打印详细信息
+        
+    Returns:
+        FieldDeviceStatusResponse: 所有田块设备状态
+    """
+    try:
+        logger.info(f"开始查询农场 {farm_id} 的所有田块设备状态")
+        
+        # 从环境变量或配置获取 app_id 和 secret（如果未提供）
+        if not app_id:
+            app_id = os.environ.get("IOT_APP_ID") or os.environ.get("ILAND_APP_ID") or "YJY"
+        if not secret:
+            secret = os.environ.get("IOT_SECRET") or os.environ.get("ILAND_SECRET") or "test005"
+        
+        logger.info(f"使用 app_id: {app_id[:4]}... (已隐藏)")
+        
+        # 调用批量查询函数
+        result = get_all_fields_device_status(
+            app_id=app_id,
+            secret=secret,
+            farm_id=farm_id,
+            timeout=timeout,
+            verbose=verbose
+        )
+        
+        if result.get("success"):
+            logger.info(f"✅ 成功查询农场 {farm_id} 的设备状态，共 {result.get('total_fields', 0)} 个田块")
+            return FieldDeviceStatusResponse(
+                success=True,
+                message=f"成功获取 {result.get('farm_name', '')} 农场所有田块设备状态",
+                data=result
+            )
+        else:
+            error_msg = result.get("error", "未知错误")
+            logger.error(f"❌ 查询失败: {error_msg}")
+            return FieldDeviceStatusResponse(
+                success=False,
+                message="查询失败",
+                data=result,
+                error=error_msg
+            )
+            
+    except Exception as e:
+        logger.error(f"查询田块设备状态失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"查询田块设备状态失败: {str(e)}"
+        )
 
 @app.post("/api/irrigation/multi-pump-scenarios", response_model=MultiPumpResponse)
 async def generate_multi_pump_scenarios_api(request: MultiPumpRequest):

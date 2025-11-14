@@ -17,6 +17,7 @@
    - [批次调整](#9-批次调整)
      - [批次间田块调整](#91-批次间田块调整)
      - [批次顺序调整](#92-批次顺序调整)
+   - [硬件设备管理](#10-硬件设备管理)
 6. [典型业务流程](#典型业务流程)
 7. [错误码说明](#错误码说明)
 8. [常见问题](#常见问题)
@@ -2736,6 +2737,7 @@ interface ExecutionStatus {
 | 更新水位 | POST | `/api/water-levels/update` | `field_id`, `water_level_mm` | 田块ID，水位值(mm) |
 | 批次间田块调整 | POST | `/api/batch/adjust` | `plan_id`, `field_adjustments`, `options` | 计划ID，田块调整列表，调整选项 |
 | 批次顺序调整 | POST | `/api/batch/reorder` | `plan_id`, `scenario_name`, `new_order` | 计划ID，scenario名称，新顺序列表 |
+| 查询所有田块设备状态 | GET | `/api/hardware/fields-device-status` | `farm_id`, `timeout`, `verbose` | 农场ID，超时时间，详细日志 |
 
 **重要ID类型对照**
 

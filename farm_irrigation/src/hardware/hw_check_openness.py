@@ -1,11 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 物联网平台设备属性查询
 查询设备当前状态（如闸门开度）
 """
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from .hw_iot_client import IoTClient
 
 # 物联网平台查看设备属性的接口
@@ -36,10 +34,10 @@ def get_gate_degree(app_id: str, secret: str, unique_no: str) -> float:
     Args:
         app_id: 应用ID
         secret: 密钥
-        unique_no: 设备唯一编号
+        unique_no: 设备唯一编号（从 hw_get_info_by_deviceids 获取）
         
     Returns:
-        float: 闸门开度（0-100）
+        float: 闸门开度（0-100），失败返回 None
     """
     result = get_device_properties(app_id, secret, unique_no)
     

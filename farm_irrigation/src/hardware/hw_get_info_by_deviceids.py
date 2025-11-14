@@ -1,144 +1,186 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 根据设备编码查询设备信息
 """
-import hashlib
-import hmac
-import time
 import json
 import requests
-from collections import OrderedDict
+from typing import Dict, Any, Optional
+from .hw_signature_helper import SignatureHelper
 
-# Constants模拟
-class Constants:
-    SIGN_APP_ID = "app-id"
-    SIGN_TIMESTAMP = "timestamp"
-    SIGN_PAYLOAD = "payload"
+# API 接口地址
+API_URL = "https://iland.zoomlion.com/fieldEquipment/openApi/v1/equipment.getByDeviceCode"
 
-# SignatureMethod枚举模拟
-class SignatureMethod:
-    HMAC_MD5 = "HmacMD5"
-    HMAC_SHA1 = "HmacSHA1"
-    HMAC_SHA256 = "HmacSHA256"
 
-def bytes_to_hex(bytes_data):
+def get_device_info_by_code(
+    app_id: str,
+    secret: str,
+    device_code: str,
+    timeout: int = 30,
+    verbose: bool = False
+) -> Optional[Dict[str, Any]]:
     """
-    将字节数组转换为十六进制字符串
+    根据设备编码查询设备信息
+    
+    Args:
+        app_id: 应用ID
+        secret: 密钥
+        device_code: 设备编码
+        timeout: 请求超时时间（秒）
+        verbose: 是否打印详细信息
+        
+    Returns:
+        dict: 响应数据，包含设备信息。格式：
+        {
+            "code": 200,
+            "message": "success",
+            "data": {
+                "uniqueNo": "设备唯一编号",
+                "deviceCode": "设备编码",
+                ...其他设备信息
+            }
+        }
+        失败返回 None
     """
-    hex_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
-    result = []
-    for b in bytes_data:
-        result.append(hex_chars[(b & 0xf0) >> 4])
-        result.append(hex_chars[b & 0x0f])
-    return ''.join(result)
-    
-def get_sign_content(params):
-    """
-    计算签名内容
-    """
-    content_parts = []
-    # 使用OrderedDict模拟TreeMap的排序行为
-    sorted_keys = sorted(params.keys())
-    
-    for key in sorted_keys:
-        value = params[key]
-        # 检查键值是否都不为空
-        if key and value:
-            content_parts.append(f"{key}={value}")
-    
-    return "&".join(content_parts)
-    
-def encrypt(method, secret, content):
-    """
-    Hmac加密 返回hex格式的结果
-    """
-    # 根据算法类型选择哈希函数
-    hash_funcs = {
-        "HmacMD5": hashlib.md5,
-        "HmacSHA1": hashlib.sha1,
-        "HmacSHA256": hashlib.sha256
-    }
-    
-    if method not in hash_funcs:
-        raise ValueError(f"Unsupported encryption method: {method}")
-    
-    # 执行HMAC加密
-    key = secret.encode('utf-8')
-    message = content.encode('utf-8')
-    digestmod = hash_funcs[method]
-    
-    hmac_obj = hmac.new(key, message, digestmod)
-    return bytes_to_hex(hmac_obj.digest())
-    
-def sign(method, secret, params):
-    """
-    计算签名
-    """
-    content = get_sign_content(params)
-    print(f"签名内容:{content}")
-    
-    # 支持的签名方法
-    supported_methods = [SignatureMethod.HMAC_MD5, SignatureMethod.HMAC_SHA1, SignatureMethod.HMAC_SHA256]
-    
-    if method in supported_methods:
-        return encrypt(method, secret, content)
-    else:
-        raise ValueError("method is error")
-
-def main():
-    """
-    主函数，演示签名过程
-    """
-    # -------------------------- 测试数据 -----------------------------
-    app_id = "YJY"
-    secret = "test005"
-    time_stamp = 1678414388870
-
-    url = "https://iland.zoomlion.com/fieldEquipment/openApi/v1/equipment.getByDeviceCode"
     payload = {
-        "deviceCode": "70fe0d98e8cc"
+        "deviceCode": str(device_code)
     }
-    # -------------------------------------------------------
-
-    # 转换payload为JSON字符串
-    payload_str = json.dumps(payload, separators=(',', ':'))
     
-    # 构建参数字典
-    params = OrderedDict()
-    params[Constants.SIGN_APP_ID] = app_id
-    params[Constants.SIGN_TIMESTAMP] = time_stamp
-    params[Constants.SIGN_PAYLOAD] = payload_str
-    
-    # 计算签名
-    signature = sign(SignatureMethod.HMAC_SHA256, secret, params)
-    
-    print(signature)
-    
-    # 请求头
-    headers = {
-        "x-auth-app-id": app_id,
-        "x-auth-timestamp": str(time_stamp),
-        "x-auth-sign": signature,
-        "Content-Type": "application/json"
-    }
-
-    print('................payload..................')
-    print(payload)
-
-    response = requests.get(
-        url=url,
-        params=payload,  # 使用JSON格式的payload
-        headers=headers,
-        timeout=30
+    # 生成签名和请求头
+    _, _, headers = SignatureHelper.generate_signature_for_iland(
+        app_id=app_id,
+        secret=secret,
+        payload=payload,
+        verbose=verbose
     )
     
-    print("=== 响应详情 ===")
-    print(f"状态码: {response.status_code}")
+    if verbose:
+        print("=== 请求详情 ===")
+        print(f"URL: {API_URL}")
+        print(f"Headers: {json.dumps(headers, indent=2, ensure_ascii=False)}")
+        print(f"Payload: {json.dumps(payload, indent=2, ensure_ascii=False)}")
+        print("================\n")
     
-    response_json = response.json()
-    print("响应体 (JSON):")
-    print(json.dumps(response_json, indent=2, ensure_ascii=False))
-    return response_json
+    try:
+        response = requests.get(
+            url=API_URL,
+            params=payload,
+            headers=headers,
+            timeout=timeout
+        )
+        
+        if verbose:
+            print("=== 响应详情 ===")
+            print(f"状态码: {response.status_code}")
+        
+        response.raise_for_status()
+        response_json = response.json()
+        
+        if verbose:
+            print(f"响应: {json.dumps(response_json, indent=2, ensure_ascii=False)}")
+            print("================\n")
+        
+        return response_json
+        
+    except requests.exceptions.Timeout:
+        print(f"❌ 请求超时 ({timeout}秒)")
+        return None
+    except requests.exceptions.ConnectionError:
+        print("❌ 连接错误 - 请检查URL和网络连接")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"❌ 请求失败: {e}")
+        return None
+    except json.JSONDecodeError:
+        print(f"❌ 响应解析失败: {response.text if 'response' in locals() else 'No response'}")
+        return None
+
+
+def extract_unique_no(response: Dict[str, Any]) -> Optional[str]:
+    """
+    从响应中提取设备唯一编号 (uniqueNo)
+    
+    Args:
+        response: API响应数据
+        
+    Returns:
+        str: 设备唯一编号，如果响应格式不正确则返回 None
+    """
+    if not response:
+        return None
+    
+    # 检查响应格式 - 支持 200、"0000"、"0" 作为成功码
+    code = response.get("code")
+    code_str = str(code) if code is not None else ""
+    is_success = (code == 200) or (code_str == "0000") or (code_str == "0")
+    
+    if not is_success:
+        message = response.get("message") or response.get("msg", "Unknown error")
+        print(f"⚠️ API返回错误: {message}")
+        return None
+    
+    data = response.get("data")
+    if isinstance(data, dict):
+        unique_no = data.get("uniqueNo")
+        return str(unique_no) if unique_no else None
+    else:
+        print(f"⚠️ 响应数据格式不正确，期望字典，实际: {type(data)}")
+        return None
+
+
+def extract_device_info(response: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    从响应中提取完整的设备信息
+    
+    Args:
+        response: API响应数据
+        
+    Returns:
+        dict: 设备信息字典，如果响应格式不正确则返回 None
+    """
+    if not response:
+        return None
+    
+    # 检查响应格式 - 支持 200、"0000"、"0" 作为成功码
+    code = response.get("code")
+    code_str = str(code) if code is not None else ""
+    is_success = (code == 200) or (code_str == "0000") or (code_str == "0")
+    
+    if not is_success:
+        message = response.get("message") or response.get("msg", "Unknown error")
+        print(f"⚠️ API返回错误: {message}")
+        return None
+    
+    data = response.get("data")
+    if isinstance(data, dict):
+        return data
+    else:
+        print(f"⚠️ 响应数据格式不正确，期望字典，实际: {type(data)}")
+        return None
 
 
 if __name__ == "__main__":
-    main()
+    # 测试数据
+    APP_ID = "YJY"
+    SECRET = "test005"
+    DEVICE_CODE = "70fe0d98e8cc"
+    
+    # 查询设备信息
+    print(f"查询设备编码 {DEVICE_CODE} 的设备信息...")
+    response = get_device_info_by_code(
+        app_id=APP_ID,
+        secret=SECRET,
+        device_code=DEVICE_CODE,
+        verbose=True
+    )
+    
+    if response:
+        unique_no = extract_unique_no(response)
+        device_info = extract_device_info(response)
+        
+        if unique_no:
+            print(f"✅ 设备唯一编号: {unique_no}")
+        if device_info:
+            print(f"✅ 设备信息: {json.dumps(device_info, indent=2, ensure_ascii=False)}")
+    else:
+        print("❌ 查询失败")
