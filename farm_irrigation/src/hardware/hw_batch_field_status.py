@@ -10,6 +10,7 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 from .hw_field_device_mapper import get_field_devices_mapping
+from .hw_check_openness import get_device_properties, get_gate_degree
 
 
 def _load_farm_id_mapping() -> Dict[str, str]:
@@ -44,6 +45,38 @@ def _get_farm_name(farm_id: str) -> Optional[str]:
     """
     mapping = _load_farm_id_mapping()
     return mapping.get(str(farm_id))
+
+
+def _get_gate_type_by_device_type(device_type_code: str) -> Optional[str]:
+    """
+    根据设备类型编码映射到闸门类型
+    
+    Args:
+        device_type_code: 设备类型编码
+        
+    Returns:
+        str: 闸门类型 (inout-G, branch-G) 或 None
+    """
+    type_mapping = {
+        "101588": "inout-G",  # 智能技术-进水阀
+        "101544": "inout-G",  # 其他进出水闸类型
+        "101134": "branch-G"  # 节制闸类型
+    }
+    return type_mapping.get(device_type_code)
+
+
+def _should_include_device(device_info: Dict[str, Any]) -> bool:
+    """
+    判断设备是否需要包含（根据设备类型筛选）
+    
+    Args:
+        device_info: 设备信息
+        
+    Returns:
+        bool: 是否包含该设备
+    """
+    device_type_code = device_info.get("deviceTypeCode")
+    return device_type_code in ["101588", "101544", "101134"]
 
 
 def _get_field_ids_from_csv(farm_name: str) -> List[Dict[str, str]]:
@@ -101,27 +134,33 @@ def get_all_fields_device_status(
     app_id: str,
     secret: str,
     farm_id: str,
+    iot_app_id: Optional[str] = None,
+    iot_secret: Optional[str] = None,
     timeout: int = 30,
     verbose: bool = False
 ) -> Dict[str, Any]:
     """
-    根据农场ID获取所有田块对应的设备信息
+    根据农场ID获取所有田块对应的设备信息和状态
     
     完整流程：
     1. 根据农场ID获取农场名称
     2. 根据农场名称查找CSV文件，提取田块ID列表
     3. 对每个田块ID，获取其设备映射（田块ID -> 设备编码 -> 设备信息 -> uniqueNo）
-    4. 返回所有设备的基本信息（不查询开度和控制状态）
+    4. 筛选特定设备类型（101588、101544、101134）
+    5. 根据设备类型标记为 inout-G 或 branch-G
+    6. 查询每个设备的实时状态（闸门开度等）
     
     Args:
-        app_id: 应用ID
-        secret: 密钥
+        app_id: 应用ID（用于iLand平台查询设备信息）
+        secret: 密钥（用于iLand平台）
         farm_id: 农场ID
+        iot_app_id: IoT平台应用ID（用于查询设备状态，默认使用siotextend）
+        iot_secret: IoT平台密钥（用于查询设备状态）
         timeout: 请求超时时间（秒）
         verbose: 是否打印详细信息
         
     Returns:
-        dict: 所有田块设备信息，格式：
+        dict: 所有田块设备信息和状态，格式：
         {
             "farm_id": "农场ID",
             "farm_name": "农场名称",
@@ -135,8 +174,12 @@ def get_all_fields_device_status(
                         {
                             "device_code": "设备编码",
                             "unique_no": "设备唯一编号",
-                            "device_info": {
-                                ...完整设备信息...
+                            "gate_type": "inout-G" or "branch-G",
+                            "device_info": {...完整设备信息...},
+                            "status": {
+                                "gate_degree": 闸门开度,
+                                "online_status": 在线状态,
+                                "success": True/False
                             }
                         },
                         ...
@@ -156,6 +199,16 @@ def get_all_fields_device_status(
         "success": False,
         "error": None
     }
+    
+    # 设置IoT平台认证信息（用于查询设备状态）
+    if not iot_app_id:
+        iot_app_id = "siotextend"
+    if not iot_secret:
+        iot_secret = "!iWu$fyUgOSH+mc_nSirKpL%+zZ%)%cL"
+    
+    if verbose:
+        print(f"iLand平台认证: app_id={app_id[:4]}...")
+        print(f"IoT平台认证: app_id={iot_app_id[:4]}...")
     
     try:
         # 步骤1: 根据农场ID获取农场名称
@@ -210,20 +263,61 @@ def get_all_fields_device_status(
                 })
                 continue
             
-            # 直接返回设备信息（不查询开度和控制状态）
+            # 筛选特定类型的设备并查询状态
             devices = []
             for device in device_mapping.get("devices", []):
+                device_info = device.get("device_info", {})
                 unique_no = device.get("unique_no")
-                if not unique_no:
+                
+                if not unique_no or not device_info:
                     continue
                 
+                # 筛选：只包含指定设备类型
+                if not _should_include_device(device_info):
+                    if verbose:
+                        print(f"  ⏭️ 跳过设备 {device.get('device_code')} (类型: {device_info.get('deviceTypeCode')})")
+                    continue
+                
+                # 获取闸门类型标记
+                gate_type = _get_gate_type_by_device_type(device_info.get("deviceTypeCode"))
+                
                 if verbose:
-                    print(f"  设备: {device.get('device_code')} -> uniqueNo: {unique_no}")
+                    print(f"  ✅ 设备: {device.get('device_code')} -> uniqueNo: {unique_no}, 类型: {gate_type}")
+                
+                # 查询设备状态
+                device_status = {
+                    "gate_degree": None,
+                    "online_status": device_info.get("onlineStatus"),
+                    "success": False,
+                    "error": None
+                }
+                
+                try:
+                    # 获取闸门开度（使用IoT平台认证）
+                    gate_degree = get_gate_degree(iot_app_id, iot_secret, unique_no, verbose=verbose)
+                    if gate_degree is not None:
+                        device_status["gate_degree"] = gate_degree
+                        device_status["success"] = True
+                        if verbose:
+                            print(f"    闸门开度: {gate_degree}%")
+                    else:
+                        device_status["error"] = "未获取到闸门开度（设备可能不支持或属性名称不匹配）"
+                        if verbose:
+                            print(f"    ⚠️ 未获取到闸门开度")
+                            print(f"    建议：使用 verbose=true 参数查看详细的API响应")
+                except Exception as e:
+                    device_status["error"] = f"查询状态失败: {str(e)}"
+                    if verbose:
+                        print(f"    ⚠️ 查询状态失败: {e}")
+                        import traceback
+                        traceback.print_exc()
                 
                 devices.append({
                     "device_code": device.get("device_code"),
                     "unique_no": unique_no,
-                    "device_info": device.get("device_info")
+                    "gate_type": gate_type,
+                    "device_info": device_info,
+                    "status": device_status
                 })
             
             field_results.append({
@@ -267,17 +361,23 @@ if __name__ == "__main__":
     print(f"成功: {result['success']}")
     
     if result['success']:
-        print("\n田块设备信息:")
+        print("\n田块设备信息和状态:")
         for field in result['fields']:
             print(f"\n  田块: {field['field_name']} (ID: {field['field_id']})")
             print(f"  设备数量: {field['device_count']}")
             for device in field['devices']:
                 print(f"    - 设备编码: {device['device_code']}")
                 print(f"      唯一编号: {device['unique_no']}")
+                print(f"      闸门类型: {device.get('gate_type', 'N/A')}")
                 device_info = device.get('device_info', {})
                 if device_info:
                     print(f"      设备类型: {device_info.get('deviceTypeName', 'N/A')}")
                     print(f"      设备名称: {device_info.get('deviceName', 'N/A')}")
+                status = device.get('status', {})
+                if status:
+                    print(f"      闸门开度: {status.get('gate_degree', 'N/A')}%")
+                    print(f"      在线状态: {status.get('online_status', 'N/A')}")
+                    print(f"      状态查询: {'成功' if status.get('success') else '失败'}")
     else:
         print(f"错误: {result.get('error', 'Unknown error')}")
 

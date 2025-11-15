@@ -1975,6 +1975,214 @@ POST /api/batch/reorder
 
 ---
 
+## 10. 硬件设备管理
+
+### 10.1 查询所有田块设备状态
+
+**接口**: `GET /api/hardware/fields-device-status`
+
+**功能**: 根据农场ID查询所有田块对应的设备信息和实时状态
+
+**完整流程**:
+1. 根据农场ID获取农场名称（从farm_id_mapping.json）
+2. 根据农场名称查找CSV文件，提取田块ID列表
+3. 对每个田块ID，获取其设备映射（田块ID → 设备编码 → 设备信息 → uniqueNo）
+4. 筛选特定设备类型（101588、101544、101134）
+5. 根据设备类型标记为 inout-G 或 branch-G
+6. 查询每个设备的实时状态（闸门开度等）
+
+**请求参数**
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| farm_id | string | 是 | 农场ID（如：13944136728576 = 港中坪） |
+| app_id | string | 否 | 应用ID（默认从环境变量读取） |
+| secret | string | 否 | 密钥（默认从环境变量读取） |
+| timeout | integer | 否 | 请求超时时间（秒），默认30 |
+| verbose | boolean | 否 | 是否打印详细日志，默认false |
+
+**设备类型映射规则**
+
+| deviceTypeCode | 设备类型名称 | 映射为闸门类型 | 说明 |
+|----------------|------------|---------------|------|
+| 101588 | 智能技术-进水阀 | inout-G | 进出水闸 |
+| 101544 | 其他进出水阀 | inout-G | 进出水闸 |
+| 101134 | 节制闸 | branch-G | 支渠节制闸 |
+
+**响应数据结构**
+
+```json
+{
+  "success": true,
+  "message": "成功获取 港中坪 农场所有田块设备状态",
+  "data": {
+    "farm_id": "13944136728576",
+    "farm_name": "港中坪",
+    "total_fields": 42,
+    "fields": [
+      {
+        "field_id": "1891820536309653504",
+        "field_name": "31",
+        "device_count": 2,
+        "devices": [
+          {
+            "device_code": "157B025010011",
+            "unique_no": "471743004049787907",
+            "gate_type": "inout-G",
+            "device_info": {
+              "deviceCode": "157B025010011",
+              "deviceName": "300*300闸门",
+              "deviceTypeCode": "101588",
+              "deviceTypeName": "智能技术-进水阀",
+              "sectionId": "1891820536309653504",
+              "sectionName": "31",
+              "farmId": "13944136728576",
+              "farmName": "鼎城区港中坪智慧农场",
+              "onlineStatus": "0",
+              "gateValveType": "0",
+              ...
+            },
+            "status": {
+              "gate_degree": 0.0,
+              "online_status": "0",
+              "success": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**响应字段说明**
+
+| 字段路径 | 类型 | 说明 |
+|---------|------|------|
+| success | boolean | 是否成功 |
+| message | string | 返回消息 |
+| data.farm_id | string | 农场ID |
+| data.farm_name | string | 农场名称 |
+| data.total_fields | integer | 田块总数 |
+| data.fields | array | 田块列表 |
+| data.fields[].field_id | string | 田块ID |
+| data.fields[].field_name | string | 田块名称 |
+| data.fields[].device_count | integer | 该田块的设备数量（仅包含筛选的类型） |
+| data.fields[].devices | array | 设备列表 |
+| data.fields[].devices[].device_code | string | 设备编码 |
+| data.fields[].devices[].unique_no | string | 设备唯一编号（用于控制） |
+| data.fields[].devices[].gate_type | string | 闸门类型标记（inout-G 或 branch-G） |
+| data.fields[].devices[].device_info | object | 完整设备信息（包含所有字段） |
+| data.fields[].devices[].status | object | 设备实时状态 |
+| data.fields[].devices[].status.gate_degree | number | 闸门开度（0-100） |
+| data.fields[].devices[].status.online_status | string | 在线状态（0=离线, 1=在线） |
+| data.fields[].devices[].status.success | boolean | 状态查询是否成功 |
+| data.fields[].devices[].status.error | string | 错误信息（如果有） |
+
+**使用场景**
+
+| 场景 | 说明 | 典型用法 |
+|------|------|----------|
+| **监控看板** | 展示所有田块设备的实时状态 | 定时轮询获取最新状态 |
+| **设备筛选** | 只显示进出水闸或节制闸 | 根据gate_type字段过滤 |
+| **异常告警** | 检测离线或故障设备 | 检查onlineStatus和success字段 |
+| **控制准备** | 获取设备的uniqueNo用于后续控制 | 提取unique_no后调用控制接口 |
+
+**典型调用示例**
+
+```javascript
+// 示例1：获取港中坪农场所有设备状态
+const response = await fetch(
+  'http://120.55.127.125/api/hardware/fields-device-status?farm_id=13944136728576',
+  {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+);
+const data = await response.json();
+
+// 处理结果
+if (data.success) {
+  console.log(`农场: ${data.data.farm_name}`);
+  console.log(`田块数: ${data.data.total_fields}`);
+  
+  // 遍历田块
+  data.data.fields.forEach(field => {
+    console.log(`田块 ${field.field_name} (ID: ${field.field_id})`);
+    console.log(`  设备数: ${field.device_count}`);
+    
+    // 遍历设备
+    field.devices.forEach(device => {
+      console.log(`  - ${device.device_info.deviceTypeName}`);
+      console.log(`    类型: ${device.gate_type}`);
+      console.log(`    开度: ${device.status.gate_degree}%`);
+      console.log(`    在线: ${device.status.online_status === '1' ? '是' : '否'}`);
+    });
+  });
+}
+
+// 示例2：筛选所有进出水闸(inout-G)
+const inoutGates = data.data.fields
+  .flatMap(field => field.devices)
+  .filter(device => device.gate_type === 'inout-G');
+
+console.log(`共有 ${inoutGates.length} 个进出水闸`);
+
+// 示例3：查找需要告警的设备（离线或开度异常）
+const alertDevices = data.data.fields
+  .flatMap(field => field.devices.map(d => ({...d, field_name: field.field_name})))
+  .filter(device => 
+    device.status.online_status === '0' ||  // 离线
+    !device.status.success ||               // 状态查询失败
+    device.status.gate_degree > 100         // 开度异常
+  );
+
+if (alertDevices.length > 0) {
+  console.log('⚠️ 发现异常设备:');
+  alertDevices.forEach(device => {
+    console.log(`  田块${device.field_name}: ${device.device_info.deviceName}`);
+    console.log(`    问题: ${device.status.error || '设备离线'}`);
+  });
+}
+```
+
+**注意事项**
+
+1. ⚠️ **设备筛选**: 接口只返回特定类型的设备（101588、101544、101134），其他类型设备会被自动过滤
+2. ⚠️ **状态查询可能失败**: 部分设备的status.success可能为false，需要检查error字段
+3. ⚠️ **性能考虑**: 查询所有田块设备可能较慢，建议：
+   - 设置合理的timeout值（建议30-60秒）
+   - 前端显示加载状态
+   - 考虑分页或增量更新
+4. ✅ **设备分类**: 使用gate_type字段可以快速区分进出水闸和节制闸
+5. ✅ **实时性**: 闸门开度为实时查询值，反映当前实际状态
+6. 💡 **unique_no的用途**: 该字段是设备的唯一标识，用于后续的设备控制操作
+7. 💡 **批量处理**: 可以使用数组方法(map, filter, reduce)对数据进行批量处理和统计
+
+**数据流程图**
+
+```
+农场ID (13944136728576)
+  ↓
+农场名称 (港中坪) ← 从 farm_id_mapping.json 读取
+  ↓
+田块列表 ← 从 港中坪地块id.csv 读取
+  ↓
+对每个田块:
+  ├─> 田块ID → API: equipment.listCodeBySection
+  ├─> 设备编码列表 → 筛选(101588/101544/101134)
+  ├─> 对每个设备编码:
+  │     ├─> API: equipment.getByDeviceCode
+  │     ├─> 获取 uniqueNo + deviceTypeCode
+  │     ├─> 映射为 gate_type (inout-G/branch-G)
+  │     └─> API: device.properties.newest (查询开度)
+  └─> 返回: 田块设备列表 + 状态
+```
+
+---
+
 ## 典型业务流程
 
 ### 流程1：标准灌溉计划生成与执行 

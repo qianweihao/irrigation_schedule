@@ -2083,6 +2083,8 @@ async def get_fields_device_status(
     farm_id: str,
     app_id: Optional[str] = None,
     secret: Optional[str] = None,
+    iot_app_id: Optional[str] = None,
+    iot_secret: Optional[str] = None,
     timeout: int = 30,
     verbose: bool = False
 ):
@@ -2097,8 +2099,10 @@ async def get_fields_device_status(
     
     Args:
         farm_id: 农场ID（如：13944136728576 港中坪）
-        app_id: 应用ID（可选，如果为None则从环境变量读取）
-        secret: 密钥（可选，如果为None则从环境变量读取）
+        app_id: iLand平台应用ID（用于查询设备信息，默认YJY）
+        secret: iLand平台密钥（默认test005）
+        iot_app_id: IoT平台应用ID（用于查询设备状态，默认siotextend）
+        iot_secret: IoT平台密钥（用于查询设备状态）
         timeout: 请求超时时间（秒）
         verbose: 是否打印详细信息
         
@@ -2110,17 +2114,24 @@ async def get_fields_device_status(
         
         # 从环境变量或配置获取 app_id 和 secret（如果未提供）
         if not app_id:
-            app_id = os.environ.get("IOT_APP_ID") or os.environ.get("ILAND_APP_ID") or "YJY"
+            app_id = os.environ.get("ILAND_APP_ID") or "YJY"
         if not secret:
-            secret = os.environ.get("IOT_SECRET") or os.environ.get("ILAND_SECRET") or "test005"
+            secret = os.environ.get("ILAND_SECRET") or "test005"
+        if not iot_app_id:
+            iot_app_id = os.environ.get("IOT_APP_ID") or "siotextend"
+        if not iot_secret:
+            iot_secret = os.environ.get("IOT_SECRET") or "!iWu$fyUgOSH+mc_nSirKpL%+zZ%)%cL"
         
-        logger.info(f"使用 app_id: {app_id[:4]}... (已隐藏)")
+        logger.info(f"使用 iLand app_id: {app_id[:4]}... (已隐藏)")
+        logger.info(f"使用 IoT app_id: {iot_app_id[:4]}... (已隐藏)")
         
         # 调用批量查询函数
         result = get_all_fields_device_status(
             app_id=app_id,
             secret=secret,
             farm_id=farm_id,
+            iot_app_id=iot_app_id,
+            iot_secret=iot_secret,
             timeout=timeout,
             verbose=verbose
         )
