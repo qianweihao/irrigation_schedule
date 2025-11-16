@@ -1494,3 +1494,122 @@ FileNotFoundError: ����ƺˮ·_code.geojson
 2025-11-14 22:04:36,015 - INFO - ✅ 成功查询农场 13944136728576 的设备状态，共 42 个田块
 2025-11-14 22:05:16,254 - INFO - 智能灌溉动态执行系统关闭中...
 2025-11-14 22:05:16,254 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-16 00:25:13,633 - INFO - pipeline模块导入成功
+2025-11-16 00:25:13,634 - INFO - 步骤4: 设置默认参数...
+2025-11-16 00:25:13,635 - INFO - output_dir: e:\irrigation_schedule\farm_irrigation\data\output
+2025-11-16 00:25:13,635 - INFO - config_path: e:\irrigation_schedule\farm_irrigation\config.json
+2025-11-16 00:25:13,635 - INFO - 步骤5: 确保输出目录存在...
+2025-11-16 00:25:13,636 - INFO - 输出目录已创建/确认: e:\irrigation_schedule\farm_irrigation\data\output
+2025-11-16 00:25:13,636 - INFO - 步骤6: 构建pipeline参数...
+2025-11-16 00:25:13,639 - INFO - Pipeline参数: {'input_dir': 'e:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'e:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'e:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-16 00:25:13,640 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-16 00:25:13,640 - INFO - Pipeline实例创建成功
+2025-11-16 00:25:13,641 - INFO - 步骤8: 运行Pipeline...
+2025-11-16 00:25:13,641 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-16 00:25:13,641 - INFO - 输入目录: e:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-16 00:25:13,641 - INFO - 输出目录: e:\irrigation_schedule\farm_irrigation\data\output
+2025-11-16 00:25:13,642 - INFO - 检查依赖文件...
+2025-11-16 00:25:13,643 - INFO - 依赖文件检查通过
+2025-11-16 00:25:13,643 - INFO - 检查输入目录: e:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-16 00:25:13,644 - INFO - 找到 6 个GIS数据文件
+2025-11-16 00:25:13,644 - INFO - === 步骤1: 数据预处理 ===
+2025-11-16 00:25:13,645 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-16 00:25:13,645 - INFO - 开始执行: GIS数据格式转换
+2025-11-16 00:25:13,645 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-16 00:25:14,717 - INFO - 输出: 找到 3 个 .shp 文件
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 3/3 个文件
+
+2025-11-16 00:25:14,717 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-16 00:25:14,717 - INFO - 开始执行: GIS数据修复
+2025-11-16 00:25:14,717 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-16 00:25:14,902 - INFO - 输出: 找到 3 个 geojson 文件: ['港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: e:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-16 00:25:14,903 - INFO - [OK] GIS数据修复 执行成功
+2025-11-16 00:25:14,904 - INFO - === 步骤2: 配置生成 ===
+2025-11-16 00:25:14,904 - INFO - 开始执行: 生成系统配置
+2025-11-16 00:25:14,905 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.auto_to_config --segments e:\irrigation_schedule\farm_irrigation\data\gzp_farm\港中坪水路_code.geojson --gates e:\irrigation_schedule\farm_irrigation\data\gzp_farm\港中坪阀门与节制闸_code.geojson --fields e:\irrigation_schedule\farm_irrigation\data\gzp_farm\港中坪田块_code.geojson
+2025-11-16 00:25:15,765 - WARNING - 警告: e:\irrigation_schedule\farm_irrigation\src\converter\auto_to_config.py:124: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  c = gdf.unary_union.centroid
+
+2025-11-16 00:25:15,765 - INFO - [OK] 生成系统配置 执行成功
+2025-11-16 00:25:15,765 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-16 00:25:15,765 - INFO - 开始执行: 生成灌溉计划
+2025-11-16 00:25:15,766 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251116_002515.json --multi-pump --summary --realtime
+2025-11-16 00:25:17,984 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=36, 有水位数据=17, 无水位数据=19, 低于阈值=17
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 17
+需要灌溉的段: ['S3', 'S4', 'S5', 'S6', 'S7', 'S8']
+有效水泵组合: [['P2'], ['P1'], ['P1', 'P2']]
+生成方案数: 3
+方案 1: 水泵['P2'] - 覆盖段6个['S3', 'S4', 'S5', 'S6', 'S7', 'S8'] - 电费914.41元 - 运行25.40h
+方案 2: 水泵['P1'] - 覆盖段6个['S3', 'S4', 'S5', 'S6', 'S7', 'S8'] - 电费914.41元 - 运行25.40h
+方案 3: 水泵['P1', 'P2'] - 覆盖段6个['S3', 'S4', 'S5', 'S6', 'S7', 'S8'] - 电费914.41元 - 运行12.70h
+推荐方案: 水泵['P1', 'P2'] (电费: 914.41元, 运行时间: 12.70h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251116_002515.json
+
+2025-11-16 00:25:17,984 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-16 00:25:17,985 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:04.345319
+2025-11-16 00:25:17,985 - INFO - 生成的文件:
+2025-11-16 00:25:17,985 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251110_133959.json
+2025-11-16 00:25:17,985 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251110_134752.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251110_165622.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251110_234901.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251110_234901_reordered_20251110_235632.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251111_105505.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251111_205429.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251112_214549.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251112_215837.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251112_215837_reordered_20251112_220007.json
+2025-11-16 00:25:17,986 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251113_101247.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251113_101247_reordered_20251113_101347.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251113_121622.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251113_121622_reordered_20251113_121642.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_155901.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_160910.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161407.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_161633.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_162125.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_162252.json
+2025-11-16 00:25:17,987 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_162648.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_204040.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_204940.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_204940_reordered_20251114_204956.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_205414.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_205414_reordered_20251114_205421.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251114_220359.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251116_002515.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1762845153.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1762998753.json
+2025-11-16 00:25:17,988 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1762753218.json
+2025-11-16 00:25:17,989 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1762753686.json
+2025-11-16 00:25:17,989 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108354.json
+2025-11-16 00:25:17,989 - INFO -   - e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763108366.json
+2025-11-16 00:25:17,989 - INFO - Pipeline执行结果: success=True
+2025-11-16 00:25:17,991 - INFO - 读取计划文件: e:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251116_002515.json
+2025-11-16 00:25:17,992 - INFO - 成功读取计划数据，包含 3 项
+2025-11-16 00:25:17,992 - INFO - 开始生成多水泵方案对比
+2025-11-16 00:25:19,358 - INFO - 多水泵方案生成成功，共 3 个方案（触发阈值: 1个田块）
+2025-11-16 00:25:19,358 - INFO - 灌溉计划结果已保存到缓存 - cache_key: 407aa85133e3f440f410a1e2f7904869
+2025-11-16 00:25:19,358 - INFO - 灌溉计划生成完成
