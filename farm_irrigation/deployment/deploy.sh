@@ -46,12 +46,16 @@ check_docker() {
 
 # 检查必要文件
 check_files() {
+    # 获取脚本所在目录和项目根目录
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    local project_root=$(cd "$script_dir/.." && pwd)
+    
     local required_files=(
-        "Dockerfile"
-        "docker-compose.yml"
-        "requirements.txt"
-        "main_dynamic_execution_api.py"
-        "pipeline.py"
+        "$project_root/deployment/Dockerfile"
+        "$project_root/deployment/docker-compose.yml"
+        "$project_root/requirements.txt"
+        "$project_root/main_dynamic_execution_api.py"
+        "$project_root/src/core/pipeline.py"
     )
     
     for file in "${required_files[@]}"; do
@@ -66,12 +70,17 @@ check_files() {
 
 # 创建必要目录
 create_directories() {
-    local dirs=("gzp_farm" "output" "logs")
+    # 获取项目根目录
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    local project_root=$(cd "$script_dir/.." && pwd)
+    
+    local dirs=("data/gzp_farm" "data/output" "data/execution_logs")
     
     for dir in "${dirs[@]}"; do
-        if [[ ! -d "$dir" ]]; then
-            mkdir -p "$dir"
-            log_info "创建目录: $dir"
+        local full_path="$project_root/$dir"
+        if [[ ! -d "$full_path" ]]; then
+            mkdir -p "$full_path"
+            log_info "创建目录: $full_path"
         fi
     done
 }
@@ -80,8 +89,12 @@ create_directories() {
 start_service() {
     log_info "启动灌溉计划API服务..."
     
+    # 获取脚本目录（deployment目录）
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    
     # 构建镜像
     log_info "构建Docker镜像..."
+    cd "$script_dir"
     docker compose build
     
     # 启动服务
@@ -106,6 +119,11 @@ start_service() {
 # 停止服务
 stop_service() {
     log_info "停止灌溉计划API服务..."
+    
+    # 获取脚本目录（deployment目录）
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    cd "$script_dir"
+    
     docker compose down
     log_success "服务已停止"
 }
@@ -121,6 +139,11 @@ restart_service() {
 # 检查服务状态
 check_status() {
     log_info "检查服务状态..."
+    
+    # 获取脚本目录（deployment目录）
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    cd "$script_dir"
+    
     docker compose ps
     
     if check_service_health; then
@@ -134,12 +157,21 @@ check_status() {
 # 查看日志
 show_logs() {
     log_info "显示服务日志..."
+    
+    # 获取脚本目录（deployment目录）
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    cd "$script_dir"
+    
     docker compose logs -f
 }
 
 # 更新服务
 update_service() {
     log_info "更新灌溉计划API服务..."
+    
+    # 获取脚本目录（deployment目录）
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    cd "$script_dir"
     
     # 停止服务
     docker compose down
@@ -203,6 +235,11 @@ show_service_info() {
 # 清理资源
 cleanup() {
     log_info "清理Docker资源..."
+    
+    # 获取脚本目录（deployment目录）
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    cd "$script_dir"
+    
     docker compose down
     docker system prune -f
     log_success "清理完成"
@@ -210,10 +247,15 @@ cleanup() {
 
 # 备份数据
 backup_data() {
-    local backup_file="irrigation-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+    # 获取项目根目录
+    local script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    local project_root=$(cd "$script_dir/.." && pwd)
+    
+    local backup_file="$project_root/irrigation-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
     log_info "备份数据到: $backup_file"
     
-    tar -czf "$backup_file" gzp_farm/ output/ *.yaml *.json 2>/dev/null || true
+    cd "$project_root"
+    tar -czf "$backup_file" data/gzp_farm/ data/output/ *.yaml *.json 2>/dev/null || true
     
     if [[ -f "$backup_file" ]]; then
         log_success "备份完成: $backup_file"

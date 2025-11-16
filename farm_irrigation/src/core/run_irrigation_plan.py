@@ -11,6 +11,9 @@ import io
 from pathlib import Path
 from typing import Optional, Dict, Any
 
+# 导入磁盘I/O优化器
+from src.optimizer.optimize_disk_io import DiskIOOptimizer
+
 # 设置输出编码以解决Windows命令行中文显示问题
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -96,7 +99,10 @@ def main(argv=None):
         # 从配置中获取触发条件
         min_fields_trigger = data.get('irrigation_trigger_config', {}).get('min_fields_trigger', 1)
         scenarios_result = generate_multi_pump_scenarios(cfg_for_multi, min_fields_trigger=min_fields_trigger)
-        Path(args.out).write_text(json.dumps(scenarios_result, ensure_ascii=False, indent=2), encoding="utf-8")
+        
+        # 使用优化的原子性写入
+        optimizer = DiskIOOptimizer()
+        optimizer.optimize_json_operations(scenarios_result, args.out)
         
         if args.summary:
             print("====== 多水泵方案对比摘要 ======")
@@ -131,7 +137,10 @@ def main(argv=None):
         
         plan = build_concurrent_plan(cfg)
         plan_json = plan_to_json(plan)  # 已递归清理 NaN/Inf
-        Path(args.out).write_text(json.dumps(plan_json, ensure_ascii=False, indent=2), encoding="utf-8")
+        
+        # 使用优化的原子性写入
+        optimizer = DiskIOOptimizer()
+        optimizer.optimize_json_operations(plan_json, args.out)
 
         if args.summary:
             _print_summary(plan_json)

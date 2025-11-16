@@ -29,6 +29,9 @@ import pandas as pd
 from shapely.geometry import Point, LineString, Polygon
 from shapely.ops import nearest_points
 
+# 导入磁盘I/O优化器
+from src.optimizer.optimize_disk_io import DiskIOOptimizer
+
 # 加载配置文件
 def _load_config(config_path: str = "auto_config_params.yaml") -> Dict[str, Any]:
     """加载配置文件，返回配置字典"""
@@ -551,7 +554,9 @@ def convert(
         "fields": fld_rows
     }
 
-    Path(cfg_out).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 使用优化的原子性写入
+    optimizer = DiskIOOptimizer()
+    optimizer.optimize_json_operations(data, cfg_out)
 
     # ============== labeled_output ==============
     out_dir = Path(labeled_dir); out_dir.mkdir(parents=True, exist_ok=True)

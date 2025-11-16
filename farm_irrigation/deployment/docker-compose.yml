@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   irrigation-api:
-    build: ..
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
     container_name: irrigation-api
     ports:
       - "8000:8000"
