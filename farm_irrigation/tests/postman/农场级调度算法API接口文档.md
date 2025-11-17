@@ -2023,6 +2023,7 @@ POST /api/batch/reorder
       {
         "field_id": "1891820536309653504",
         "field_name": "31",
+        "section_code": "S6-G39-F26",
         "device_count": 2,
         "devices": [
           {
@@ -2065,8 +2066,9 @@ POST /api/batch/reorder
 | data.farm_name | string | 农场名称 |
 | data.total_fields | integer | 田块总数 |
 | data.fields | array | 田块列表 |
-| data.fields[].field_id | string | 田块ID |
-| data.fields[].field_name | string | 田块名称 |
+| data.fields[].field_id | string | 田块ID（长ID） |
+| data.fields[].field_name | string | 田块名称（简短编号） |
+| data.fields[].section_code | string | 田块编码（S-G-F格式，如S6-G39-F26） |
 | data.fields[].device_count | integer | 该田块的设备数量（仅包含筛选的类型） |
 | data.fields[].devices | array | 设备列表 |
 | data.fields[].devices[].device_code | string | 设备编码 |
@@ -2110,7 +2112,7 @@ if (data.success) {
   
   // 遍历田块
   data.data.fields.forEach(field => {
-    console.log(`田块 ${field.field_name} (ID: ${field.field_id})`);
+    console.log(`田块 ${field.field_name} (ID: ${field.field_id}, Code: ${field.section_code || 'N/A'})`);
     console.log(`  设备数: ${field.device_count}`);
     
     // 遍历设备

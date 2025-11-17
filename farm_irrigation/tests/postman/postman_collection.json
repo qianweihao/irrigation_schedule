@@ -1431,6 +1431,21 @@
                   "        pm.expect(jsonData.data).to.have.property('total_fields');",
                   "        pm.expect(jsonData.data).to.have.property('fields');",
                   "    }",
+                  "});",
+                  "",
+                  "pm.test(\"田块包含section_code字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data && jsonData.data.fields.length > 0) {",
+                  "        var firstField = jsonData.data.fields[0];",
+                  "        pm.expect(firstField).to.have.property('field_id');",
+                  "        pm.expect(firstField).to.have.property('field_name');",
+                  "        ",
+                  "        // 检查section_code字段（S-G-F格式）",
+                  "        if (firstField.section_code) {",
+                  "            pm.expect(firstField.section_code).to.match(/^S\\d+-G\\d+-F\\d+$/);",
+                  "            console.log('✅ 示例田块: ID=' + firstField.field_id + ', Name=' + firstField.field_name + ', SectionCode=' + firstField.section_code);",
+                  "        }",
+                  "    }",
                   "});"
                 ]
               }

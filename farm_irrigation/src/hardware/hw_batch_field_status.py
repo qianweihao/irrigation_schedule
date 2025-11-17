@@ -79,15 +79,44 @@ def _should_include_device(device_info: Dict[str, Any]) -> bool:
     return device_type_code in ["101588", "101544", "101134"]
 
 
+def _load_section_id_to_code_mapping() -> Dict[str, str]:
+    """
+    从 config.json 加载 sectionID 到 sectionCode 的映射
+    
+    Returns:
+        dict: {sectionID: sectionCode} 映射
+    """
+    current_file = Path(__file__)
+    project_root = current_file.parent.parent.parent
+    config_file = project_root / "config.json"
+    
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # 从 fields 数组中提取 sectionID -> sectionCode 映射
+        mapping = {}
+        for field in config.get("fields", []):
+            section_id = field.get("sectionID")
+            section_code = field.get("sectionCode") or field.get("id")  # 优先使用 sectionCode，否则用 id
+            if section_id and section_code:
+                mapping[str(section_id)] = str(section_code)
+        
+        return mapping
+    except Exception as e:
+        print(f"⚠️ 加载 config.json 失败: {e}")
+        return {}
+
+
 def _get_field_ids_from_csv(farm_name: str) -> List[Dict[str, str]]:
     """
-    根据农场名称从CSV文件中提取田块ID列表
+    根据农场名称从CSV文件中提取田块ID列表，并从 config.json 中补充 sectionCode
     
     Args:
         farm_name: 农场名称（如"港中坪"）
         
     Returns:
-        List[Dict]: 田块信息列表，格式：[{"id": "田块ID", "name": "田块名称"}, ...]
+        List[Dict]: 田块信息列表，格式：[{"id": "田块ID", "name": "田块名称", "section_code": "S-G-F格式"}, ...]
     """
     # 从当前文件位置向上找到项目根目录
     current_file = Path(__file__)
@@ -102,6 +131,9 @@ def _get_field_ids_from_csv(farm_name: str) -> List[Dict[str, str]]:
         return []
     
     try:
+        # 加载 sectionID -> sectionCode 映射
+        section_mapping = _load_section_id_to_code_mapping()
+        
         # 读取CSV文件
         df = pd.read_csv(csv_file, encoding="utf-8-sig")
         
@@ -116,10 +148,20 @@ def _get_field_ids_from_csv(farm_name: str) -> List[Dict[str, str]]:
         # 转换为字典列表
         fields = []
         for _, row in df_filtered.iterrows():
-            fields.append({
-                "id": str(row["id"]).strip(),
-                "name": str(row["name"]).strip()
-            })
+            field_id = str(row["id"]).strip()
+            field_name = str(row["name"]).strip()
+            section_code = section_mapping.get(field_id)  # 从映射中获取 sectionCode
+            
+            field_info = {
+                "id": field_id,
+                "name": field_name
+            }
+            
+            # 如果找到 sectionCode，添加到结果中
+            if section_code:
+                field_info["section_code"] = section_code
+            
+            fields.append(field_info)
         
         return fields
         
@@ -169,6 +211,7 @@ def get_all_fields_device_status(
                 {
                     "field_id": "田块ID",
                     "field_name": "田块名称",
+                    "section_code": "S-G-F格式编码（如S3-G2-F1）",
                     "device_count": 设备数量,
                     "devices": [
                         {
@@ -238,9 +281,10 @@ def get_all_fields_device_status(
         for i, field in enumerate(fields, 1):
             field_id = field["id"]
             field_name = field["name"]
+            section_code = field.get("section_code")  # 获取 S-G-F 格式的编码
             
             if verbose:
-                print(f"\n步骤3.{i}: 处理田块 {field_name} (ID: {field_id})")
+                print(f"\n步骤3.{i}: 处理田块 {field_name} (ID: {field_id}, Code: {section_code or 'N/A'})")
             
             # 获取田块的设备映射
             device_mapping = get_field_devices_mapping(
@@ -254,13 +298,17 @@ def get_all_fields_device_status(
             if not device_mapping.get("success"):
                 if verbose:
                     print(f"⚠️ 田块 {field_name} 未找到设备")
-                field_results.append({
+                field_result = {
                     "field_id": field_id,
                     "field_name": field_name,
                     "device_count": 0,
                     "devices": [],
                     "error": device_mapping.get("error", "未找到设备")
-                })
+                }
+                # 添加 section_code（如果存在）
+                if section_code:
+                    field_result["section_code"] = section_code
+                field_results.append(field_result)
                 continue
             
             # 筛选特定类型的设备并查询状态
@@ -320,12 +368,16 @@ def get_all_fields_device_status(
                     "status": device_status
                 })
             
-            field_results.append({
+            field_result = {
                 "field_id": field_id,
                 "field_name": field_name,
                 "device_count": len(devices),
                 "devices": devices
-            })
+            }
+            # 添加 section_code（如果存在）
+            if section_code:
+                field_result["section_code"] = section_code
+            field_results.append(field_result)
         
         result["fields"] = field_results
         result["success"] = True
@@ -363,7 +415,8 @@ if __name__ == "__main__":
     if result['success']:
         print("\n田块设备信息和状态:")
         for field in result['fields']:
-            print(f"\n  田块: {field['field_name']} (ID: {field['field_id']})")
+            section_code = field.get('section_code', 'N/A')
+            print(f"\n  田块: {field['field_name']} (ID: {field['field_id']}, Code: {section_code})")
             print(f"  设备数量: {field['device_count']}")
             for device in field['devices']:
                 print(f"    - 设备编码: {device['device_code']}")
