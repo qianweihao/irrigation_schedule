@@ -5,6 +5,7 @@
 根据农场ID查询所有田块对应的设备状态
 """
 import json
+import re
 import pandas as pd
 from typing import List, Dict, Any, Optional
 from pathlib import Path
@@ -77,6 +78,27 @@ def _should_include_device(device_info: Dict[str, Any]) -> bool:
     """
     device_type_code = device_info.get("deviceTypeCode")
     return device_type_code in ["101588", "101544", "101134"]
+
+
+def _extract_gates_code_from_section_code(section_code: Optional[str]) -> Optional[str]:
+    """
+    从 section_code (S-G-F格式) 中提取 gates_code (S-G格式)
+    
+    Args:
+        section_code: 田块编码，格式如 "S3-G10-F7"
+        
+    Returns:
+        str: 闸门编码，格式如 "S3-G10"，如果无法解析则返回 None
+    """
+    if not section_code:
+        return None
+    
+    # 使用正则表达式匹配 S-G-F 格式，提取 S-G 部分
+    match = re.match(r'^(S\d+-G\d+)', section_code)
+    if match:
+        return match.group(1)
+    
+    return None
 
 
 def _load_section_id_to_code_mapping() -> Dict[str, str]:
@@ -212,6 +234,7 @@ def get_all_fields_device_status(
                     "field_id": "田块ID",
                     "field_name": "田块名称",
                     "section_code": "S-G-F格式编码（如S3-G2-F1）",
+                    "gates_code": "S-G格式编码（如S3-G2）",
                     "device_count": 设备数量,
                     "devices": [
                         {
@@ -282,9 +305,10 @@ def get_all_fields_device_status(
             field_id = field["id"]
             field_name = field["name"]
             section_code = field.get("section_code")  # 获取 S-G-F 格式的编码
+            gates_code = _extract_gates_code_from_section_code(section_code)  # 提取 S-G 部分
             
             if verbose:
-                print(f"\n步骤3.{i}: 处理田块 {field_name} (ID: {field_id}, Code: {section_code or 'N/A'})")
+                print(f"\n步骤3.{i}: 处理田块 {field_name} (ID: {field_id}, Code: {section_code or 'N/A'}, Gate: {gates_code or 'N/A'})")
             
             # 获取田块的设备映射
             device_mapping = get_field_devices_mapping(
@@ -305,9 +329,11 @@ def get_all_fields_device_status(
                     "devices": [],
                     "error": device_mapping.get("error", "未找到设备")
                 }
-                # 添加 section_code（如果存在）
+                # 添加 section_code 和 gates_code（如果存在）
                 if section_code:
                     field_result["section_code"] = section_code
+                if gates_code:
+                    field_result["gates_code"] = gates_code
                 field_results.append(field_result)
                 continue
             
@@ -374,9 +400,11 @@ def get_all_fields_device_status(
                 "device_count": len(devices),
                 "devices": devices
             }
-            # 添加 section_code（如果存在）
+            # 添加 section_code 和 gates_code（如果存在）
             if section_code:
                 field_result["section_code"] = section_code
+            if gates_code:
+                field_result["gates_code"] = gates_code
             field_results.append(field_result)
         
         result["fields"] = field_results
@@ -416,7 +444,8 @@ if __name__ == "__main__":
         print("\n田块设备信息和状态:")
         for field in result['fields']:
             section_code = field.get('section_code', 'N/A')
-            print(f"\n  田块: {field['field_name']} (ID: {field['field_id']}, Code: {section_code})")
+            gates_code = field.get('gates_code', 'N/A')
+            print(f"\n  田块: {field['field_name']} (ID: {field['field_id']}, Code: {section_code}, Gate: {gates_code})")
             print(f"  设备数量: {field['device_count']}")
             for device in field['devices']:
                 print(f"    - 设备编码: {device['device_code']}")
