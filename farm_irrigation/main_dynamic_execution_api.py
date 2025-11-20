@@ -2295,7 +2295,7 @@ class UpdateConfigFromRiceRequest(BaseModel):
     """独立配置更新请求（基于Rice决策）"""
     farm_id: str = Field(..., description="农场ID")
     rice_api_url: str = Field(
-        default="http://localhost:5000/v1/rice_irrigation",
+        default="http://rice-backend:5000/v1/rice_irrigation",  # Docker 容器名访问
         description="Rice API地址"
     )
 
@@ -2312,7 +2312,7 @@ class RiceIntegrationRequest(BaseModel):
     """Rice智能决策集成请求（一体化：更新配置+生成计划）"""
     farm_id: str = Field(..., description="农场ID")
     rice_api_url: str = Field(
-        "http://localhost:5000/v1/rice_irrigation",
+        "http://rice-backend:5000/v1/rice_irrigation",  # Docker 容器名访问
         description="Rice API地址"
     )
     pumps: str = Field("P1,P2", description="启用的水泵")
@@ -2989,7 +2989,7 @@ async def list_config_backups():
 
 @app.get("/api/irrigation/rice-status")
 async def check_rice_service_status(
-    rice_api_url: str = "http://localhost:5000/v1/rice_irrigation"
+    rice_api_url: str = "http://rice-backend:5000/v1/rice_irrigation"  # Docker 容器名访问
 ):
     """
     检查 Rice 服务状态

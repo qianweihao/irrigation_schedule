@@ -48,6 +48,7 @@ services:
       start_period: 40s
     networks:
       - irrigation-network
+      - rice-network  # 加入 Rice 网络以实现跨容器通信
 
   # 可选：添加Nginx反向代理
   nginx:
@@ -78,6 +79,11 @@ networks:
   irrigation-network:
     driver: bridge
     name: farm_schedule_irrigation-network
+  
+  # 加入 Rice 的网络以实现跨容器通信
+  rice-network:
+    external: true
+    name: rice_smart_irrigation-network
 
 volumes:
   # 如果需要持久化存储，可以定义命名卷
