@@ -275,9 +275,18 @@ class IrrigationPipeline:
         # 执行步骤
         steps = [
             (self.step1_data_preprocessing, [input_dir]),
-            (self.step2_config_generation, [input_dir, output_dir]),
-            (self.step3_plan_generation, [output_dir], kwargs)
         ]
+        
+        # 如果指定了 config_file，跳过配置生成步骤（使用现有配置）
+        if not kwargs.get('config_file'):
+            logger.info("未指定 config_file，将生成新配置")
+            steps.append((self.step2_config_generation, [input_dir, output_dir]))
+        else:
+            logger.info(f"使用现有配置文件: {kwargs.get('config_file')}")
+            logger.info("跳过配置生成步骤（保留 Rice 决策配置）")
+        
+        # 计划生成步骤（总是执行）
+        steps.append((self.step3_plan_generation, [output_dir], kwargs))
         
         for i, step_info in enumerate(steps, 1):
             step_func = step_info[0]

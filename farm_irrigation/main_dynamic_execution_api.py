@@ -32,6 +32,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import uvicorn
 import geopandas as gpd
+import requests
 
 # 导入动态执行相关模块
 from src.scheduler.batch_execution_scheduler import BatchExecutionScheduler
@@ -1558,10 +1559,13 @@ async def generate_irrigation_plan(request: IrrigationPlanRequest):
         
         # 构建pipeline参数
         logger.info("步骤6: 构建pipeline参数...")
+        
+        # 关键：传递 config_file 参数，告诉 pipeline 使用现有配置（不重新生成）
+        # 这确保了 Rice 决策的配置不会被覆盖
         kwargs = {
             'input_dir': os.path.join(os.path.dirname(__file__), "data", "gzp_farm"),
             'output_dir': output_dir,
-            'config_file': config_path if os.path.exists(config_path) else None,
+            'config_file': config_path,  # 总是传递 config_file，跳过配置生成步骤
             'merge_waterlevels': True,
             'print_summary': True,
             'multi_pump_scenarios': request.multi_pump_scenarios or False
@@ -2285,6 +2289,750 @@ async def optimize_irrigation_plan(request: OptimizationRequest):
             detail=f"灌溉计划优化失败: {str(e)}"
         )
 
+# ==================== Rice 智能决策集成 API ====================
+
+class UpdateConfigFromRiceRequest(BaseModel):
+    """独立配置更新请求（基于Rice决策）"""
+    farm_id: str = Field(..., description="农场ID")
+    rice_api_url: str = Field(
+        default="http://localhost:5000/v1/rice_irrigation",
+        description="Rice API地址"
+    )
+
+class UpdateConfigFromRiceResponse(BaseModel):
+    """独立配置更新响应"""
+    success: bool
+    message: str
+    decision_count: int = Field(default=0, description="总决策数量")
+    irrigate_count: int = Field(default=0, description="需要灌溉的田块数量")
+    config_backup: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
+
+class RiceIntegrationRequest(BaseModel):
+    """Rice智能决策集成请求（一体化：更新配置+生成计划）"""
+    farm_id: str = Field(..., description="农场ID")
+    rice_api_url: str = Field(
+        "http://localhost:5000/v1/rice_irrigation",
+        description="Rice API地址"
+    )
+    pumps: str = Field("P1,P2", description="启用的水泵")
+    time_constraints: bool = Field(False, description="是否启用时间约束")
+    auto_execute: bool = Field(False, description="是否自动执行")
+
+class RiceIntegrationResponse(BaseModel):
+    """Rice智能决策集成响应"""
+    success: bool
+    message: str
+    decision_count: int = 0
+    irrigate_count: int = 0
+    plan_file: Optional[str] = None
+    execution_id: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
+
+@app.post("/api/irrigation/update-config-from-rice", response_model=UpdateConfigFromRiceResponse)
+async def update_config_from_rice(request: UpdateConfigFromRiceRequest):
+    """
+    独立的配置更新接口：从 Rice 获取决策并更新 config.json
+    
+    **设计理念**:
+    - 职责单一：只负责配置更新，不生成计划
+    - 灵活复用：更新后可调用任意接口（计划生成、批次重生成、执行等）
+    - RESTful 设计：符合单一职责原则
+    
+    **工作流程**:
+    1. 调用 Rice API 获取智能灌溉决策
+    2. 映射田块ID (sectionID → field_id)
+    3. 备份当前 config.json
+    4. 更新 config.json 中的水位参数：
+       - wl_mm: 当前水位（Rice 提供）
+       - wl_low: current + 1（强制触发灌溉）
+       - wl_opt: Rice 目标水位
+    5. 返回更新详情和备份路径
+    
+    **后续使用**:
+    更新配置后，可以调用以下任意接口：
+    - /api/irrigation/plan-generation（生成计划）
+    - /api/regeneration/batch（批次重新生成）
+    - /api/execution/plan（执行计划）
+    - /api/water-levels/targets（查看水位目标）
+    
+    **示例**:
+    ```bash
+    # 1. 先更新配置
+    curl -X POST "http://localhost:8000/api/irrigation/update-config-from-rice" \\
+      -H "Content-Type: application/json" \\
+      -d '{"farm_id": "13944136728576"}'
+    
+    # 2. 再生成计划（使用 Rice 配置）
+    curl -X POST "http://localhost:8000/api/irrigation/plan-generation" \\
+      -H "Content-Type: application/json" \\
+      -d '{"farm_id": "13944136728576"}'
+    ```
+    
+    **与一体化接口的区别**:
+    - 一体化接口 (/generate-from-rice): 更新配置 + 生成计划（一键式）
+    - 独立接口 (本接口): 只更新配置（更灵活）
+    """
+    try:
+        logger.info(f"开始更新配置 - 基于 Rice 决策, farm_id: {request.farm_id}")
+        
+        # ===== 步骤1: 调用 Rice API =====
+        logger.info(f"步骤1: 调用 Rice API: {request.rice_api_url}")
+        
+        try:
+            response = requests.get(
+                request.rice_api_url,
+                params={"farm_id": request.farm_id, "debug": "0"},
+                timeout=30
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Rice API 返回错误: {response.status_code}"
+                )
+            
+            rice_decisions = response.json()
+            logger.info(f"✓ 成功获取 Rice 决策，共 {len(rice_decisions)} 项")
+            
+        except requests.exceptions.ConnectionError:
+            raise HTTPException(
+                status_code=503,
+                detail="无法连接到 Rice 服务，请确保 Rice API 已启动 (python app.py)"
+            )
+        except requests.exceptions.Timeout:
+            raise HTTPException(
+                status_code=504,
+                detail="Rice API 响应超时（30秒）"
+            )
+        
+        # ===== 步骤2: 加载 config.json 并映射 ID =====
+        logger.info("步骤2: 加载配置并映射 ID...")
+        config_path = os.path.join(os.path.dirname(__file__), "config.json")
+        
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # 构建 sectionID → field_id 映射
+        section_to_field = {}
+        for field in config.get('fields', []):
+            section_id = field.get('sectionID')
+            field_id = field.get('id')
+            if section_id and field_id:
+                section_to_field[section_id] = field_id
+        
+        logger.info(f"✓ 成功映射 {len(section_to_field)} 个田块")
+        
+        # ===== 步骤3: 转换 Rice 决策为 field_id 格式 =====
+        logger.info("步骤3: 转换 Rice 决策...")
+        
+        field_targets = {}
+        custom_waterlevels = {}
+        skipped = []
+        
+        for section_id, decision in rice_decisions.items():
+            if section_id == 'log':
+                continue
+            
+            action = decision.get('action', 'none')
+            if action != 'irrigate':
+                continue
+            
+            # 映射到 field_id
+            field_id = section_to_field.get(section_id)
+            if not field_id:
+                skipped.append(section_id)
+                continue
+            
+            # 提取关键参数
+            current_wl = decision.get('current_waterlevel', 0)
+            target_wl = decision.get('target', 50)
+            
+            field_targets[field_id] = target_wl
+            custom_waterlevels[field_id] = current_wl
+        
+        logger.info(f"✓ 转换完成：{len(custom_waterlevels)} 个田块需要灌溉")
+        if skipped:
+            logger.warning(f"跳过 {len(skipped)} 个未映射的 section: {skipped[:5]}...")
+        
+        # ===== 步骤4: 备份并修改 config.json =====
+        logger.info("步骤4: 备份并更新 config.json...")
+        
+        # 确保备份目录存在
+        backup_dir = os.path.join(os.path.dirname(__file__), "data", "config_backup")
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        # 备份原始配置
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_path = os.path.join(backup_dir, f"config_backup_{timestamp}.json")
+        
+        import shutil
+        shutil.copy2(config_path, backup_path)
+        logger.info(f"✓ 原始配置已备份: {backup_path}")
+        
+        # 记录修改详情
+        rice_modifications = {
+            "timestamp": timestamp,
+            "source": "rice_smart_irrigation",
+            "farm_id": request.farm_id,
+            "modified_fields": {}
+        }
+        
+        # 直接修改 config.json 中的字段
+        modified_count = 0
+        for field in config['fields']:
+            field_id = field['id']
+            if field_id in field_targets:
+                original_wl_low = field.get('wl_low', 30.0)
+                original_wl_opt = field.get('wl_opt', 80.0)
+                original_wl_mm = field.get('wl_mm', 0)
+                
+                field['wl_mm'] = custom_waterlevels[field_id]
+                field['wl_low'] = custom_waterlevels[field_id] + 1  # 强制触发
+                field['wl_opt'] = field_targets[field_id]           # Rice 的目标
+                
+                rice_modifications["modified_fields"][field_id] = {
+                    "original": {
+                        "wl_low": original_wl_low,
+                        "wl_opt": original_wl_opt,
+                        "wl_mm": original_wl_mm
+                    },
+                    "rice_decision": {
+                        "wl_low": field['wl_low'],
+                        "wl_opt": field['wl_opt'],
+                        "wl_mm": field['wl_mm']
+                    }
+                }
+                modified_count += 1
+                logger.info(f"  田块 {field_id}: wl_low={original_wl_low}→{field['wl_low']}, wl_opt={original_wl_opt}→{field['wl_opt']}")
+            else:
+                # Rice 说不灌溉的田块 - 设置很高的阈值
+                field['wl_low'] = 999
+        
+        # 添加 Rice 元数据到配置
+        config['_rice_integration'] = rice_modifications
+        
+        # 保存修改后的配置
+        logger.info(f"准备写入配置文件: {config_path}")
+        try:
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            logger.info(f"✓ config.json 已成功更新（修改 {modified_count} 个田块）")
+            logger.info(f"✓ 备份文件: {backup_path}")
+        except Exception as write_error:
+            logger.error(f"❌ 写入配置文件失败: {write_error}")
+            raise
+        
+        # ===== 返回结果 =====
+        return UpdateConfigFromRiceResponse(
+            success=True,
+            message=f"成功！config.json 已基于 Rice 决策更新（{len(custom_waterlevels)} 个田块）",
+            decision_count=len(rice_decisions) - 1 if 'log' in rice_decisions else len(rice_decisions),
+            irrigate_count=len(custom_waterlevels),
+            config_backup=backup_path.replace('\\', '/'),
+            details={
+                "skipped_sections": skipped,
+                "mapping_count": len(section_to_field),
+                "converted_count": len(custom_waterlevels),
+                "rice_modifications": rice_modifications,
+                "next_steps": [
+                    "可以调用 /api/irrigation/plan-generation 生成计划",
+                    "可以调用 /api/regeneration/batch 重新生成批次",
+                    "可以调用 /api/water-levels/targets 查看更新后的水位",
+                    "可以调用 /api/irrigation/restore-config 恢复原配置"
+                ]
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"更新配置失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"更新配置失败: {str(e)}"
+        )
+
+@app.post("/api/irrigation/generate-from-rice", response_model=RiceIntegrationResponse)
+async def generate_plan_from_rice_decisions(request: RiceIntegrationRequest):
+    """
+    基于 Rice 智能决策生成灌溉计划（一体化接口）
+    
+    **架构说明**:
+    - rice_smart_irrigation: 独立服务，提供智能决策 API
+    - farm_irrigation: 独立服务，负责计划生成和执行
+    - 两个服务通过 HTTP API 通信，完全解耦
+    
+    **工作流程**:
+    1. 调用 Rice API 获取智能决策 (HTTP)
+    2. 映射田块ID (section_id → field_id)
+    3. 更新 config.json（内部调用配置更新逻辑）
+    4. 调用现有的计划生成接口
+    5. (可选) 自动启动执行
+    
+    **示例**:
+    ```bash
+    curl -X POST "http://localhost:8000/api/irrigation/generate-from-rice" \\
+      -H "Content-Type: application/json" \\
+      -d '{
+        "farm_id": "13944136728576",
+        "rice_api_url": "http://localhost:5000/v1/rice_irrigation",
+        "pumps": "P1,P2"
+      }'
+    ```
+    
+    **与独立接口的区别**:
+    - 独立接口 (/update-config-from-rice): 只更新配置（更灵活）
+    - 一体化接口 (本接口): 更新配置 + 生成计划（一键式）
+    
+    **与传统方法的区别**:
+    - 传统: 基于固定阈值 (wl_low/wl_opt)
+    - Rice集成: 基于生育期、天气、农事操作的动态决策
+    """
+    try:
+        logger.info(f"开始基于 Rice 决策生成计划 - farm_id: {request.farm_id}")
+        
+        # ===== 步骤1: 调用 Rice API =====
+        logger.info(f"调用 Rice API: {request.rice_api_url}")
+        
+        try:
+            import requests
+            response = requests.get(
+                request.rice_api_url,
+                params={'farm_id': request.farm_id},
+                timeout=30
+            )
+            response.raise_for_status()
+            rice_decisions = response.json()
+            
+            # 统计决策
+            irrigate_fields = {}
+            for section_id, decision in rice_decisions.items():
+                if section_id == 'log':
+                    continue
+                if decision.get('action') == 'irrigate':
+                    irrigate_fields[section_id] = decision
+            
+            logger.info(f"✓ 获取到 {len(irrigate_fields)} 个灌溉决策")
+            
+        except requests.exceptions.ConnectionError:
+            raise HTTPException(
+                status_code=503,
+                detail="无法连接到 Rice API，请确保 rice_smart_irrigation 服务正在运行"
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"调用 Rice API 失败: {str(e)}"
+            )
+        
+        if not irrigate_fields:
+            return RiceIntegrationResponse(
+                success=True,
+                message="Rice 决策获取成功，但没有需要灌溉的田块",
+                decision_count=len(rice_decisions) - 1 if 'log' in rice_decisions else len(rice_decisions),
+                irrigate_count=0
+            )
+        
+        # ===== 步骤2: 映射田块ID =====
+        logger.info("加载田块映射...")
+        
+        config_path = os.path.join(os.path.dirname(__file__), "config.json")
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # 建立映射: section_id → field_id
+        section_to_field = {}
+        for field in config.get('fields', []):
+            section_id = str(field.get('sectionID'))
+            if section_id:
+                section_to_field[section_id] = field.get('id')
+        
+        # ===== 步骤3: 构造参数 =====
+        logger.info("构造自定义水位参数...")
+        
+        custom_waterlevels = {}
+        field_targets = {}
+        skipped = []
+        
+        for section_id, decision in irrigate_fields.items():
+            if section_id not in section_to_field:
+                skipped.append(section_id)
+                logger.warning(f"田块 {section_id} 未找到映射，跳过")
+                continue
+            
+            field_id = section_to_field[section_id]
+            current_wl = decision.get('current_waterlevel')
+            target_wl = decision.get('target')
+            
+            if current_wl is not None and target_wl is not None:
+                custom_waterlevels[field_id] = current_wl
+                field_targets[field_id] = target_wl
+        
+        logger.info(f"✓ 成功转换 {len(custom_waterlevels)} 个田块")
+        
+        # ===== 步骤4: 备份并修改 config.json =====
+        logger.info("备份并更新 config.json...")
+        
+        # 备份原始配置（保存到 data/config_backup 目录）
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_dir = os.path.join(os.path.dirname(__file__), "data", "config_backup")
+        os.makedirs(backup_dir, exist_ok=True)  # 确保备份目录存在
+        
+        backup_path = os.path.join(
+            backup_dir,
+            f"config_backup_{timestamp}.json"
+        )
+        
+        import shutil
+        shutil.copy2(config_path, backup_path)
+        logger.info(f"✓ 原始配置已备份: {backup_path}")
+        
+        # 记录修改详情
+        rice_modifications = {
+            "timestamp": timestamp,
+            "source": "rice_smart_irrigation",
+            "farm_id": request.farm_id,
+            "modified_fields": {}
+        }
+        
+        # 直接修改 config.json 中的字段
+        for field in config['fields']:
+            field_id = field['id']
+            if field_id in field_targets:
+                # Rice 说要灌溉的田块
+                original_wl_low = field.get('wl_low', 30.0)
+                original_wl_opt = field.get('wl_opt', 80.0)
+                
+                field['wl_mm'] = custom_waterlevels[field_id]
+                field['wl_low'] = custom_waterlevels[field_id] + 1  # 强制触发
+                field['wl_opt'] = field_targets[field_id]           # Rice 的目标
+                
+                # 记录修改
+                rice_modifications["modified_fields"][field_id] = {
+                    "original": {
+                        "wl_low": original_wl_low,
+                        "wl_opt": original_wl_opt,
+                        "wl_mm": field.get('wl_mm', 0)
+                    },
+                    "rice_decision": {
+                        "wl_low": field['wl_low'],
+                        "wl_opt": field['wl_opt'],
+                        "wl_mm": field['wl_mm']
+                    }
+                }
+                logger.info(f"  田块 {field_id}: wl_low={original_wl_low}→{field['wl_low']}, wl_opt={original_wl_opt}→{field['wl_opt']}")
+            else:
+                # Rice 说不灌溉的田块 - 设置很高的阈值
+                field['wl_low'] = 999
+        
+        # 添加 Rice 元数据到配置
+        config['_rice_integration'] = rice_modifications
+        
+        # 保存修改后的配置
+        logger.info(f"准备写入配置文件: {config_path}")
+        logger.info(f"修改的田块数量: {len(rice_modifications['modified_fields'])}")
+        
+        # 调试：检查第一个田块的修改
+        if len(rice_modifications['modified_fields']) > 0:
+            first_field_id = list(rice_modifications['modified_fields'].keys())[0]
+            first_field_data = rice_modifications['modified_fields'][first_field_id]
+            logger.info(f"示例田块 {first_field_id}:")
+            logger.info(f"  原值: wl_low={first_field_data['original']['wl_low']}, wl_opt={first_field_data['original']['wl_opt']}")
+            logger.info(f"  新值: wl_low={first_field_data['rice_decision']['wl_low']}, wl_opt={first_field_data['rice_decision']['wl_opt']}")
+        
+        try:
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            logger.info(f"✓ config.json 已成功写入（备份: {backup_path}）")
+            
+            # 验证写入
+            with open(config_path, 'r', encoding='utf-8') as f:
+                verify_config = json.load(f)
+            
+            # 检查是否包含 _rice_integration
+            if '_rice_integration' in verify_config:
+                logger.info("✓ 验证成功: _rice_integration 元数据已写入")
+            else:
+                logger.error("❌ 验证失败: _rice_integration 元数据未找到")
+            
+            # 检查第一个田块
+            if len(rice_modifications['modified_fields']) > 0:
+                first_field_id = list(rice_modifications['modified_fields'].keys())[0]
+                verify_field = next((f for f in verify_config['fields'] if f['id'] == first_field_id), None)
+                if verify_field:
+                    logger.info(f"✓ 验证田块 {first_field_id}: wl_low={verify_field['wl_low']}, wl_opt={verify_field['wl_opt']}")
+                else:
+                    logger.error(f"❌ 验证失败: 田块 {first_field_id} 未找到")
+                    
+        except Exception as write_error:
+            logger.error(f"❌ 写入配置文件失败: {write_error}")
+            import traceback
+            logger.error(traceback.format_exc())
+            raise
+        
+        # ===== 步骤5: 调用现有的计划生成接口 =====
+        logger.info("调用计划生成...")
+        
+        # 使用更新后的 config.json
+        plan_request = IrrigationPlanRequest(
+            farm_id=request.farm_id,
+            config_path=config_path,  # 使用修改后的 config.json
+            output_dir=os.path.join(os.path.dirname(__file__), "data", "output")
+        )
+        
+        plan_response = await generate_irrigation_plan(plan_request)
+        
+        if not plan_response.success:
+            raise HTTPException(
+                status_code=500,
+                detail=f"计划生成失败: {plan_response.message}"
+            )
+        
+        # ===== 重要：计划生成后再次写入配置 =====
+        # 因为 generate_irrigation_plan 可能会重新加载/保存 config.json
+        logger.info("计划生成完成，再次写入 Rice 配置...")
+        
+        try:
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            logger.info("✓ Rice 配置已再次写入（确保不被覆盖）")
+            
+            # 最终验证
+            with open(config_path, 'r', encoding='utf-8') as f:
+                final_verify = json.load(f)
+            
+            if '_rice_integration' in final_verify:
+                logger.info("✓ 最终验证成功: config.json 包含 Rice 配置")
+                
+                # 检查一个示例田块
+                if len(rice_modifications['modified_fields']) > 0:
+                    sample_field_id = list(rice_modifications['modified_fields'].keys())[0]
+                    sample_field = next((f for f in final_verify['fields'] if f['id'] == sample_field_id), None)
+                    if sample_field:
+                        expected_wl_opt = rice_modifications['modified_fields'][sample_field_id]['rice_decision']['wl_opt']
+                        actual_wl_opt = sample_field['wl_opt']
+                        if actual_wl_opt == expected_wl_opt:
+                            logger.info(f"✓ 田块验证成功: {sample_field_id} wl_opt={actual_wl_opt}")
+                        else:
+                            logger.warning(f"⚠️ 田块验证异常: {sample_field_id} 期望wl_opt={expected_wl_opt}, 实际={actual_wl_opt}")
+            else:
+                logger.error("❌ 最终验证失败: _rice_integration 元数据丢失")
+                
+        except Exception as final_write_error:
+            logger.error(f"❌ 最终写入失败: {final_write_error}")
+            # 不抛出异常，因为计划已经生成成功
+        
+        # ===== 步骤6: (可选) 自动执行 =====
+        execution_id = None
+        
+        if request.auto_execute and plan_response.plan_id:
+            logger.info("启动自动执行...")
+            
+            try:
+                exec_request = DynamicExecutionRequest(
+                    plan_file=plan_response.plan_id,
+                    farm_id=request.farm_id
+                )
+                exec_response = await start_dynamic_execution(exec_request)
+                execution_id = exec_response.execution_id
+                logger.info(f"✓ 执行已启动: {execution_id}")
+            except Exception as e:
+                logger.error(f"执行启动失败: {e}")
+        
+        # ===== 返回结果 =====
+        return RiceIntegrationResponse(
+            success=True,
+            message=f"成功！基于 Rice 智能决策生成灌溉计划（{len(custom_waterlevels)} 个田块），config.json 已更新",
+            decision_count=len(rice_decisions) - 1 if 'log' in rice_decisions else len(rice_decisions),
+            irrigate_count=len(custom_waterlevels),
+            plan_file=plan_response.plan_id,
+            execution_id=execution_id,
+            details={
+                "skipped_sections": skipped,
+                "mapping_count": len(section_to_field),
+                "converted_count": len(custom_waterlevels),
+                "config_backup": backup_path,
+                "rice_modifications": rice_modifications,
+                "note": "config.json 已被 Rice 决策更新，原始配置已备份"
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"基于 Rice 决策生成计划失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"生成失败: {str(e)}"
+        )
+
+@app.post("/api/irrigation/restore-config")
+async def restore_config_from_backup(
+    backup_file: str = Query(..., description="备份文件名（如 config_backup_20251120_123456.json）")
+):
+    """
+    从备份恢复 config.json
+    
+    用于在使用 Rice 决策后恢复到原始配置。
+    
+    **使用示例**:
+    ```bash
+    curl -X POST "http://localhost:8000/api/irrigation/restore-config?backup_file=config_backup_20251120_123456.json"
+    ```
+    """
+    try:
+        logger.info(f"尝试从备份恢复配置: {backup_file}")
+        
+        # 构建备份文件路径（备份文件在 data/config_backup 目录）
+        backup_dir = os.path.join(os.path.dirname(__file__), "data", "config_backup")
+        backup_path = os.path.join(backup_dir, backup_file)
+        config_path = os.path.join(os.path.dirname(__file__), "config.json")
+        
+        # 检查备份文件是否存在
+        if not os.path.exists(backup_path):
+            raise HTTPException(
+                status_code=404,
+                detail=f"备份文件不存在: {backup_file}"
+            )
+        
+        # 备份当前的 config.json（以防万一）
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        current_backup = os.path.join(
+            backup_dir,
+            f"config_before_restore_{timestamp}.json"
+        )
+        
+        import shutil
+        shutil.copy2(config_path, current_backup)
+        logger.info(f"✓ 当前配置已备份: {current_backup}")
+        
+        # 恢复备份
+        shutil.copy2(backup_path, config_path)
+        logger.info(f"✓ 配置已从备份恢复")
+        
+        return {
+            "success": True,
+            "message": "配置已成功恢复",
+            "restored_from": backup_file,
+            "current_config_backup": current_backup,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"恢复配置失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"恢复配置失败: {str(e)}"
+        )
+
+@app.get("/api/irrigation/list-backups")
+async def list_config_backups():
+    """
+    列出所有配置备份文件
+    
+    **使用示例**:
+    ```bash
+    curl "http://localhost:8000/api/irrigation/list-backups"
+    ```
+    """
+    try:
+        # 备份文件保存在 data/config_backup 目录
+        backup_dir = os.path.join(os.path.dirname(__file__), "data", "config_backup")
+        
+        # 如果目录不存在，返回空列表
+        if not os.path.exists(backup_dir):
+            return {
+                "success": True,
+                "total_backups": 0,
+                "backups": [],
+                "timestamp": datetime.now().isoformat()
+            }
+        
+        # 查找所有备份文件
+        import glob
+        backup_files = glob.glob(os.path.join(backup_dir, "config_backup_*.json"))
+        
+        backups = []
+        for backup_path in sorted(backup_files, reverse=True):  # 最新的在前
+            filename = os.path.basename(backup_path)
+            stat = os.stat(backup_path)
+            
+            backups.append({
+                "filename": filename,
+                "path": backup_path,
+                "size_bytes": stat.st_size,
+                "created_time": datetime.fromtimestamp(stat.st_mtime).isoformat()
+            })
+        
+        return {
+            "success": True,
+            "total_backups": len(backups),
+            "backups": backups,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"列出备份文件失败: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"列出备份文件失败: {str(e)}"
+        )
+
+@app.get("/api/irrigation/rice-status")
+async def check_rice_service_status(
+    rice_api_url: str = "http://localhost:5000/v1/rice_irrigation"
+):
+    """
+    检查 Rice 服务状态
+    
+    用于验证 rice_smart_irrigation 服务是否可用
+    
+    **使用示例**:
+    ```bash
+    curl "http://localhost:8000/api/irrigation/rice-status"
+    ```
+    """
+    try:
+        import requests
+        
+        response = requests.get(
+            rice_api_url,
+            params={'farm_id': '13944136728576'},  # 测试用
+            timeout=30
+        )
+        
+        return {
+            "success": response.status_code == 200,
+            "status_code": response.status_code,
+            "message": "Rice 服务正常" if response.status_code == 200 else "Rice 服务异常",
+            "rice_api_url": rice_api_url,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    except requests.exceptions.ConnectionError:
+        return {
+            "success": False,
+            "message": "无法连接到 Rice 服务，请确保服务正在运行",
+            "rice_api_url": rice_api_url,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"检查失败: {str(e)}",
+            "rice_api_url": rice_api_url,
+            "timestamp": datetime.now().isoformat()
+        }
+
 @app.get("/api/info")
 async def api_info():
     """API信息"""
@@ -2299,7 +3047,8 @@ async def api_info():
             "执行状态监控和历史记录",
             "田块水位趋势分析",
             "多水泵方案对比分析",
-            "灌溉计划智能优化"
+            "灌溉计划智能优化",
+            "Rice智能决策集成（解耦架构）"
         ],
         "endpoints": {
             "system": "/api/system/*",
@@ -2308,7 +3057,14 @@ async def api_info():
             "regeneration": "/api/regeneration/*",
             "batches": "/api/batches/*",
             "irrigation": "/api/irrigation/*",
-            "data": "/api/data/*"
+            "data": "/api/data/*",
+            "rice_integration": {
+                "update_config": "/api/irrigation/update-config-from-rice",
+                "generate": "/api/irrigation/generate-from-rice",
+                "status": "/api/irrigation/rice-status",
+                "restore": "/api/irrigation/restore-config",
+                "list_backups": "/api/irrigation/list-backups"
+            }
         }
     }
 

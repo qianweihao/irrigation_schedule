@@ -2187,6 +2187,264 @@ if (alertDevices.length > 0) {
 
 ---
 
+### 11. Rice 智能决策集成
+
+#### 11.1 检查 Rice 服务状态
+
+**接口说明**: 检查 rice_smart_irrigation 服务是否正常运行
+
+**请求**
+```
+GET /api/irrigation/rice-status?rice_api_url=http://localhost:5000/v1/rice_irrigation
+```
+
+**查询参数**
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| rice_api_url | string | 否 | http://localhost:5000/v1/rice_irrigation | Rice API 地址 |
+
+**响应示例**
+```json
+{
+  "success": true,
+  "status_code": 200,
+  "message": "Rice 服务正常",
+  "rice_api_url": "http://localhost:5000/v1/rice_irrigation",
+  "timestamp": "2025-11-20T15:30:45.123456"
+}
+```
+
+**状态码说明**
+- `200`: Rice 服务正常
+- `503`: 无法连接到 Rice 服务
+
+---
+
+#### 11.2 基于 Rice 决策生成灌溉计划
+
+**接口说明**: 调用 rice_smart_irrigation 的智能决策，生成灌溉计划
+
+**架构说明**:
+- rice_smart_irrigation: 独立服务，提供智能决策 API（端口 5000）
+- farm_irrigation: 独立服务，负责计划生成和执行（端口 8000）
+- 两个服务通过 HTTP API 通信，完全解耦
+
+**请求**
+```
+POST /api/irrigation/generate-from-rice
+Content-Type: application/json
+```
+
+**请求体**
+```json
+{
+  "farm_id": "13944136728576",
+  "rice_api_url": "http://localhost:5000/v1/rice_irrigation",
+  "pumps": "P1,P2",
+  "time_constraints": false,
+  "auto_execute": false
+}
+```
+
+**参数说明**
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| farm_id | string | 是 | - | 农场ID |
+| rice_api_url | string | 否 | http://localhost:5000/v1/rice_irrigation | Rice API 地址 |
+| pumps | string | 否 | P1,P2 | 启用的水泵（逗号分隔） |
+| time_constraints | boolean | 否 | false | 是否启用时间约束 |
+| auto_execute | boolean | 否 | false | 是否自动执行生成的计划 |
+
+**响应示例**
+```json
+{
+  "success": true,
+  "message": "成功！基于 Rice 智能决策生成灌溉计划（8 个田块）",
+  "decision_count": 36,
+  "irrigate_count": 8,
+  "plan_file": "e:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251120_153045.json",
+  "execution_id": null,
+  "details": {
+    "skipped_sections": [],
+    "mapping_count": 36,
+    "converted_count": 8
+  }
+}
+```
+
+**响应字段说明**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| success | boolean | 是否成功 |
+| message | string | 消息 |
+| decision_count | integer | Rice 决策总数 |
+| irrigate_count | integer | 需要灌溉的田块数 |
+| plan_file | string | 生成的计划文件路径 |
+| execution_id | string/null | 执行ID（如果 auto_execute=true） |
+| details.skipped_sections | array | 未找到映射的田块列表 |
+| details.mapping_count | integer | 田块映射总数 |
+| details.converted_count | integer | 成功转换的田块数 |
+
+**工作流程**
+1. 调用 Rice API 获取智能决策 (HTTP)
+2. 映射田块ID (section_id → field_id)
+3. 构造灌溉参数
+4. 调用现有的计划生成接口
+5. (可选) 自动启动执行
+
+**Rice 决策示例**
+Rice API 返回的决策格式：
+```json
+{
+  "1901477857038049280": {
+    "action": "irrigate",
+    "current_waterlevel": 45.2,
+    "target": 90.0,
+    "reason": "分蘖期水位低于适宜水位",
+    "irrigation_amount": 157.8,
+    "irrigation_duration": 0.53
+  },
+  "1901478066941992960": {
+    "action": "none",
+    "current_waterlevel": 85.0,
+    "target": 90.0,
+    "reason": "水位适宜"
+  }
+}
+```
+
+**映射转换**
+```
+Rice section_id          Farm field_id
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1901477857038049280  →  S3-G2-F1
+1901478066941992960  →  S3-G5-F3
+```
+
+**与传统方法的对比**
+| 特性 | 传统方法 | Rice 集成 |
+|------|---------|-----------|
+| 决策依据 | 固定阈值 (wl_low/wl_opt) | 生育期 + 天气 + 农事操作 |
+| 灵活性 | 低 | 高 |
+| 准确性 | 中等 | 高（智能决策） |
+| 维护成本 | 低 | 中（需要维护两个服务） |
+
+**使用示例**
+
+```javascript
+// 示例1：检查 Rice 服务
+const statusResponse = await fetch(
+  'http://localhost:8000/api/irrigation/rice-status'
+);
+const statusData = await statusResponse.json();
+
+if (statusData.success) {
+  console.log('✅ Rice 服务正常');
+  
+  // 示例2：生成计划（不自动执行）
+  const planResponse = await fetch(
+    'http://localhost:8000/api/irrigation/generate-from-rice',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        farm_id: "13944136728576",
+        pumps: "P1,P2",
+        auto_execute: false
+      })
+    }
+  );
+  const planData = await planResponse.json();
+  
+  console.log(`✅ 计划已生成: ${planData.plan_file}`);
+  console.log(`📊 需要灌溉 ${planData.irrigate_count} 个田块`);
+  
+  // 示例3：手动启动执行
+  if (planData.success && planData.plan_file) {
+    const execResponse = await fetch(
+      'http://localhost:8000/api/execution/start',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_file: planData.plan_file,
+          farm_id: "13944136728576"
+        })
+      }
+    );
+  }
+} else {
+  console.log('❌ Rice 服务不可用:', statusData.message);
+}
+
+// 示例4：生成并自动执行
+const autoExecResponse = await fetch(
+  'http://localhost:8000/api/irrigation/generate-from-rice',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      farm_id: "13944136728576",
+      pumps: "P1,P2",
+      auto_execute: true  // 自动执行
+    })
+  }
+);
+const autoExecData = await autoExecResponse.json();
+
+if (autoExecData.execution_id) {
+  console.log('✅ 已自动启动执行:', autoExecData.execution_id);
+}
+```
+
+**故障排查**
+
+**问题1: 无法连接到 Rice API**
+```json
+{
+  "detail": "无法连接到 Rice API，请确保 rice_smart_irrigation 服务正在运行"
+}
+```
+**解决方案**:
+1. 检查 Rice 服务是否启动：`curl http://localhost:5000/v1/rice_irrigation?farm_id=13944136728576`
+2. 检查防火墙设置
+3. 检查端口是否被占用
+
+**问题2: 没有需要灌溉的田块**
+```json
+{
+  "success": true,
+  "message": "Rice 决策获取成功，但没有需要灌溉的田块",
+  "irrigate_count": 0
+}
+```
+**原因**: 所有田块水位都在适宜范围内，或 Rice 判断当前不需要灌溉
+
+**问题3: 田块映射失败**
+```json
+{
+  "details": {
+    "skipped_sections": ["1234567890123456789"],
+    "mapping_count": 36,
+    "converted_count": 0
+  }
+}
+```
+**解决方案**:
+1. 检查 `config.json` 中的 `sectionID` 是否与 Rice 返回的一致
+2. 确认农场ID是否正确
+
+**注意事项**
+
+1. ⚠️ **服务依赖**: 需要 rice_smart_irrigation 服务正常运行
+2. ⚠️ **映射配置**: 确保 config.json 中的 sectionID 与 Rice 使用的一致
+3. ✅ **解耦架构**: 两个服务独立部署，通过 HTTP 通信
+4. ✅ **智能决策**: 基于生育期、天气、农事操作的综合决策
+5. 💡 **调试模式**: 先使用 `auto_execute: false` 检查计划，再手动执行
+6. 💡 **监控**: 定期调用 `/api/irrigation/rice-status` 监控服务状态
+
+---
+
 ## 典型业务流程
 
 ### 流程1：标准灌溉计划生成与执行 
@@ -2950,6 +3208,11 @@ interface ExecutionStatus {
 | 批次间田块调整 | POST | `/api/batch/adjust` | `plan_id`, `field_adjustments`, `options` | 计划ID，田块调整列表，调整选项 |
 | 批次顺序调整 | POST | `/api/batch/reorder` | `plan_id`, `scenario_name`, `new_order` | 计划ID，scenario名称，新顺序列表 |
 | 查询所有田块设备状态 | GET | `/api/hardware/fields-device-status` | `farm_id`, `timeout`, `verbose` | 农场ID，超时时间，详细日志 |
+| 检查 Rice 服务 | GET | `/api/irrigation/rice-status` | `rice_api_url` | Rice API 地址 |
+| **更新配置（Rice 决策）** | POST | `/api/irrigation/update-config-from-rice` | `farm_id`, `rice_api_url` | 【独立】只更新配置，不生成计划 |
+| Rice 智能决策生成计划（一体化） | POST | `/api/irrigation/generate-from-rice` | `farm_id`, `pumps`, `auto_execute` | 更新配置+生成计划（一键式） |
+| 列出配置备份 | GET | `/api/irrigation/list-backups` | 无 | 列出所有 config.json 备份文件 |
+| 恢复配置 | POST | `/api/irrigation/restore-config` | `backup_file` | 备份文件名 |
 
 **重要ID类型对照**
 
@@ -2969,6 +3232,574 @@ interface ExecutionStatus {
 | source | `sensor`, `manual`, `estimated` | 传感器 / 手动 / 估算 | 优先使用:`sensor` |
 | quality | `good`, `fair`, `poor` | 良好 / 一般 / 较差 | 传感器:`good`，人工:`fair` |
 | optimization_goals | `cost_minimization`, `time_minimization`, `balanced`, `off_peak`, `water_saving` | 成本优先 / 时间优先 / 均衡 / 避峰 / 节水 | 日常使用:`balanced` |
+
+---
+
+## D. Rice 智能决策集成 - 配置管理
+
+### 📌 核心变更
+
+从 **v1.1.0** 开始，Rice 集成改为**直接修改 `config.json`**，而非使用临时配置文件。
+
+**主要变化**：
+- ✅ 调用 Rice API 后，直接更新 `config.json` 中的 `wl_low` 和 `wl_opt`
+- ✅ 所有接口（包括 `/api/water-levels/targets`）都能看到 Rice 的决策参数
+- ✅ 自动创建配置备份，支持一键恢复
+- ✅ 支持配置版本管理
+
+从 **v1.2.0** 开始，新增**独立的配置更新接口**，提供更灵活的工作流：
+- ✅ **独立接口** (`/update-config-from-rice`): 只更新配置，不生成计划
+- ✅ **一体化接口** (`/generate-from-rice`): 更新配置 + 生成计划（一键式）
+- ✅ 用户可以根据需求选择合适的工作流
+
+---
+
+### 1. 更新配置（基于 Rice 决策）【新增】
+
+**接口**: `POST /api/irrigation/update-config-from-rice`
+
+**功能**: 独立的配置更新接口，从 Rice 获取决策并更新 `config.json`
+
+**设计理念**:
+- ✅ **职责单一**: 只负责配置更新，不生成计划
+- ✅ **灵活复用**: 更新后可调用任意接口
+- ✅ **RESTful 设计**: 符合单一职责原则
+
+**请求参数**:
+```json
+{
+  "farm_id": "13944136728576",
+  "rice_api_url": "http://localhost:5000/v1/rice_irrigation"  // 可选，默认 localhost:5000
+}
+```
+
+**请求示例**:
+```bash
+curl -X POST "http://localhost:8000/api/irrigation/update-config-from-rice" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "farm_id": "13944136728576"
+  }'
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "成功！config.json 已基于 Rice 决策更新（33 个田块）",
+  "decision_count": 40,
+  "irrigate_count": 33,
+  "config_backup": "data/config_backup/config_backup_20251120_153022.json",
+  "details": {
+    "skipped_sections": ["1901478357028446208"],
+    "mapping_count": 36,
+    "converted_count": 33,
+    "rice_modifications": {
+      "timestamp": "20251120_153022",
+      "source": "rice_smart_irrigation",
+      "farm_id": "13944136728576",
+      "modified_fields": {
+        "S3-G2-F1": {
+          "original": {
+            "wl_low": 30.0,
+            "wl_opt": 80.0,
+            "wl_mm": 3.0
+          },
+          "rice_decision": {
+            "wl_low": 4.0,
+            "wl_opt": 50.0,
+            "wl_mm": 3.0
+          }
+        }
+      }
+    },
+    "next_steps": [
+      "可以调用 /api/irrigation/plan-generation 生成计划",
+      "可以调用 /api/regeneration/batch 重新生成批次",
+      "可以调用 /api/water-levels/targets 查看更新后的水位",
+      "可以调用 /api/irrigation/restore-config 恢复原配置"
+    ]
+  }
+}
+```
+
+**字段说明**:
+- `decision_count`: Rice API 返回的总决策数量
+- `irrigate_count`: 需要灌溉的田块数量
+- `config_backup`: 原始配置的备份文件路径
+- `rice_modifications`: Rice 配置修改详情
+  - `modified_fields`: 每个田块的原始值和 Rice 决策值
+
+**后续使用场景**:
+
+**场景 1: 标准工作流**
+```bash
+# 1. 先更新配置
+POST /api/irrigation/update-config-from-rice
+{
+  "farm_id": "13944136728576"
+}
+
+# 2. 再生成计划（使用 Rice 配置）
+POST /api/irrigation/plan-generation
+{
+  "farm_id": "13944136728576"
+}
+```
+
+**场景 2: 配置更新 + 批次重新生成**
+```bash
+# 1. 更新配置
+POST /api/irrigation/update-config-from-rice
+{
+  "farm_id": "13944136728576"
+}
+
+# 2. 批次重新生成（会使用 Rice 配置）
+POST /api/regeneration/batch
+{
+  "original_plan_id": "xxx",
+  "field_modifications": [...]
+}
+```
+
+**场景 3: 只更新配置，查看水位**
+```bash
+# 1. 更新配置
+POST /api/irrigation/update-config-from-rice
+{
+  "farm_id": "13944136728576"
+}
+
+# 2. 查看水位目标（会显示 Rice 配置）
+GET /api/water-levels/targets?farm_id=13944136728576
+```
+
+**与一体化接口的区别**:
+| 特性 | 独立接口 (`/update-config-from-rice`) | 一体化接口 (`/generate-from-rice`) |
+|------|---------------------------------------|-------------------------------------|
+| 职责 | 只更新配置 | 更新配置 + 生成计划 |
+| 灵活性 | 高（可调用任意后续接口） | 低（固定生成计划） |
+| 适用场景 | 需要细粒度控制 | 一键式快速操作 |
+| 返回内容 | 配置更新详情 | 计划文件路径 + 执行ID |
+
+---
+
+### 2. 列出配置备份
+
+**接口**: `GET /api/irrigation/list-backups`
+
+**功能**: 列出所有配置备份文件（按时间倒序）
+
+**请求示例**:
+```bash
+curl "http://localhost:8000/api/irrigation/list-backups"
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "total_backups": 3,
+  "backups": [
+    {
+      "filename": "config_backup_20251120_153022.json",
+      "path": "/app/config_backup_20251120_153022.json",
+      "size_bytes": 24567,
+      "created_time": "2025-11-20T15:30:22"
+    },
+    {
+      "filename": "config_backup_20251120_142015.json",
+      "path": "/app/config_backup_20251120_142015.json",
+      "size_bytes": 24567,
+      "created_time": "2025-11-20T14:20:15"
+    }
+  ],
+  "timestamp": "2025-11-20T15:35:10.123456"
+}
+```
+
+**字段说明**:
+- `total_backups`: 备份文件总数
+- `backups`: 备份文件列表（最新的在最前面）
+  - `filename`: 文件名（可用于恢复接口）
+  - `path`: 完整路径
+  - `size_bytes`: 文件大小（字节）
+  - `created_time`: 创建时间
+
+---
+
+### 2. 恢复配置
+
+**接口**: `POST /api/irrigation/restore-config`
+
+**功能**: 从备份文件恢复 `config.json`
+
+**参数**:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `backup_file` | string | 是 | 备份文件名（如 `config_backup_20251120_153022.json`） |
+
+**请求示例**:
+```bash
+curl -X POST "http://localhost:8000/api/irrigation/restore-config?backup_file=config_backup_20251120_153022.json"
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "配置已成功恢复",
+  "restored_from": "config_backup_20251120_153022.json",
+  "current_config_backup": "config_before_restore_20251120_160045.json",
+  "timestamp": "2025-11-20T16:00:45.123456"
+}
+```
+
+**字段说明**:
+- `restored_from`: 恢复来源的备份文件
+- `current_config_backup`: 恢复前的当前配置备份（安全机制）
+
+**⚠️ 注意事项**:
+1. 恢复操作会自动备份当前配置
+2. 恢复后需要重新生成灌溉计划
+3. 正在执行的任务不受影响（使用已生成的计划）
+
+---
+
+### 3. Rice 智能决策生成灌溉计划（一体化接口）
+
+**接口**: `POST /api/irrigation/generate-from-rice`
+
+**类型**: 一体化接口（更新配置 + 生成计划）
+
+**功能**: 
+- ✅ 调用 Rice API 获取智能决策
+- ✅ 直接修改 `config.json`
+- ✅ 自动生成灌溉计划
+- ✅ 自动创建配置备份
+- ✅ 可选自动启动执行
+
+**与独立接口的对比**:
+| 特性 | 一体化接口（本接口） | 独立接口 (`/update-config-from-rice`) |
+|------|---------------------|----------------------------------------|
+| 操作范围 | 更新配置 + 生成计划 | 只更新配置 |
+| 适用场景 | 一键式快速操作 | 需要细粒度控制 |
+| 返回内容 | 计划文件路径 + 执行ID | 配置更新详情 |
+| 后续操作 | 可直接执行计划 | 可调用任意接口 |
+
+**请求参数**:
+```json
+{
+  "farm_id": "13944136728576",
+  "rice_api_url": "http://localhost:5000/v1/rice_irrigation",  // 可选
+  "pumps": "P1,P2",                                             // 可选
+  "time_constraints": false,                                    // 可选
+  "auto_execute": false                                         // 可选
+}
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "成功！基于 Rice 智能决策生成灌溉计划（28 个田块），config.json 已更新",
+  "decision_count": 36,
+  "irrigate_count": 28,
+  "plan_file": "/app/output/irrigation_plan_20251120_123456.json",
+  "execution_id": null,
+  "details": {
+    "skipped_sections": [],
+    "mapping_count": 36,
+    "converted_count": 28,
+    "config_backup": "config_backup_20251120_123456.json",
+    "rice_modifications": {
+      "timestamp": "20251120_123456",
+      "source": "rice_smart_irrigation",
+      "farm_id": "13944136728576",
+      "modified_fields": {
+        "S3-G2-F1": {
+          "original": {
+            "wl_low": 30.0,
+            "wl_opt": 80.0,
+            "wl_mm": 3.0
+          },
+          "rice_decision": {
+            "wl_low": 4.0,
+            "wl_opt": 90.0,
+            "wl_mm": 3.0
+          }
+        }
+        // ... 更多田块
+      }
+    },
+    "note": "config.json 已被 Rice 决策更新，原始配置已备份"
+  }
+}
+```
+
+---
+
+### 4. 配置管理完整工作流
+
+**场景1: 一键式生成（使用一体化接口）**
+
+```javascript
+// 适用场景：快速生成计划，一步到位
+const response = await fetch('/api/irrigation/generate-from-rice', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    farm_id: "13944136728576",
+    pumps: "P1,P2",
+    auto_execute: true  // 可自动启动执行
+  })
+});
+const data = await response.json();
+
+console.log('✅ 计划已生成:', data.plan_file);
+console.log('✅ 执行已启动:', data.execution_id);
+```
+
+**场景2: 灵活控制（使用独立接口）**
+
+```javascript
+// 步骤1: 先更新配置
+const updateResponse = await fetch('/api/irrigation/update-config-from-rice', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    farm_id: "13944136728576"
+  })
+});
+const updateData = await updateResponse.json();
+
+console.log('✅ 配置已更新:', updateData.irrigate_count, '个田块');
+console.log('📦 备份文件:', updateData.config_backup);
+
+// 步骤2: 查看更新后的配置
+const targetsResponse = await fetch('/api/water-levels/targets?farm_id=13944136728576');
+const targets = await targetsResponse.json();
+
+console.log('Rice 决策水位:');
+console.log('  wl_low:', targets.fields["S3-G2-F1"].wl_low);  // 4.0
+console.log('  wl_opt:', targets.fields["S3-G2-F1"].wl_opt);  // 50.0
+
+// 步骤3: 根据需要调用其他接口
+// 3a. 生成计划
+const planResponse = await fetch('/api/irrigation/plan-generation', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ farm_id: "13944136728576" })
+});
+
+// 或 3b. 批次重新生成
+const batchResponse = await fetch('/api/regeneration/batch', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    original_plan_id: "xxx",
+    field_modifications: [...]
+  })
+});
+```
+
+**场景3: 配置查看和验证**
+
+```javascript
+// 使用独立接口更新配置后，可以查看和验证
+const updateResponse = await fetch('/api/irrigation/update-config-from-rice', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ farm_id: "13944136728576" })
+});
+const data = await updateResponse.json();
+
+// 查看修改详情
+console.log('修改的田块数:', Object.keys(data.details.rice_modifications.modified_fields).length);
+
+// 查看具体田块的修改
+const field = data.details.rice_modifications.modified_fields["S3-G2-F1"];
+console.log('田块 S3-G2-F1:');
+console.log('  原始配置:', field.original);
+console.log('  Rice 决策:', field.rice_decision);
+
+// 验证配置
+const targetsResponse = await fetch('/api/water-levels/targets?farm_id=13944136728576');
+const targets = await targetsResponse.json();
+console.log('✅ 配置验证:', targets.fields["S3-G2-F1"]);
+```
+
+**场景4: 恢复到原始配置**
+
+```javascript
+// 步骤1: 列出备份
+const backupsResponse = await fetch('/api/irrigation/list-backups');
+const backups = await backupsResponse.json();
+
+console.log('📦 可用备份:', backups.total_backups, '个');
+backups.backups.forEach(b => {
+  console.log(`  - ${b.filename} (${b.age})`);
+});
+
+// 步骤2: 选择最新备份恢复
+const latestBackup = backups.backups[0].filename;
+
+const restoreResponse = await fetch('/api/irrigation/restore-config', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    backup_file: latestBackup
+  })
+});
+const restore = await restoreResponse.json();
+
+console.log('✅ 配置已恢复:', restore.restored_from);
+console.log('📦 当前配置已备份:', restore.current_config_backed_up_to);
+
+// 步骤3: 验证配置已恢复
+const targetsResponse = await fetch('/api/water-levels/targets?farm_id=13944136728576');
+const targets = await targetsResponse.json();
+
+console.log('验证原始配置:');
+console.log('  wl_low:', targets.fields["S3-G2-F1"].wl_low);  // 30.0 (原始默认值)
+console.log('  wl_opt:', targets.fields["S3-G2-F1"].wl_opt);  // 80.0 (原始默认值)
+```
+
+**场景5: 接口选择建议**
+
+```javascript
+// ✅ 推荐：快速一键操作
+// 场景：需要立即生成计划并执行
+const quickGenerate = async () => {
+  return await fetch('/api/irrigation/generate-from-rice', {
+    method: 'POST',
+    body: JSON.stringify({
+      farm_id: "13944136728576",
+      auto_execute: true
+    })
+  });
+};
+
+// ✅ 推荐：需要查看配置再决定
+// 场景：先更新配置，查看 Rice 决策，然后决定下一步
+const flexibleControl = async () => {
+  // 1. 更新配置
+  const update = await fetch('/api/irrigation/update-config-from-rice', {
+    method: 'POST',
+    body: JSON.stringify({ farm_id: "13944136728576" })
+  });
+  
+  // 2. 查看配置
+  const config = await fetch('/api/water-levels/targets?farm_id=13944136728576');
+  
+  // 3. 根据配置决定后续操作
+  // - 如果满意：调用 /plan-generation
+  // - 如果不满意：调用 /restore-config 恢复
+};
+
+// ✅ 推荐：需要多次使用 Rice 配置
+// 场景：基于 Rice 配置，需要调用多个不同接口
+const reuseConfig = async () => {
+  // 1. 先更新配置
+  await fetch('/api/irrigation/update-config-from-rice', {
+    method: 'POST',
+    body: JSON.stringify({ farm_id: "13944136728576" })
+  });
+  
+  // 2. 多次使用 Rice 配置
+  await fetch('/api/irrigation/plan-generation', ...);
+  await fetch('/api/regeneration/batch', ...);
+  await fetch('/api/irrigation/plan-optimization', ...);
+};
+```
+
+**场景6: 配置版本管理**
+
+```javascript
+// 定期查看配置历史
+const viewHistory = async () => {
+  const backups = await fetch('/api/irrigation/list-backups').then(r => r.json());
+  
+  backups.backups.forEach((backup, index) => {
+    console.log(`版本 ${index + 1}: ${backup.created_time}`);
+  });
+};
+
+// 回滚到特定版本
+const rollbackTo = async (backupFilename) => {
+  await fetch(
+    `/api/irrigation/restore-config?backup_file=${backupFilename}`,
+    { method: 'POST' }
+  );
+};
+```
+
+---
+
+### 5. 配置文件元数据
+
+使用 Rice 决策后，`config.json` 会包含元数据：
+
+```json
+{
+  "farm_id": "13944136728576",
+  "fields": [
+    {
+      "id": "S3-G2-F1",
+      "wl_mm": 3.0,
+      "wl_low": 4.0,      // Rice 修改后的值
+      "wl_opt": 90.0,     // Rice 修改后的值
+      "wl_high": 140.0
+      // ... 其他字段
+    }
+  ],
+  "_rice_integration": {
+    "timestamp": "20251120_123456",
+    "source": "rice_smart_irrigation",
+    "farm_id": "13944136728576",
+    "modified_fields": {
+      // 详细的修改记录
+    }
+  }
+}
+```
+
+**元数据字段说明**:
+- `_rice_integration`: Rice 集成元数据（下划线开头表示内部使用）
+  - `timestamp`: 修改时间戳
+  - `source`: 数据来源（`rice_smart_irrigation`）
+  - `modified_fields`: 详细的修改记录（原值 vs 新值）
+
+---
+
+### 6. 常见问题
+
+**Q: 使用 Rice 决策后，其他接口能看到修改吗？**  
+A: 是的！所有基于 `config.json` 的接口都会看到修改：
+- `/api/water-levels/targets` - 显示 Rice 的决策参数
+- `/api/irrigation/plan-generation` - 使用 Rice 的阈值生成计划
+- 所有批次和田块相关接口
+
+**Q: 如何知道配置是否被 Rice 修改过？**  
+A: 检查 `config.json` 中的 `_rice_integration` 字段：
+```javascript
+const hasRiceModifications = config._rice_integration !== undefined;
+```
+
+**Q: 误操作怎么办？**  
+A: 每次使用 Rice 决策都会自动创建备份，使用 `/api/irrigation/restore-config` 恢复即可。
+
+**Q: 备份文件占用空间怎么办？**  
+A: 
+- 备份文件通常 < 30KB，占用空间很小
+- 可以手动删除旧备份文件（文件名包含时间戳）
+- 建议保留最近 10 个备份
+
+**Q: 恢复配置会影响正在执行的任务吗？**  
+A: 不会。正在执行的任务使用已生成的计划文件，不依赖 `config.json`。
+
+---
 
 
 

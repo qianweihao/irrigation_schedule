@@ -596,9 +596,9 @@
       "canal_id": "C_A",
       "segment_id": "S4",
       "distance_rank": 16,
-      "wl_mm": 3.8,
-      "wl_low": 4.8,
-      "wl_opt": 50.0,
+      "wl_mm": null,
+      "wl_low": 999,
+      "wl_opt": 80.0,
       "wl_high": 140.0,
       "has_drain_gate": true,
       "rel_to_regulator": "downstream",
@@ -613,8 +613,8 @@
       "canal_id": "C_A",
       "segment_id": "S8",
       "distance_rank": 36,
-      "wl_mm": 1.2,
-      "wl_low": 2.2,
+      "wl_mm": 1.9,
+      "wl_low": 2.9,
       "wl_opt": 50.0,
       "wl_high": 140.0,
       "has_drain_gate": true,
@@ -800,8 +800,8 @@
       "canal_id": "C_A",
       "segment_id": "S5",
       "distance_rank": 19,
-      "wl_mm": 1.9,
-      "wl_low": 2.9,
+      "wl_mm": 1.6,
+      "wl_low": 2.6,
       "wl_opt": 50.0,
       "wl_high": 140.0,
       "has_drain_gate": true,
@@ -851,8 +851,8 @@
       "canal_id": "C_A",
       "segment_id": "S5",
       "distance_rank": 22,
-      "wl_mm": 0.0,
-      "wl_low": 1.0,
+      "wl_mm": 1.2,
+      "wl_low": 2.2,
       "wl_opt": 50.0,
       "wl_high": 140.0,
       "has_drain_gate": true,
@@ -868,8 +868,8 @@
       "canal_id": "C_A",
       "segment_id": "S5",
       "distance_rank": 23,
-      "wl_mm": 1.2,
-      "wl_low": 2.2,
+      "wl_mm": 0.9,
+      "wl_low": 1.9,
       "wl_opt": 50.0,
       "wl_high": 140.0,
       "has_drain_gate": true,
@@ -936,8 +936,8 @@
       "canal_id": "C_A",
       "segment_id": "S4",
       "distance_rank": 9,
-      "wl_mm": 0.7,
-      "wl_low": 1.7,
+      "wl_mm": 0.9,
+      "wl_low": 1.9,
       "wl_opt": 50.0,
       "wl_high": 140.0,
       "has_drain_gate": true,
@@ -1065,14 +1065,14 @@
     }
   ],
   "_rice_integration": {
-    "timestamp": "20251120_144014",
+    "timestamp": "20251120_132709",
     "source": "rice_smart_irrigation",
     "farm_id": "13944136728576",
     "modified_fields": {
       "S3-G2-F1": {
         "original": {
-          "wl_low": 4.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 3.0
         },
         "rice_decision": {
@@ -1083,8 +1083,8 @@
       },
       "S3-G5-F3": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1095,8 +1095,8 @@
       },
       "S3-G7-F5": {
         "original": {
-          "wl_low": 2.2,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 1.2
         },
         "rice_decision": {
@@ -1107,8 +1107,8 @@
       },
       "S3-G10-F7": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1119,8 +1119,8 @@
       },
       "S3-G3-F2": {
         "original": {
-          "wl_low": 1.5,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.5
         },
         "rice_decision": {
@@ -1131,8 +1131,8 @@
       },
       "S3-G8-F6": {
         "original": {
-          "wl_low": 2.5,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 1.5
         },
         "rice_decision": {
@@ -1143,8 +1143,8 @@
       },
       "S3-G11-F8": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1155,21 +1155,9 @@
       },
       "S4-G20-F14": {
         "original": {
-          "wl_low": 4.8,
-          "wl_opt": 50.0,
-          "wl_mm": 3.8
-        },
-        "rice_decision": {
-          "wl_low": 4.8,
-          "wl_opt": 50.0,
-          "wl_mm": 3.8
-        }
-      },
-      "S4-G22-F16": {
-        "original": {
-          "wl_low": 999,
+          "wl_low": 30.0,
           "wl_opt": 80.0,
-          "wl_mm": null
+          "wl_mm": 3.8
         },
         "rice_decision": {
           "wl_low": 4.8,
@@ -1179,20 +1167,20 @@
       },
       "S8-G53-F36": {
         "original": {
-          "wl_low": 2.9,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 1.9
         },
         "rice_decision": {
-          "wl_low": 2.2,
+          "wl_low": 2.9,
           "wl_opt": 50.0,
-          "wl_mm": 1.2
+          "wl_mm": 1.9
         }
       },
       "S6-G37-F25": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1203,8 +1191,8 @@
       },
       "S6-G39-F26": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1215,8 +1203,8 @@
       },
       "S6-G42-F28": {
         "original": {
-          "wl_low": 1.8,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.8
         },
         "rice_decision": {
@@ -1227,8 +1215,8 @@
       },
       "S7-G49-F32": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1239,8 +1227,8 @@
       },
       "S7-G50-F33": {
         "original": {
-          "wl_low": 1.9,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.9
         },
         "rice_decision": {
@@ -1251,8 +1239,8 @@
       },
       "S7-G51-F34": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1263,8 +1251,8 @@
       },
       "S6-G40-F27": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1275,8 +1263,8 @@
       },
       "S7-G47-F31": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1287,8 +1275,8 @@
       },
       "S4-G24-F18": {
         "original": {
-          "wl_low": 3.8,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 2.8
         },
         "rice_decision": {
@@ -1299,20 +1287,20 @@
       },
       "S5-G27-F19": {
         "original": {
-          "wl_low": 2.6,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 1.6
         },
         "rice_decision": {
-          "wl_low": 2.9,
+          "wl_low": 2.6,
           "wl_opt": 50.0,
-          "wl_mm": 1.9
+          "wl_mm": 1.6
         }
       },
       "S5-G29-F20": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1323,8 +1311,8 @@
       },
       "S5-G30-F21": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1335,32 +1323,32 @@
       },
       "S5-G32-F22": {
         "original": {
-          "wl_low": 2.2,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 1.2
         },
         "rice_decision": {
-          "wl_low": 1.0,
+          "wl_low": 2.2,
           "wl_opt": 50.0,
-          "wl_mm": 0.0
+          "wl_mm": 1.2
         }
       },
       "S5-G33-F23": {
         "original": {
-          "wl_low": 1.9,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.9
         },
         "rice_decision": {
-          "wl_low": 2.2,
+          "wl_low": 1.9,
           "wl_opt": 50.0,
-          "wl_mm": 1.2
+          "wl_mm": 0.9
         }
       },
       "S5-G35-F24": {
         "original": {
-          "wl_low": 2.9,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 1.9
         },
         "rice_decision": {
@@ -1371,8 +1359,8 @@
       },
       "S6-G45-F30": {
         "original": {
-          "wl_low": 3.7,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 2.7
         },
         "rice_decision": {
@@ -1383,8 +1371,8 @@
       },
       "S3-G6-F4": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1395,20 +1383,20 @@
       },
       "S4-G14-F9": {
         "original": {
-          "wl_low": 1.9,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.9
         },
         "rice_decision": {
-          "wl_low": 1.7,
+          "wl_low": 1.9,
           "wl_opt": 50.0,
-          "wl_mm": 0.7
+          "wl_mm": 0.9
         }
       },
       "S4-G17-F11": {
         "original": {
-          "wl_low": 4.2,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 3.2
         },
         "rice_decision": {
@@ -1419,8 +1407,8 @@
       },
       "S4-G19-F13": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1431,8 +1419,8 @@
       },
       "S4-G21-F15": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1443,8 +1431,8 @@
       },
       "S4-G23-F17": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1455,8 +1443,8 @@
       },
       "S4-G15-F10": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {
@@ -1467,8 +1455,8 @@
       },
       "S6-G43-F29": {
         "original": {
-          "wl_low": 1.0,
-          "wl_opt": 50.0,
+          "wl_low": 30.0,
+          "wl_opt": 80.0,
           "wl_mm": 0.0
         },
         "rice_decision": {

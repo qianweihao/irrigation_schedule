@@ -1460,6 +1460,352 @@
           ]
         }
       ]
+    },
+    {
+      "name": "8.智能决策集成",
+      "item": [
+        {
+          "name": "检查服务状态",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/rice-status?rice_api_url=http://localhost:5000/v1/rice_irrigation",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "rice-status"
+              ],
+              "query": [
+                {
+                  "key": "rice_api_url",
+                  "value": "http://localhost:5000/v1/rice_irrigation",
+                  "description": "Rice API 地址"
+                }
+              ]
+            },
+            "description": "检查 rice_smart_irrigation 服务是否正常运行\n\n**使用场景**:\n- 在生成计划前验证 Rice 服务可用性\n- 监控服务健康状态"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含 success 字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "});",
+                  "",
+                  "pm.test(\"Rice 服务状态检查\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success) {",
+                  "        console.log('✅ Rice 服务正常');",
+                  "    } else {",
+                  "        console.log('⚠️ Rice 服务异常:', jsonData.message);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "更新配置（config.json）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"rice_api_url\": \"http://localhost:5000/v1/rice_irrigation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/update-config-from-rice",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "update-config-from-rice"
+              ]
+            },
+            "description": "【独立接口】从 Rice 获取决策并更新 config.json\n\n**设计理念**:\n- 职责单一：只负责配置更新，不生成计划\n- 灵活复用：更新后可调用任意接口\n- RESTful 设计：符合单一职责原则\n\n**工作流程**:\n1. 调用 Rice API 获取智能决策\n2. 映射 sectionID → field_id\n3. 备份当前 config.json\n4. 更新 config.json 中的水位参数\n5. 返回更新详情和备份路径\n\n**后续使用**:\n更新配置后，可以调用以下任意接口：\n- /api/irrigation/plan-generation（生成计划）\n- /api/regeneration/batch（批次重新生成）\n- /api/water-levels/targets（查看水位目标）\n\n**使用场景**:\n1. 只想更新配置，暂不生成计划\n2. 需要基于 Rice 配置调用多个接口\n3. 需要更细粒度的控制流程"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"配置已更新\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.config_backup).to.be.a('string');",
+                  "    console.log('✅ 配置已更新，备份文件:', jsonData.config_backup);",
+                  "    console.log('📊 Rice 决策统计:');",
+                  "    console.log('  - 总决策数:', jsonData.decision_count);",
+                  "    console.log('  - 需要灌溉:', jsonData.irrigate_count);",
+                  "});",
+                  "",
+                  "pm.test(\"显示后续步骤\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.details && jsonData.details.next_steps) {",
+                  "        console.log('📋 后续可执行的操作:');",
+                  "        jsonData.details.next_steps.forEach((step, index) => {",
+                  "            console.log(`  ${index + 1}. ${step}`);",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "智能决策生成灌溉计划（测试）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"rice_api_url\": \"http://localhost:5000/v1/rice_irrigation\",\n  \"pumps\": \"P1,P2\",\n  \"time_constraints\": false,\n  \"auto_execute\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/generate-from-rice",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "generate-from-rice"
+              ]
+            },
+            "description": "基于 rice_smart_irrigation 的智能决策生成灌溉计划\n\n**工作流程**:\n1. 调用 Rice API 获取智能决策\n2. 映射 section_id → field_id\n3. 生成灌溉计划\n4. (可选) 自动启动执行\n\n**参数说明**:\n- `farm_id`: 农场ID（必填）\n- `rice_api_url`: Rice API 地址（默认: http://localhost:5000/v1/rice_irrigation）\n- `pumps`: 启用的水泵（默认: P1,P2）\n- `time_constraints`: 是否启用时间约束（默认: false）\n- `auto_execute`: 是否自动执行生成的计划（默认: false）\n\n**与传统方法的区别**:\n- 传统: 基于固定阈值 (wl_low/wl_opt)\n- Rice集成: 基于生育期、天气、农事操作的动态决策"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"包含计划文件路径\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.plan_file) {",
+                  "        pm.expect(jsonData.plan_file).to.be.a('string');",
+                  "        pm.environment.set('plan_id', jsonData.plan_file);",
+                  "        console.log('✅ 计划已生成:', jsonData.plan_file);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"决策统计信息\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('📊 Rice 决策统计:');",
+                  "    console.log('  - 总决策数:', jsonData.decision_count);",
+                  "    console.log('  - 需要灌溉:', jsonData.irrigate_count);",
+                  "    ",
+                  "    if (jsonData.details) {",
+                  "        console.log('  - 映射总数:', jsonData.details.mapping_count);",
+                  "        console.log('  - 转换成功:', jsonData.details.converted_count);",
+                  "        if (jsonData.details.skipped_sections && jsonData.details.skipped_sections.length > 0) {",
+                  "            console.log('  ⚠️ 跳过的田块:', jsonData.details.skipped_sections);",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"执行状态检查\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.execution_id) {",
+                  "        console.log('✅ 已自动启动执行，执行ID:', jsonData.execution_id);",
+                  "        pm.environment.set('execution_id', jsonData.execution_id);",
+                  "    } else {",
+                  "        console.log('ℹ️ 未自动执行，需要手动启动');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "智能决策生成并自动执行（测试）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"rice_api_url\": \"http://localhost:5000/v1/rice_irrigation\",\n  \"pumps\": \"P1,P2\",\n  \"time_constraints\": false,\n  \"auto_execute\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/generate-from-rice",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "generate-from-rice"
+              ]
+            },
+            "description": "基于 Rice 智能决策生成灌溉计划并自动执行\n\n**注意**: \n- 此请求会自动启动执行\n- 建议先使用不自动执行的版本检查计划\n- 生产环境中需谨慎使用"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"已自动启动执行\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.execution_id).to.not.be.null;",
+                  "    pm.environment.set('execution_id', jsonData.execution_id);",
+                  "    console.log('✅ 执行已启动，执行ID:', jsonData.execution_id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "列出配置备份",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/list-backups",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "list-backups"
+              ]
+            },
+            "description": "列出所有配置备份文件\n\n用于查看在使用 Rice 决策时自动创建的备份文件。"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"列出备份文件\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('📦 找到', jsonData.total_backups, '个备份文件');",
+                  "    if (jsonData.backups && jsonData.backups.length > 0) {",
+                  "        console.log('最新备份:', jsonData.backups[0].filename);",
+                  "        pm.environment.set('latest_backup', jsonData.backups[0].filename);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "恢复配置",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/restore-config?backup_file={{latest_backup}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "restore-config"
+              ],
+              "query": [
+                {
+                  "key": "backup_file",
+                  "value": "{{latest_backup}}",
+                  "description": "备份文件名（如 config_backup_20251120_123456.json）"
+                }
+              ]
+            },
+            "description": "从备份恢复 config.json\n\n**使用场景**:\n- 在使用 Rice 决策后想恢复到原始配置\n- 回滚到之前的配置状态\n\n**注意**:\n- 需要先调用\"列出配置备份\"获取备份文件名\n- 或手动指定备份文件名"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"配置已恢复\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('✅ 配置已从备份恢复:', jsonData.restored_from);",
+                  "    console.log('📦 当前配置已备份为:', jsonData.current_config_backup);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "event": [
