@@ -25,6 +25,7 @@ import threading
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Form, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -62,6 +63,11 @@ from src.core.farm_irr_full_device_modified import farmcfg_from_json_select, gen
 
 # 导入硬件批量查询模块
 from src.hardware.hw_batch_field_status import get_all_fields_device_status
+from src.hardware.hw_device_self_check import (
+    trigger_device_self_check,
+    query_device_status,
+    filter_successful_devices
+)
 
 # 全局缓存和线程池
 _cache = {}
@@ -289,6 +295,24 @@ class FieldDeviceStatusRequest(BaseModel):
 
 class FieldDeviceStatusResponse(BaseModel):
     """田块设备状态查询响应模型"""
+    success: bool
+    message: str
+    data: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
+
+class DeviceSelfCheckRequest(BaseModel):
+    """设备自检请求"""
+    plan_id: Optional[str] = Field(None, description="灌溉计划ID或文件路径（留空则使用最新计划）")
+    farm_id: str = Field(..., description="农场ID")
+    scenario_name: Optional[str] = Field(None, description="方案名称（留空则使用默认方案）")
+    wait_minutes: int = Field(5, description="等待设备自检的时间（分钟），默认5分钟", ge=1, le=30)
+    app_id: Optional[str] = Field(None, description="iLand平台应用ID")
+    secret: Optional[str] = Field(None, description="iLand平台密钥")
+    timeout: int = Field(30, description="API请求超时时间（秒）")
+    auto_regenerate: bool = Field(True, description="是否自动重新生成计划")
+
+class DeviceSelfCheckResponse(BaseModel):
+    """设备自检响应"""
     success: bool
     message: str
     data: Optional[Dict[str, Any]] = None
@@ -2164,6 +2188,292 @@ async def get_fields_device_status(
         raise HTTPException(
             status_code=500,
             detail=f"查询田块设备状态失败: {str(e)}"
+        )
+
+@app.post("/api/hardware/device-self-check-workflow", response_model=DeviceSelfCheckResponse)
+async def device_self_check_workflow(request: DeviceSelfCheckRequest):
+    """
+    设备自检完整工作流
+    
+    工作流程：
+    1. 获取当前灌溉计划，提取需要灌溉的田块
+    2. 通过田块ID获取设备unique_no列表
+    3. 预检查设备是否在硬件系统中（过滤出存在的设备）
+    4. 调用设备自检接口
+    5. 等待指定时间（默认5分钟）
+    6. 查询设备状态
+    7. 过滤自检成功的设备，找到对应田块
+    8. 移除自检失败的田块，重新生成灌溉计划
+    9. 返回新计划中需要灌溉的设备ID列表
+    """
+    try:
+        logger.info(f"========== 开始设备自检工作流 ==========")
+        logger.info(f"农场ID: {request.farm_id}, 等待时间: {request.wait_minutes}分钟")
+        
+        # 从环境变量或请求中获取认证信息
+        app_id = request.app_id or os.environ.get("ILAND_APP_ID") or "YJY"
+        secret = request.secret or os.environ.get("ILAND_SECRET") or "test005"
+        
+        # 步骤1: 获取灌溉计划中的田块列表
+        logger.info("步骤1: 获取当前灌溉计划...")
+        
+        from pathlib import Path
+        if request.plan_id:
+            plan_file = request.plan_id if os.path.isabs(request.plan_id) else os.path.join(OUTPUT_DIR, request.plan_id)
+        else:
+            plan_files = sorted(Path(OUTPUT_DIR).glob("irrigation_plan_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+            if not plan_files:
+                return DeviceSelfCheckResponse(
+                    success=False,
+                    message="未找到灌溉计划文件",
+                    error="请先生成灌溉计划"
+                )
+            plan_file = str(plan_files[0])
+        
+        logger.info(f"使用计划文件: {plan_file}")
+        
+        with open(plan_file, 'r', encoding='utf-8') as f:
+            plan_data = json.load(f)
+        
+        # 提取需要灌溉的田块ID列表
+        irrigation_fields = set()
+        scenarios_to_check = []
+        
+        if request.scenario_name:
+            scenarios_to_check = [s for s in plan_data.get("scenarios", []) if s.get("scenario_name") == request.scenario_name]
+        else:
+            scenarios_to_check = plan_data.get("scenarios", [])[:1]  # 使用第一个scenario
+        
+        if not scenarios_to_check:
+            return DeviceSelfCheckResponse(
+                success=False,
+                message=f"未找到方案: {request.scenario_name or '默认方案'}",
+                error="请检查方案名称或计划文件"
+            )
+        
+        for scenario in scenarios_to_check:
+            # 注意：田块数据在 plan.batches 路径下
+            batches = scenario.get("plan", {}).get("batches", [])
+            for batch in batches:
+                for field in batch.get("fields", []):
+                    irrigation_fields.add(field.get("id"))
+        
+        logger.info(f"找到需要灌溉的田块: {len(irrigation_fields)} 个")
+        
+        if not irrigation_fields:
+            return DeviceSelfCheckResponse(
+                success=False,
+                message="灌溉计划中没有田块",
+                error="计划文件可能为空或格式不正确"
+            )
+        
+        # 步骤2: 获取田块对应的设备unique_no
+        logger.info("步骤2: 获取田块对应的设备unique_no...")
+        
+        fields_device_status = get_all_fields_device_status(
+            app_id=app_id,
+            secret=secret,
+            farm_id=request.farm_id,
+            timeout=request.timeout,
+            verbose=False
+        )
+        
+        if not fields_device_status.get("success"):
+            return DeviceSelfCheckResponse(
+                success=False,
+                message="获取田块设备信息失败",
+                error=fields_device_status.get("error")
+            )
+        
+        # 建立田块ID到设备unique_no的映射
+        field_to_devices = {}
+        device_to_field = {}
+        all_unique_nos = []
+        
+        for field in fields_device_status.get("fields", []):
+            # 优先使用 section_code (S-G-F格式)，如果没有则使用 field_id
+            section_code = field.get("section_code")
+            field_id = section_code if section_code else field.get("field_id")
+            
+            # 匹配灌溉计划中的田块
+            if field_id not in irrigation_fields:
+                continue
+            
+            devices = field.get("devices", [])
+            device_unique_nos = []
+            
+            for device in devices:
+                unique_no = device.get("unique_no")
+                if unique_no:
+                    device_unique_nos.append(unique_no)
+                    all_unique_nos.append(unique_no)
+                    device_to_field[unique_no] = field_id
+            
+            field_to_devices[field_id] = device_unique_nos
+            
+            logger.debug(f"田块 {field_id}: 找到 {len(device_unique_nos)} 个设备")
+        
+        logger.info(f"需要自检的设备总数: {len(all_unique_nos)}")
+        
+        if not all_unique_nos:
+            return DeviceSelfCheckResponse(
+                success=False,
+                message="未找到需要自检的设备",
+                error="灌溉田块可能没有关联设备"
+            )
+        
+        # 步骤3: 预检查 - 过滤出硬件系统中存在的设备
+        logger.info("步骤3: 预检查设备是否在硬件系统中...")
+        
+        pre_check_result = query_device_status(all_unique_nos, timeout=request.timeout)
+        
+        if pre_check_result.get("success"):
+            # 从预检查结果中提取存在的设备
+            existing_devices_data = pre_check_result.get("devices", [])
+            existing_device_nos = [d.get("no") for d in existing_devices_data if d.get("no")]
+            
+            logger.info(f"预检查结果: 硬件系统中存在 {len(existing_device_nos)}/{len(all_unique_nos)} 个设备")
+            
+            if not existing_device_nos:
+                return DeviceSelfCheckResponse(
+                    success=False,
+                    message="硬件系统中没有找到可自检的设备",
+                    error=f"已查询 {len(all_unique_nos)} 个设备，但硬件系统中都不存在。请检查设备映射关系或联系硬件系统管理员。"
+                )
+            
+            # 只对存在的设备进行自检
+            all_unique_nos = existing_device_nos
+            logger.info(f"将对以下 {len(all_unique_nos)} 个设备进行自检")
+        else:
+            logger.warning(f"预检查失败: {pre_check_result.get('error')}，继续进行自检...")
+        
+        # 步骤4: 触发设备自检
+        logger.info("步骤4: 触发设备自检...")
+        
+        check_result = trigger_device_self_check(all_unique_nos, timeout=request.timeout)
+        
+        if not check_result.get("success"):
+            return DeviceSelfCheckResponse(
+                success=False,
+                message="触发设备自检失败",
+                error=check_result.get("error")
+            )
+        
+        accepted_devices = check_result.get("accepted_no_list", [])
+        logger.info(f"✅ 自检任务已接受，设备数: {len(accepted_devices)}")
+        
+        # 步骤5: 等待设备自检完成
+        wait_seconds = request.wait_minutes * 60
+        logger.info(f"步骤5: 等待 {request.wait_minutes} 分钟，让设备完成自检...")
+        
+        await asyncio.sleep(wait_seconds)
+        
+        # 步骤6: 查询设备状态
+        logger.info("步骤6: 查询设备自检状态...")
+        
+        status_result = query_device_status(all_unique_nos, timeout=request.timeout)
+        
+        if not status_result.get("success"):
+            return DeviceSelfCheckResponse(
+                success=False,
+                message="查询设备状态失败",
+                error=status_result.get("error")
+            )
+        
+        devices_status = status_result.get("devices", [])
+        
+        # 步骤7: 过滤自检成功的设备
+        logger.info("步骤7: 过滤自检成功的设备...")
+        
+        successful_devices = filter_successful_devices(devices_status)
+        failed_devices = [d["no"] for d in devices_status if d.get("status") != "check_success"]
+        
+        logger.info(f"自检成功: {len(successful_devices)} 个设备, 失败: {len(failed_devices)} 个设备")
+        
+        # 找到自检失败的田块
+        failed_fields = set()
+        for device_no in failed_devices:
+            field_id = device_to_field.get(device_no)
+            if field_id:
+                failed_fields.add(field_id)
+        
+        logger.info(f"需要移除的田块（设备自检失败）: {len(failed_fields)} 个")
+        
+        # 步骤8: 重新生成灌溉计划
+        new_plan_file = None
+        final_device_list = []
+        
+        if request.auto_regenerate and failed_fields:
+            logger.info("步骤8: 重新生成灌溉计划，排除自检失败的田块...")
+            
+            try:
+                modified_plan = json.loads(json.dumps(plan_data))
+                
+                for scenario in modified_plan.get("scenarios", []):
+                    if request.scenario_name and scenario.get("scenario_name") != request.scenario_name:
+                        continue
+                    
+                    # 注意：田块数据在 plan.batches 路径下
+                    plan = scenario.get("plan", {})
+                    if "batches" in plan:
+                        for batch in plan["batches"]:
+                            batch["fields"] = [f for f in batch.get("fields", []) if f.get("id") not in failed_fields]
+                
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                new_plan_file = os.path.join(OUTPUT_DIR, f"irrigation_plan_selfcheck_{timestamp}.json")
+                with open(new_plan_file, 'w', encoding='utf-8') as f:
+                    json.dump(modified_plan, f, ensure_ascii=False, indent=2)
+                
+                logger.info(f"✅ 新计划已生成: {new_plan_file}")
+                
+                # 从新计划中提取设备列表
+                successful_fields = irrigation_fields - failed_fields
+                for field_id in successful_fields:
+                    final_device_list.extend(field_to_devices.get(field_id, []))
+                
+            except Exception as e:
+                logger.error(f"重新生成计划失败: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+        else:
+            successful_fields = irrigation_fields - failed_fields
+            for field_id in successful_fields:
+                final_device_list.extend(field_to_devices.get(field_id, []))
+        
+        # 步骤9: 返回结果
+        logger.info("步骤9: 整理结果...")
+        
+        result_data = {
+            "total_devices": len(all_unique_nos),
+            "successful_devices": len(successful_devices),
+            "failed_devices": len(failed_devices),
+            "total_fields": len(irrigation_fields),
+            "successful_fields": len(irrigation_fields) - len(failed_fields),
+            "failed_fields": len(failed_fields),
+            "failed_field_ids": list(failed_fields),
+            "device_status_details": devices_status,
+            "final_device_list": final_device_list,
+            "new_plan_file": new_plan_file,
+            "original_plan_file": plan_file
+        }
+        
+        logger.info(f"========== 设备自检工作流完成 ==========")
+        logger.info(f"总设备: {len(all_unique_nos)}, 成功: {len(successful_devices)}, 失败: {len(failed_devices)}")
+        logger.info(f"总田块: {len(irrigation_fields)}, 保留: {len(irrigation_fields) - len(failed_fields)}, 移除: {len(failed_fields)}")
+        
+        return DeviceSelfCheckResponse(
+            success=True,
+            message=f"设备自检完成，{len(successful_devices)}/{len(all_unique_nos)} 个设备自检成功",
+            data=result_data
+        )
+        
+    except Exception as e:
+        logger.error(f"设备自检工作流失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"设备自检工作流失败: {str(e)}"
         )
 
 @app.post("/api/irrigation/multi-pump-scenarios", response_model=MultiPumpResponse)
