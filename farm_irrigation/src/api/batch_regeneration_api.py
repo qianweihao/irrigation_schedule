@@ -181,28 +181,28 @@ class BatchRegenerationService:
             batches = scenario_plan.get('batches', [])
             
             # 应用田块修改
-        for mod in modifications:
-            if mod.action == "add":
+            for mod in modifications:
+                if mod.action == "add":
                     # 查找田块信息
-                field_info = self._find_field_info(available_fields, mod.field_id)
-                if field_info:
-                    # 如果指定了自定义水位，更新水位信息
-                    if mod.custom_water_level is not None:
-                        field_info['wl_mm'] = mod.custom_water_level
-                    
+                    field_info = self._find_field_info(available_fields, mod.field_id)
+                    if field_info:
+                        # 如果指定了自定义水位，更新水位信息
+                        if mod.custom_water_level is not None:
+                            field_info['wl_mm'] = mod.custom_water_level
+                        
                         # 检查是否已在计划中
                         if not self._is_field_in_batches(batches, mod.field_id):
                             # 添加到合适的批次（根据segment_id）
                             self._add_field_to_batches(batches, field_info)
                             if mod.field_id not in added_fields:
                                 added_fields.append(mod.field_id)
-                        
-                    elif mod.action == "remove":
-                        # 从批次中移除田块
-                        if self._remove_field_from_batches(batches, mod.field_id):
-                            if mod.field_id not in removed_fields:
-                                removed_fields.append(mod.field_id)
-        
+                
+                elif mod.action == "remove":
+                    # 从批次中移除田块
+                    if self._remove_field_from_batches(batches, mod.field_id):
+                        if mod.field_id not in removed_fields:
+                            removed_fields.append(mod.field_id)
+            
             # 重新生成steps和commands
             self._regenerate_scenario_execution(scenario)
             
