@@ -241,7 +241,8 @@
                 "execution",
                 "start"
               ]
-            }
+            },
+            "description": "启动灌溉计划的动态执行（增强版）\n\n**🆕 新增功能（v2.0）**:\n- ✅ 自动初始化田块水位监控器\n- ✅ 自动生成设备控制指令（泵站、节制闸、进水阀）\n- ✅ 实时监控水位变化，动态生成设备关闭指令\n- ✅ 三级联动控制（田块 → 节制闸 → 泵站）\n\n**后端自动执行的操作**:\n1. 初始化 FieldCompletionMonitor\n2. 生成批次启动指令（phase: start）\n3. 启动实时监控循环（每30秒检查水位）\n4. 水位达标时生成关闭指令（phase: running）\n5. 所有田块完成时生成停泵指令（phase: stop）\n\n**硬件团队对接**:\n- 使用 `GET /api/execution/batch-commands` 获取待执行指令\n- 使用 `POST /api/execution/command-feedback` 提交执行反馈\n\n**参数说明**:\n- `plan_file_path`: 计划文件路径\n- `farm_id`: 农场ID\n- `auto_start`: 是否立即开始执行\n- `water_level_update_interval_minutes`: 水位更新间隔\n- `enable_plan_regeneration`: 是否启用智能重新生成\n- `execution_mode`: 执行模式（simulation/production）"
           },
           "event": [
             {
@@ -284,7 +285,8 @@
                   "value": "{{execution_id}}"
                 }
               ]
-            }
+            },
+            "description": "查询当前执行的详细状态\n\n**返回信息包括**:\n- 执行状态（running/paused/completed/failed）\n- 当前批次和总批次数\n- 执行进度百分比\n- 计划重新生成次数\n- 正在灌溉的田块列表\n- 已完成的批次列表\n- 当前执行的方案信息\n\n**🆕 可扩展（未来版本）**:\n- 设备指令统计（待执行/已执行/失败）\n- 监控器状态（完成田块数/节制闸关闭数/泵站停止数）\n- 实时水位信息\n\n**使用场景**:\n- 前端实时展示执行进度\n- 监控灌溉任务状态\n- 检查是否需要人工干预\n\n**轮询建议**: 每5-10秒查询一次状态更新"
           },
           "event": [
             {
@@ -652,7 +654,8 @@
                 "regeneration",
                 "manual"
               ]
-            }
+            },
+            "description": "基于新的水位数据重新生成指定批次\n\n**🆕 新增功能（v2.0）**:\n- ✅ 人工调整水位后自动触发设备检查\n- ✅ 实时更新监控器中的水位数据\n- ✅ 自动生成设备关闭指令（如果田块达标）\n- ✅ 支持田块级自定义水位标准\n\n**后端自动执行的操作**:\n1. 更新监控器中的水位数据\n2. 立即触发一次设备检查（check_and_close_devices）\n3. 检测田块是否达标（wl_opt ≤ wl ≤ wl_high）\n4. 生成关闭指令：\n   - 达标田块 → 关闭进水阀\n   - 支渠完成 → 关闭节制闸\n   - 所有完成 → 停止泵站\n5. 指令加入队列，供硬件团队获取\n\n**使用场景**:\n- 传感器数据更新后，手动触发重新计算\n- 人工巡检后调整水位值\n- 田块提前达标，触发设备关闭\n\n**硬件团队对接**:\n调整水位后，硬件团队通过轮询 `GET /api/execution/batch-commands?phase=running&status=pending` 可以获取到新生成的关闭指令。\n\n**参数说明**:\n- `batch_index`: 批次索引\n- `custom_water_levels`: 自定义田块实际水位\n- `custom_water_level_standards`: 自定义田块级水位标准（可选）\n- `force_regeneration`: 强制重新生成"
           },
           "event": [
             {
@@ -1583,6 +1586,128 @@
           ]
         },
         {
+          "name": "根据计划获取设备列表（生产）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/hardware/devices-from-plan?farm_id={{farm_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hardware",
+                "devices-from-plan"
+              ],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}",
+                  "description": "农场ID（必填）"
+                },
+                {
+                  "key": "plan_id",
+                  "value": "",
+                  "description": "灌溉计划ID（可选，留空使用最新计划）",
+                  "disabled": true
+                },
+                {
+                  "key": "scenario_name",
+                  "value": "",
+                  "description": "方案名称（可选，如：P2单独使用）",
+                  "disabled": true
+                },
+                {
+                  "key": "app_id",
+                  "value": "{{app_id}}",
+                  "description": "应用ID（可选）",
+                  "disabled": true
+                },
+                {
+                  "key": "secret",
+                  "value": "{{secret}}",
+                  "description": "密钥（可选）",
+                  "disabled": true
+                },
+                {
+                  "key": "timeout",
+                  "value": "30",
+                  "description": "请求超时时间（秒）",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "根据灌溉计划ID获取需要自检的设备列表，简化前端处理逻辑\n\n**功能**：\n- 从灌溉计划中提取需要灌溉的田块\n- 查询这些田块对应的设备\n- 返回设备的unique_no列表\n\n**使用场景**：\n- 生成灌溉计划后，快速获取需要自检的设备列表\n- 前端无需手动筛选田块和设备\n\n**工作流程**：\n1. 读取灌溉计划文件\n2. 提取需要灌溉的田块ID列表\n3. 查询这些田块对应的设备\n4. 返回设备的unique_no列表\n\n**优势**：\n- 简化前端逻辑，减少代码量60%+\n- 减少数据传输量（只返回需要的设备）\n- 后端统一处理筛选逻辑\n- 易于维护和调试\n\n**完整业务流程示例**：\n```javascript\n// 1. 生成灌溉计划\nPOST /api/irrigation/plan-generation\n\n// 2. 获取设备列表（使用本接口）\nGET /api/hardware/devices-from-plan?farm_id=xxx\n\n// 3. 设备自检\nPOST /api/hardware/device-self-check\n{\n  \"unique_no_list\": [从步骤2获取]\n}\n```"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含设备列表\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('unique_no_list');",
+                  "    pm.expect(jsonData.data.unique_no_list).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"显示设备统计信息\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        console.log('\\n=== 设备列表信息 ===');",
+                  "        console.log('需要灌溉的田块数:', jsonData.data.field_count);",
+                  "        console.log('对应的设备数:', jsonData.data.device_count);",
+                  "        console.log('使用的计划文件:', jsonData.data.plan_file);",
+                  "        console.log('方案名称:', jsonData.data.scenario_name);",
+                  "        ",
+                  "        if (jsonData.data.unique_no_list.length > 0) {",
+                  "            console.log('\\n设备列表(前5个):');",
+                  "            jsonData.data.unique_no_list.slice(0, 5).forEach(function(no, index) {",
+                  "                console.log('  ' + (index + 1) + '. ' + no);",
+                  "            });",
+                  "            ",
+                  "            // 保存到环境变量，供后续自检接口使用",
+                  "            pm.environment.set('device_unique_no_list', JSON.stringify(jsonData.data.unique_no_list));",
+                  "            console.log('\\n✅ 设备列表已保存到环境变量: device_unique_no_list');",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"显示田块设备映射详情\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data && jsonData.data.field_device_mapping) {",
+                  "        var mapping = jsonData.data.field_device_mapping;",
+                  "        var fieldIds = Object.keys(mapping);",
+                  "        ",
+                  "        console.log('\\n=== 田块设备映射示例（前3个田块）===');",
+                  "        fieldIds.slice(0, 3).forEach(function(fieldId) {",
+                  "            console.log('\\n田块:', fieldId);",
+                  "            mapping[fieldId].forEach(function(device) {",
+                  "                console.log('  - ' + device.device_name + ' (' + device.gate_type + ')');",
+                  "                console.log('    unique_no: ' + device.unique_no);",
+                  "            });",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "设备自检完整工作流",
           "request": {
             "method": "POST",
@@ -1672,6 +1797,91 @@
                   "            console.log(status + ':', statusCount[status] + '个');",
                   "        });",
                   "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "根据计划获取设备列表（业务）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/hardware/devices-from-plan?farm_id={{farm_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hardware",
+                "devices-from-plan"
+              ],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}"
+                }
+              ]
+            },
+            "description": "完整业务流程演示：生成计划 → 获取设备列表 → 设备自检\n\n**使用说明**:\n本测试用例演示如何使用新接口简化前端逻辑\n\n**执行顺序**:\n1. 先运行【2. 灌溉计划生成】→「生成灌溉计划」\n2. 运行本接口（获取设备列表）\n3. 运行【硬件设备管理】→「设备自检完整工作流」\n\n**新方法 vs 旧方法**:\n\n【旧方法】前端需要:\n```javascript\n// 1. 生成计划\nconst plan = await fetch('/api/irrigation/plan-generation');\n// 2. 提取田块ID（前端代码）\nconst fieldIds = plan.data.batches.flatMap(b => b.fields.map(f => f.id));\n// 3. 获取所有设备\nconst allDevices = await fetch('/api/hardware/fields-device-status');\n// 4. 筛选设备（前端代码）\nconst devices = allDevices.data.fields\n  .filter(f => fieldIds.includes(f.section_code))\n  .flatMap(f => f.devices.map(d => d.unique_no));\n// 5. 自检\nawait fetch('/api/hardware/device-self-check', { body: { unique_no_list: devices } });\n```\n\n【新方法】使用新接口:\n```javascript\n// 1. 生成计划\nawait fetch('/api/irrigation/plan-generation');\n// 2. 获取设备列表（一行代码）\nconst devices = await fetch('/api/hardware/devices-from-plan?farm_id=xxx');\n// 3. 自检\nawait fetch('/api/hardware/device-self-check', {\n  body: { unique_no_list: devices.data.unique_no_list }\n});\n```\n\n**优势**:\n- ✅ 代码量减少 60%+\n- ✅ 前端逻辑简化\n- ✅ 减少数据传输\n- ✅ 易于维护"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// 演示完整业务流程",
+                  "pm.test(\"【步骤2/3】获取设备列表成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    ",
+                  "    console.log('\\n╔════════════════════════════════════════╗');",
+                  "    console.log('║   完整业务流程 - 步骤 2/3           ║');",
+                  "    console.log('╚════════════════════════════════════════╝');",
+                  "    ",
+                  "    console.log('\\n【前置步骤】');",
+                  "    console.log('✅ 步骤1: 生成灌溉计划（已完成）');",
+                  "    ",
+                  "    console.log('\\n【当前步骤】');",
+                  "    console.log('✅ 步骤2: 获取设备列表');",
+                  "    console.log('  → 需要灌溉的田块数:', jsonData.data.field_count);",
+                  "    console.log('  → 对应的设备数:', jsonData.data.device_count);",
+                  "    console.log('  → 使用的计划:', jsonData.data.plan_file.split('/').pop());",
+                  "    console.log('  → 方案名称:', jsonData.data.scenario_name);",
+                  "    ",
+                  "    // 保存设备列表供下一步使用",
+                  "    if (jsonData.data.unique_no_list && jsonData.data.unique_no_list.length > 0) {",
+                  "        pm.environment.set('device_list_for_check', JSON.stringify(jsonData.data.unique_no_list));",
+                  "        console.log('\\n  ✅ 设备列表已保存（共 ' + jsonData.data.unique_no_list.length + ' 个设备）');",
+                  "        console.log('     前3个设备: ' + jsonData.data.unique_no_list.slice(0, 3).join(', '));",
+                  "    }",
+                  "    ",
+                  "    console.log('\\n【后续步骤】');",
+                  "    console.log('⏭️  步骤3: 运行「设备自检完整工作流」');",
+                  "    console.log('   或手动调用: POST /api/hardware/device-self-check');",
+                  "    console.log('   参数: { \"unique_no_list\": [从本接口获取] }');",
+                  "    ",
+                  "    console.log('\\n【前后端对比】');",
+                  "    console.log('旧方法: 前端需要 3 个接口 + 复杂筛选逻辑');",
+                  "    console.log('新方法: 前端只需 2 个接口 + 零筛选逻辑');",
+                  "    console.log('代码量减少: 60%+ ✨');",
+                  "    ",
+                  "    console.log('\\n════════════════════════════════════════\\n');",
+                  "});",
+                  "",
+                  "pm.test(\"验证数据完整性\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('unique_no_list');",
+                  "    pm.expect(jsonData.data).to.have.property('field_count');",
+                  "    pm.expect(jsonData.data).to.have.property('device_count');",
+                  "    pm.expect(jsonData.data).to.have.property('plan_file');",
+                  "    pm.expect(jsonData.data).to.have.property('scenario_name');",
+                  "    pm.expect(jsonData.data).to.have.property('field_device_mapping');",
                   "});"
                 ]
               }
@@ -2012,6 +2222,189 @@
                   "    var jsonData = pm.response.json();",
                   "    console.log('✅ 配置已从备份恢复:', jsonData.restored_from);",
                   "    console.log('📦 当前配置已备份为:', jsonData.current_config_backup);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. 设备指令管理",
+      "item": [
+        {
+          "name": "获取批次设备指令",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/execution/batch-commands?execution_id={{execution_id}}&batch_index=1&phase=start&status=pending",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "execution",
+                "batch-commands"
+              ],
+              "query": [
+                {
+                  "key": "execution_id",
+                  "value": "{{execution_id}}",
+                  "description": "执行ID（必填）"
+                },
+                {
+                  "key": "batch_index",
+                  "value": "1",
+                  "description": "批次索引（可选）"
+                },
+                {
+                  "key": "phase",
+                  "value": "start",
+                  "description": "阶段：start|running|stop（可选）"
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "状态：pending|sent|executed|failed（可选，默认pending）"
+                }
+              ]
+            },
+            "description": "获取批次设备控制指令（硬件团队接口）\n\n**使用场景**：\n- 硬件团队轮询获取待执行的设备控制指令\n- 获取批次启动时的泵站、节制闸、进水阀开启指令\n- 获取批次执行中的设备关闭指令\n- 获取批次结束时的停泵指令\n\n**参数说明**：\n- execution_id: 执行ID（必填）\n- batch_index: 批次索引（可选，不填返回当前批次）\n- phase: 阶段筛选（可选）\n  - start: 批次启动阶段指令\n  - running: 批次执行中的指令\n  - stop: 批次停止阶段指令\n- status: 状态筛选（可选，默认pending）\n  - pending: 待执行\n  - sent: 已发送\n  - executed: 已执行\n  - failed: 执行失败\n\n**返回指令格式**：\n```json\n{\n  \"command_id\": \"cmd_001\",\n  \"device_type\": \"pump|regulator|field_inlet_gate|field_outlet_gate\",\n  \"device_id\": \"P1\",\n  \"unique_no\": \"477379421064159253\",\n  \"action\": \"start|stop|open|close\",\n  \"params\": {\"gate_degree\": 100, \"open_pct\": 100},\n  \"priority\": 1,\n  \"description\": \"启动P1泵站\",\n  \"reason\": \"批次1开始\"\n}\n```\n\n**⚠️ 注意**：\n- 调用此接口获取pending状态的指令后，指令会自动标记为sent\n- 硬件团队应定期轮询（建议30秒一次）\n- 执行完指令后，需调用【提交指令反馈】接口"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"包含指令列表\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.commands).to.be.an('array');",
+                  "    pm.expect(jsonData).to.have.property('total_commands');",
+                  "    pm.expect(jsonData).to.have.property('has_new_commands');",
+                  "});",
+                  "",
+                  "pm.test(\"显示指令详情\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('\\n=== 设备指令详情 ===');",
+                  "    console.log('执行ID:', jsonData.execution_id);",
+                  "    console.log('批次索引:', jsonData.batch_index);",
+                  "    console.log('阶段:', jsonData.phase);",
+                  "    console.log('指令数量:', jsonData.total_commands);",
+                  "    console.log('有新指令:', jsonData.has_new_commands);",
+                  "    ",
+                  "    if (jsonData.commands && jsonData.commands.length > 0) {",
+                  "        console.log('\\n指令列表:');",
+                  "        jsonData.commands.forEach(function(cmd, index) {",
+                  "            console.log((index + 1) + '. [' + cmd.device_type + '] ' + cmd.description);",
+                  "            console.log('   设备ID: ' + cmd.device_id + ', unique_no: ' + cmd.unique_no);",
+                  "            console.log('   动作: ' + cmd.action + ', 优先级: ' + cmd.priority);",
+                  "            if (cmd.reason) {",
+                  "                console.log('   原因: ' + cmd.reason);",
+                  "            }",
+                  "        });",
+                  "        ",
+                  "        // 保存第一个指令ID用于反馈测试",
+                  "        pm.environment.set('command_id', jsonData.commands[0].command_id);",
+                  "    }",
+                  "    ",
+                  "    if (jsonData.statistics) {",
+                  "        console.log('\\n统计信息:');",
+                  "        console.log('总指令数:', jsonData.statistics.total_commands);",
+                  "        console.log('待执行:', jsonData.statistics.pending);",
+                  "        console.log('已发送:', jsonData.statistics.sent);",
+                  "        console.log('已执行:', jsonData.statistics.executed);",
+                  "        console.log('失败:', jsonData.statistics.failed);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "提交指令反馈",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "command_id",
+                  "value": "{{command_id}}",
+                  "description": "指令ID（必填）",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "executed",
+                  "description": "执行状态：executed|failed（必填）",
+                  "type": "text"
+                },
+                {
+                  "key": "message",
+                  "value": "设备已成功启动",
+                  "description": "反馈消息（可选）",
+                  "type": "text"
+                },
+                {
+                  "key": "execution_time",
+                  "value": "2.5",
+                  "description": "执行耗时（秒，可选）",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/execution/command-feedback",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "execution",
+                "command-feedback"
+              ]
+            },
+            "description": "硬件团队反馈指令执行结果\n\n**使用场景**：\n- 硬件团队执行完设备控制指令后，反馈执行结果\n- 后端记录指令执行状态，便于追踪和问题排查\n\n**参数说明**：\n- command_id: 指令ID（必填，从【获取批次设备指令】接口获取）\n- status: 执行状态（必填）\n  - executed: 执行成功\n  - failed: 执行失败\n- message: 反馈消息（可选，建议提供详细信息）\n- execution_time: 执行耗时（秒，可选）\n\n**反馈示例**：\n\n成功示例：\n```\ncommand_id: cmd_001\nstatus: executed\nmessage: P1泵站已成功启动，当前转速2800rpm\nexecution_time: 2.5\n```\n\n失败示例：\n```\ncommand_id: cmd_002\nstatus: failed\nmessage: 节制闸S3-G2无响应，请检查设备连接\n```\n\n**⚠️ 注意**：\n- 每个指令执行后都应提交反馈\n- 失败的指令应提供详细的错误信息\n- 反馈信息会记录到日志中，便于后续分析"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"反馈已记录\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal('反馈已记录');",
+                  "    pm.expect(jsonData.command_id).to.exist;",
+                  "    ",
+                  "    console.log('✅ 指令反馈成功');",
+                  "    console.log('指令ID:', jsonData.command_id);",
                   "});"
                 ]
               }

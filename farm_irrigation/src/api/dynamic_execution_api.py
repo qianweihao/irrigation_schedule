@@ -707,6 +707,75 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
         if field_standards:
             message += f"（使用了 {len(field_standards)} 个田块的自定义水位标准）"
         
+        # 如果使用了自定义水位，更新监控器并触发设备关闭检查
+        if request.custom_water_levels and scheduler.completion_monitor:
+            logger.info("人工调整水位，更新监控器并触发设备检查")
+            
+            # 更新监控器中的水位
+            scheduler.completion_monitor.update_water_levels(request.custom_water_levels)
+            
+            # 立即触发一次设备关闭检查
+            try:
+                check_result = await scheduler.completion_monitor.check_and_close_devices(request.custom_water_levels)
+                
+                # 将生成的关闭指令加入队列
+                if check_result.get('completed_fields'):
+                    logger.info(f"人工调整后，{len(check_result['completed_fields'])}个田块达标")
+                    for field_id in check_result['completed_fields']:
+                        field_info = scheduler.completion_monitor.active_fields.get(field_id)
+                        if field_info:
+                            close_cmd = {
+                                "device_type": "field_inlet_gate",
+                                "device_id": field_id,
+                                "unique_no": field_info.inlet_device,
+                                "action": "close",
+                                "params": {"gate_degree": 0},
+                                "priority": 1,
+                                "phase": "running",
+                                "reason": f"人工调整后水位达标({field_info.current_wl:.1f}mm)",
+                                "description": f"关闭{field_id}进水阀(人工调整触发)"
+                            }
+                            scheduler.command_queue.add_command(close_cmd)
+                
+                if check_result.get('closed_regulators'):
+                    logger.info(f"人工调整后，{len(check_result['closed_regulators'])}个节制闸需关闭")
+                    for reg_id in check_result['closed_regulators']:
+                        reg_info = scheduler.completion_monitor.active_regulators.get(reg_id)
+                        if reg_info:
+                            close_cmd = {
+                                "device_type": "regulator",
+                                "device_id": reg_id,
+                                "unique_no": reg_info.unique_no,
+                                "action": "close",
+                                "params": {"gate_degree": 0, "open_pct": 0},
+                                "priority": 2,
+                                "phase": "running",
+                                "reason": "人工调整后支渠田块已完成",
+                                "description": f"关闭{reg_id}节制闸(人工调整触发)"
+                            }
+                            scheduler.command_queue.add_command(close_cmd)
+                
+                if check_result.get('stopped_pumps'):
+                    logger.info(f"人工调整后，{len(check_result['stopped_pumps'])}个泵站需停止")
+                    for pump_id in check_result['stopped_pumps']:
+                        # 从调度器获取泵站unique_no
+                        pump_unique_no = scheduler._get_pump_unique_no(pump_id)
+                        stop_cmd = {
+                            "device_type": "pump",
+                            "device_id": pump_id,
+                            "unique_no": pump_unique_no,
+                            "action": "stop",
+                            "params": {},
+                            "priority": 3,
+                            "phase": "running",
+                            "reason": "人工调整后所有批次完成",
+                            "description": f"停止{pump_id}泵站(人工调整触发)"
+                        }
+                        scheduler.command_queue.add_command(stop_cmd)
+                        
+            except Exception as e:
+                logger.warning(f"人工调整后触发设备检查失败: {e}")
+        
         return ManualRegenerationResponse(
             success=True,
             message=message,

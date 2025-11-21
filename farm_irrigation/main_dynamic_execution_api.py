@@ -2432,6 +2432,219 @@ async def get_fields_device_status(
             detail=f"查询田块设备状态失败: {str(e)}"
         )
 
+@app.get("/api/hardware/devices-from-plan")
+async def get_devices_from_plan(
+    plan_id: Optional[str] = Query(None, description="灌溉计划ID（留空使用最新计划）"),
+    scenario_name: Optional[str] = Query(None, description="方案名称（留空使用第一个）"),
+    farm_id: str = Query(..., description="农场ID"),
+    app_id: Optional[str] = None,
+    secret: Optional[str] = None,
+    timeout: int = 30
+):
+    """
+    根据灌溉计划ID获取需要自检的设备列表
+    
+    **功能**: 简化前端逻辑，直接从计划中提取需要灌溉的田块对应的设备unique_no列表
+    
+    **工作流程**:
+    1. 读取灌溉计划文件
+    2. 提取需要灌溉的田块ID列表
+    3. 查询这些田块对应的设备
+    4. 返回设备的unique_no列表
+    
+    **使用场景**:
+    - 生成灌溉计划后，获取需要自检的设备列表
+    - 前端只需调用此接口，然后将返回的unique_no_list传递给设备自检接口
+    
+    **示例**:
+    ```bash
+    # 使用最新计划
+    GET /api/hardware/devices-from-plan?farm_id=13944136728576
+    
+    # 指定计划文件
+    GET /api/hardware/devices-from-plan?plan_id=irrigation_plan_20250121_123456.json&farm_id=13944136728576
+    ```
+    
+    Returns:
+        dict: {
+            "success": true,
+            "message": "成功获取 36 个田块对应的 58 个设备",
+            "data": {
+                "unique_no_list": ["477379421064159253", "471743004049787907", ...],
+                "field_count": 36,
+                "device_count": 58,
+                "plan_file": "/app/output/irrigation_plan_20250121_123456.json",
+                "scenario_name": "P2单独使用"
+            }
+        }
+    """
+    try:
+        logger.info(f"========== 开始获取计划中的设备列表 ==========")
+        logger.info(f"农场ID: {farm_id}, 计划ID: {plan_id or '最新'}")
+        
+        # 从环境变量或请求中获取认证信息
+        if not app_id:
+            app_id = os.environ.get("ILAND_APP_ID") or "YJY"
+        if not secret:
+            secret = os.environ.get("ILAND_SECRET") or "test005"
+        
+        # 步骤1: 获取灌溉计划文件
+        logger.info("步骤1: 获取灌溉计划...")
+        
+        from pathlib import Path
+        if plan_id:
+            # 处理可能的路径格式
+            if os.path.isabs(plan_id):
+                plan_file = plan_id
+            elif plan_id.startswith(OUTPUT_DIR):
+                plan_file = plan_id
+            else:
+                # 尝试在output目录中查找
+                plan_file = os.path.join(OUTPUT_DIR, os.path.basename(plan_id))
+        else:
+            # 使用最新的计划文件
+            plan_files = sorted(
+                Path(OUTPUT_DIR).glob("irrigation_plan_*.json"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True
+            )
+            if not plan_files:
+                raise HTTPException(
+                    status_code=404,
+                    detail="未找到灌溉计划文件，请先生成灌溉计划"
+                )
+            plan_file = str(plan_files[0])
+        
+        if not os.path.exists(plan_file):
+            raise HTTPException(
+                status_code=404,
+                detail=f"计划文件不存在: {plan_file}"
+            )
+        
+        logger.info(f"使用计划文件: {plan_file}")
+        
+        # 读取计划文件
+        with open(plan_file, 'r', encoding='utf-8') as f:
+            plan_data = json.load(f)
+        
+        # 步骤2: 提取需要灌溉的田块ID列表
+        logger.info("步骤2: 提取需要灌溉的田块...")
+        
+        irrigation_fields = set()
+        scenarios_to_check = []
+        actual_scenario_name = None
+        
+        if scenario_name:
+            scenarios_to_check = [
+                s for s in plan_data.get("scenarios", [])
+                if s.get("scenario_name") == scenario_name
+            ]
+            if not scenarios_to_check:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"未找到指定的方案: {scenario_name}"
+                )
+        else:
+            # 使用第一个scenario
+            scenarios_to_check = plan_data.get("scenarios", [])[:1]
+        
+        if not scenarios_to_check:
+            raise HTTPException(
+                status_code=404,
+                detail="计划文件中没有可用的方案"
+            )
+        
+        # 提取田块ID
+        for scenario in scenarios_to_check:
+            actual_scenario_name = scenario.get("scenario_name")
+            batches = scenario.get("plan", {}).get("batches", [])
+            for batch in batches:
+                for field in batch.get("fields", []):
+                    field_id = field.get("id")
+                    if field_id:
+                        irrigation_fields.add(field_id)
+        
+        if not irrigation_fields:
+            return {
+                "success": True,
+                "message": "计划中没有需要灌溉的田块",
+                "data": {
+                    "unique_no_list": [],
+                    "field_count": 0,
+                    "device_count": 0,
+                    "plan_file": plan_file,
+                    "scenario_name": actual_scenario_name
+                }
+            }
+        
+        logger.info(f"找到需要灌溉的田块: {len(irrigation_fields)} 个")
+        
+        # 步骤3: 获取田块对应的设备
+        logger.info("步骤3: 查询田块对应的设备...")
+        
+        fields_device_status = get_all_fields_device_status(
+            app_id=app_id,
+            secret=secret,
+            farm_id=farm_id,
+            timeout=timeout,
+            verbose=False
+        )
+        
+        if not fields_device_status.get("success"):
+            raise HTTPException(
+                status_code=500,
+                detail=f"获取田块设备信息失败: {fields_device_status.get('error')}"
+            )
+        
+        # 步骤4: 筛选需要灌溉的田块的设备
+        logger.info("步骤4: 筛选设备...")
+        
+        unique_no_list = []
+        field_device_mapping = {}
+        
+        for field in fields_device_status.get("fields", []):
+            section_code = field.get("section_code")
+            if section_code and section_code in irrigation_fields:
+                devices = field.get("devices", [])
+                field_devices = []
+                for device in devices:
+                    unique_no = device.get("unique_no")
+                    if unique_no:
+                        unique_no_list.append(unique_no)
+                        field_devices.append({
+                            "unique_no": unique_no,
+                            "device_name": device.get("device_info", {}).get("deviceName"),
+                            "gate_type": device.get("gate_type")
+                        })
+                field_device_mapping[section_code] = field_devices
+        
+        logger.info(f"✅ 成功获取 {len(irrigation_fields)} 个田块对应的 {len(unique_no_list)} 个设备")
+        logger.info(f"========== 获取设备列表完成 ==========")
+        
+        return {
+            "success": True,
+            "message": f"成功获取 {len(irrigation_fields)} 个田块对应的 {len(unique_no_list)} 个设备",
+            "data": {
+                "unique_no_list": unique_no_list,
+                "field_count": len(irrigation_fields),
+                "device_count": len(unique_no_list),
+                "plan_file": plan_file,
+                "scenario_name": actual_scenario_name,
+                "field_device_mapping": field_device_mapping  # 可选：显示详细映射关系
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取计划设备列表失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"获取设备列表失败: {str(e)}"
+        )
+
 @app.post("/api/hardware/device-self-check-workflow", response_model=DeviceSelfCheckResponse)
 async def device_self_check_workflow(request: DeviceSelfCheckRequest):
     """
@@ -3897,6 +4110,162 @@ async def api_info():
             }
         }
     }
+
+# ==================== 设备指令管理 API ====================
+
+@app.get("/api/execution/batch-commands")
+async def get_batch_commands(
+    execution_id: str = Query(..., description="执行ID"),
+    batch_index: Optional[int] = Query(None, description="批次索引"),
+    phase: Optional[str] = Query(None, description="阶段: start|running|stop"),
+    status: Optional[str] = Query(None, description="状态: pending|sent|executed|failed")
+):
+    """
+    获取批次设备控制指令
+    
+    硬件团队通过此接口获取需要执行的设备控制指令
+    
+    Args:
+        execution_id: 执行ID
+        batch_index: 批次索引（可选）
+        phase: 阶段筛选（可选）
+        status: 状态筛选（可选，默认返回pending）
+    
+    Returns:
+        {
+            "success": true,
+            "execution_id": "exec_xxx",
+            "batch_index": 1,
+            "phase": "start",
+            "timestamp": "2025-11-21T16:00:00",
+            "commands": [
+                {
+                    "command_id": "cmd_001",
+                    "device_type": "pump",
+                    "device_id": "P1",
+                    "unique_no": null,
+                    "action": "start",
+                    "params": {},
+                    "priority": 1,
+                    "description": "启动P1泵站"
+                },
+                ...
+            ],
+            "total_commands": 36,
+            "has_new_commands": true
+        }
+    """
+    try:
+        from src.api.dynamic_execution_api import get_scheduler
+        
+        scheduler = get_scheduler()
+        
+        if not scheduler.command_queue:
+            return {
+                "success": False,
+                "error": "指令队列未初始化"
+            }
+        
+        # 默认返回待执行指令
+        if status is None:
+            status = "pending"
+        
+        # 获取指令列表
+        commands = scheduler.command_queue.get_commands(
+            phase=phase,
+            status=status
+        )
+        
+        # 标记为已发送（仅对pending状态）
+        if status == "pending":
+            for cmd in commands:
+                scheduler.command_queue.mark_as_sent(cmd['command_id'])
+        
+        # 获取统计
+        stats = scheduler.command_queue.get_statistics()
+        
+        return {
+            "success": True,
+            "execution_id": execution_id,
+            "batch_index": batch_index or scheduler.current_batch_index,
+            "phase": phase,
+            "timestamp": datetime.now().isoformat(),
+            "commands": commands,
+            "total_commands": len(commands),
+            "has_new_commands": len(commands) > 0,
+            "statistics": stats
+        }
+        
+    except Exception as e:
+        logger.error(f"获取设备指令失败: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+@app.post("/api/execution/command-feedback")
+async def submit_command_feedback(
+    command_id: str = Form(..., description="指令ID"),
+    status: str = Form(..., description="执行状态: executed|failed"),
+    message: Optional[str] = Form(None, description="反馈消息"),
+    execution_time: Optional[float] = Form(None, description="执行耗时（秒）")
+):
+    """
+    硬件团队反馈指令执行结果
+    
+    Args:
+        command_id: 指令ID
+        status: 执行状态（executed|failed）
+        message: 反馈消息
+        execution_time: 执行耗时
+    
+    Returns:
+        {
+            "success": true,
+            "message": "反馈已记录",
+            "command_id": "cmd_001"
+        }
+    """
+    try:
+        from src.api.dynamic_execution_api import get_scheduler
+        
+        scheduler = get_scheduler()
+        
+        if not scheduler.command_queue:
+            return {
+                "success": False,
+                "error": "指令队列未初始化"
+            }
+        
+        # 更新指令状态
+        success = scheduler.command_queue.update_command_status(
+            command_id=command_id,
+            status=status,
+            message=message
+        )
+        
+        if success:
+            logger.info(f"收到指令反馈: {command_id} - {status}")
+            return {
+                "success": True,
+                "message": "反馈已记录",
+                "command_id": command_id
+            }
+        else:
+            return {
+                "success": False,
+                "error": "指令不存在",
+                "command_id": command_id
+            }
+        
+    except Exception as e:
+        logger.error(f"处理指令反馈失败: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
 
 if __name__ == "__main__":
     # 运行服务器

@@ -88,7 +88,9 @@ class BatchExecutionScheduler:
                  config_path: str = None,
                  farm_id: str = "default_farm",
                  enable_realtime_waterlevels: bool = True,
-                 pre_execution_buffer_minutes: int = 5):
+                 pre_execution_buffer_minutes: int = 5,
+                 app_id: str = None,
+                 secret: str = None):
         """
         初始化调度器
         
@@ -97,6 +99,8 @@ class BatchExecutionScheduler:
             farm_id: 农场ID，用于获取水位数据
             enable_realtime_waterlevels: 是否启用实时水位获取
             pre_execution_buffer_minutes: 批次执行前的缓冲时间（分钟）
+            app_id: iLand平台应用ID
+            secret: iLand平台密钥
         """
         # 如果未指定路径，基于项目根目录计算
         if config_path is None:
@@ -107,6 +111,11 @@ class BatchExecutionScheduler:
         self.farm_id = farm_id
         self.enable_realtime_waterlevels = enable_realtime_waterlevels
         self.pre_execution_buffer_minutes = pre_execution_buffer_minutes
+        
+        # iLand平台认证
+        import os
+        self.app_id = app_id or os.getenv("ILAND_APP_ID", "")
+        self.secret = secret or os.getenv("ILAND_SECRET", "")
         
         # 执行状态
         self.is_running = False
@@ -128,6 +137,13 @@ class BatchExecutionScheduler:
         
         # 初始化组件
         self.status_manager = get_status_manager()
+        
+        # 设备指令队列
+        from .device_command_queue import DeviceCommandQueue
+        self.command_queue = DeviceCommandQueue()
+        
+        # 田块完成度监控器（延迟初始化）
+        self.completion_monitor = None
         
         # 加载配置
         self._load_config()
@@ -463,7 +479,7 @@ class BatchExecutionScheduler:
     
     async def _execute_batch(self, batch_exec: BatchExecution):
         """
-        执行批次
+        执行批次（增强版 - 集成实时监控）
         
         Args:
             batch_exec: 批次执行对象
@@ -479,11 +495,21 @@ class BatchExecutionScheduler:
             # 使用更新后的计划或原始计划
             plan_to_execute = batch_exec.updated_plan or batch_exec.original_plan
             
-            if plan_to_execute and self.device_control_callback:
-                # 调用设备控制回调
-                await self.device_control_callback(batch_exec, plan_to_execute)
+            # 1. 生成启动指令并加入队列
+            start_commands = self._generate_batch_start_commands(plan_to_execute, batch_exec.batch_index)
+            for cmd in start_commands:
+                cmd['phase'] = 'start'
+                self.command_queue.add_command(cmd)
             
-            logger.info(f"批次 {batch_exec.batch_index} 开始执行")
+            logger.info(f"批次 {batch_exec.batch_index} 已生成 {len(start_commands)} 条启动指令")
+            
+            # 2. 初始化监控器
+            self._initialize_batch_monitoring(plan_to_execute, batch_exec.batch_index)
+            
+            # 3. 启动实时监控循环
+            await self._monitor_batch_until_completion(batch_exec)
+            
+            logger.info(f"批次 {batch_exec.batch_index} 执行完成")
             
             # 通知状态更新
             if self.status_update_callback:
@@ -829,6 +855,303 @@ class BatchExecutionScheduler:
             logger.info(f"清理 {retention_days} 天前的旧数据完成")
         except Exception as e:
             logger.error(f"清理旧数据失败: {e}")
+    
+    def _generate_batch_start_commands(self, plan: Dict[str, Any], batch_index: int) -> List[Dict]:
+        """
+        生成批次启动指令
+        
+        Args:
+            plan: 批次计划
+            batch_index: 批次索引
+        
+        Returns:
+            List[Dict]: 指令列表
+        """
+        commands = []
+        
+        # 1. 泵站启动指令
+        for step in plan.get('steps', []):
+            pumps_on = step.get('sequence', {}).get('pumps_on', [])
+            for pump_id in pumps_on:
+                # 从配置数据中查找泵站的unique_no
+                pump_unique_no = self._get_pump_unique_no(pump_id)
+                commands.append({
+                    "device_type": "pump",
+                    "device_id": pump_id,
+                    "unique_no": pump_unique_no,
+                    "action": "start",
+                    "params": {},
+                    "priority": 1,
+                    "description": f"启动{pump_id}泵站"
+                })
+        
+        # 2. 节制闸开启指令
+        for step in plan.get('steps', []):
+            gates_set = step.get('sequence', {}).get('gates_set', [])
+            for gate in gates_set:
+                if gate.get('open_pct', 0) > 0:
+                    commands.append({
+                        "device_type": "regulator",
+                        "device_id": gate['id'],
+                        "unique_no": gate.get('unique_no'),
+                        "action": "open",
+                        "params": {"open_pct": gate['open_pct'], "gate_degree": gate['open_pct']},
+                        "priority": 2,
+                        "description": f"开启{gate['id']}节制闸({gate['open_pct']}%)"
+                    })
+        
+        # 3. 田块进水阀开启指令
+        for field in plan.get('fields', []):
+            commands.append({
+                "device_type": "field_inlet_gate",
+                "device_id": field['id'],
+                "unique_no": field.get('inlet_unique_no'),
+                "action": "open",
+                "params": {"gate_degree": 100},
+                "priority": 3,
+                "description": f"开启{field['id']}进水阀"
+            })
+        
+        # 按优先级排序
+        commands.sort(key=lambda x: x['priority'])
+        
+        return commands
+    
+    def _get_pump_unique_no(self, pump_id: str) -> Optional[str]:
+        """
+        从配置数据中获取泵站的unique_no
+        
+        Args:
+            pump_id: 泵站ID（如 "P1"）
+        
+        Returns:
+            Optional[str]: 泵站的unique_no，如果找不到则返回None
+        """
+        try:
+            pumps = self.config_data.get('pumps', [])
+            for pump in pumps:
+                if pump.get('id') == pump_id:
+                    return pump.get('unique_no')
+            
+            logger.warning(f"未找到泵站 {pump_id} 的unique_no")
+            return None
+        except Exception as e:
+            logger.error(f"获取泵站unique_no失败: {e}")
+            return None
+    
+    def _initialize_batch_monitoring(self, plan: Dict[str, Any], batch_index: int):
+        """
+        初始化批次监控
+        
+        Args:
+            plan: 批次计划
+            batch_index: 批次索引
+        """
+        # 延迟初始化监控器
+        if self.completion_monitor is None:
+            from .field_completion_monitor import FieldCompletionMonitor
+            self.completion_monitor = FieldCompletionMonitor(
+                config_data=self.config_data,
+                app_id=self.app_id,
+                secret=self.secret,
+                check_interval=30
+            )
+        
+        # 提取田块信息
+        batch_fields = []
+        for field in plan.get('fields', []):
+            batch_fields.append({
+                'id': field['id'],
+                'segment_id': field.get('segment_id', ''),
+                'inlet_gid': field.get('inlet_G_id', ''),
+                'wl_mm': field.get('wl_mm', 0.0),
+                'wl_opt': field.get('wl_opt', 50.0),
+                'wl_high': field.get('wl_high', 80.0),
+                'inlet_unique_no': field.get('inlet_unique_no', ''),
+                'outlet_unique_no': field.get('outlet_unique_no', None)
+            })
+        
+        # 提取节制闸信息
+        batch_regulators = []
+        for step in plan.get('steps', []):
+            for gate in step.get('sequence', {}).get('gates_set', []):
+                if gate.get('open_pct', 0) > 0:
+                    segment_id = self._extract_segment_from_gate_id(gate['id'])
+                    batch_regulators.append({
+                        'id': gate['id'],
+                        'type': gate.get('type', 'branch-g'),
+                        'segment_id': segment_id,
+                        'unique_no': gate.get('unique_no', None),
+                        'open_pct': gate['open_pct']
+                    })
+        
+        # 提取泵站信息
+        batch_pumps = []
+        for step in plan.get('steps', []):
+            pumps_on = step.get('sequence', {}).get('pumps_on', [])
+            batch_pumps.extend(pumps_on)
+        
+        # 去重
+        batch_pumps = list(set(batch_pumps))
+        
+        # 初始化监控器
+        self.completion_monitor.initialize_batch(
+            batch_fields=batch_fields,
+            batch_regulators=batch_regulators,
+            batch_pumps=batch_pumps
+        )
+        
+        logger.info(f"批次 {batch_index} 监控初始化完成: "
+                   f"{len(batch_fields)}田块, {len(batch_regulators)}节制闸, {len(batch_pumps)}泵站")
+    
+    async def _monitor_batch_until_completion(self, batch_exec: BatchExecution):
+        """
+        实时监控直到批次完成
+        
+        Args:
+            batch_exec: 批次执行对象
+        """
+        check_count = 0
+        max_duration_hours = batch_exec.original_duration * 2  # 超时保护：预计时间的2倍
+        max_checks = int(max_duration_hours * 3600 / 30)  # 每30秒检查一次
+        
+        logger.info(f"批次 {batch_exec.batch_index} 开始实时监控（预计 {batch_exec.original_duration:.2f}h）")
+        
+        while check_count < max_checks:
+            check_count += 1
+            
+            # 1. 获取最新水位
+            latest_wl = await self._fetch_current_water_levels()
+            
+            if not latest_wl:
+                logger.warning(f"第 {check_count} 次检查：未获取到水位数据，30秒后重试")
+                await asyncio.sleep(30)
+                continue
+            
+            # 2. 检查并生成关闭指令
+            result = await self.completion_monitor.check_and_close_devices(latest_wl)
+            
+            # 3. 将关闭指令加入队列
+            if result['completed_fields']:
+                for field_id in result['completed_fields']:
+                    field_info = self.completion_monitor.active_fields.get(field_id)
+                    if field_info:
+                        close_cmd = {
+                            "device_type": "field_inlet_gate",
+                            "device_id": field_id,
+                            "unique_no": field_info.inlet_device,
+                            "action": "close",
+                            "params": {"gate_degree": 0},
+                            "priority": 1,
+                            "phase": "running",
+                            "reason": f"水位达标({field_info.current_wl:.1f}mm)",
+                            "description": f"关闭{field_id}进水阀"
+                        }
+                        self.command_queue.add_command(close_cmd)
+            
+            if result['closed_regulators']:
+                for reg_id in result['closed_regulators']:
+                    reg_info = self.completion_monitor.active_regulators.get(reg_id)
+                    if reg_info:
+                        close_cmd = {
+                            "device_type": "regulator",
+                            "device_id": reg_id,
+                            "unique_no": reg_info.unique_no,
+                            "action": "close",
+                            "params": {"gate_degree": 0, "open_pct": 0},
+                            "priority": 2,
+                            "phase": "running",
+                            "reason": f"支渠{reg_info.segment_id}所有田块已完成",
+                            "description": f"关闭{reg_id}节制闸"
+                        }
+                        self.command_queue.add_command(close_cmd)
+            
+            if result['stopped_pumps']:
+                for pump_id in result['stopped_pumps']:
+                    pump_unique_no = self._get_pump_unique_no(pump_id)
+                    stop_cmd = {
+                        "device_type": "pump",
+                        "device_id": pump_id,
+                        "unique_no": pump_unique_no,
+                        "action": "stop",
+                        "params": {},
+                        "priority": 3,
+                        "phase": "running",
+                        "reason": "所有批次完成",
+                        "description": f"停止{pump_id}泵站"
+                    }
+                    self.command_queue.add_command(stop_cmd)
+            
+            # 4. 检查是否完成
+            if result['all_completed']:
+                batch_exec.status = BatchStatus.COMPLETED
+                batch_exec.completed_at = datetime.now()
+                
+                actual_duration = (batch_exec.completed_at - batch_exec.started_at).total_seconds() / 3600
+                logger.info(f"✅ 批次 {batch_exec.batch_index} 完成！")
+                logger.info(f"  预计时间: {batch_exec.original_duration:.2f}h")
+                logger.info(f"  实际时间: {actual_duration:.2f}h")
+                logger.info(f"  完成田块: {len(result['completed_fields'])}")
+                break
+            
+            # 5. 显示进度
+            if self.completion_monitor:
+                stats = self.completion_monitor.get_statistics()
+                progress = (stats['completed_fields'] / stats['total_fields']) * 100 if stats['total_fields'] > 0 else 0
+                logger.info(f"批次 {batch_exec.batch_index} 进度: {progress:.0f}% "
+                           f"({stats['completed_fields']}/{stats['total_fields']} 田块)")
+            
+            # 6. 等待30秒后继续
+            await asyncio.sleep(30)
+        
+        # 超时保护
+        if check_count >= max_checks:
+            logger.warning(f"批次 {batch_exec.batch_index} 超时（已检查{check_count}次），强制完成")
+            batch_exec.status = BatchStatus.COMPLETED
+            batch_exec.completed_at = datetime.now()
+    
+    @staticmethod
+    def _extract_segment_from_gate_id(gate_id: str) -> str:
+        """从闸门ID提取支渠ID，如 S3-G2 → S3"""
+        if '-G' in gate_id:
+            return gate_id.split('-G')[0]
+        return gate_id
+    
+    async def _fetch_current_water_levels(self) -> Dict[str, float]:
+        """
+        获取当前最新水位数据
+        
+        Returns:
+            Dict[str, float]: 田块ID到水位(mm)的映射
+        """
+        try:
+            from src.api.waterlevel_api import fetch_waterlevels
+            
+            # 调用水位API获取最新数据
+            response = fetch_waterlevels(
+                app_id=self.app_id,
+                secret=self.secret,
+                farm_id=self.farm_id
+            )
+            
+            if not response or not response.get('success'):
+                logger.warning("获取水位数据失败")
+                return {}
+            
+            # 解析水位数据
+            water_levels = {}
+            for item in response.get('data', []):
+                field_id = item.get('section_code')
+                wl_mm = item.get('wl_mm')
+                if field_id and wl_mm is not None:
+                    water_levels[field_id] = wl_mm
+            
+            logger.debug(f"获取到 {len(water_levels)} 个田块的水位数据")
+            return water_levels
+            
+        except Exception as e:
+            logger.error(f"获取水位数据异常: {e}")
+            return {}
 
 # 示例设备控制回调函数
 async def example_device_control_callback(batch_exec: BatchExecution, plan: Dict[str, Any]):

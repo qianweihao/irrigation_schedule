@@ -18,6 +18,12 @@
      - [批次间田块调整](#91-批次间田块调整)
      - [批次顺序调整](#92-批次顺序调整)
    - [硬件设备管理](#10-硬件设备管理)
+     - [查询所有田块设备状态](#101-查询所有田块设备状态)
+     - [根据计划获取设备列表](#102-根据计划获取设备列表)
+     - [设备自检完整工作流](#103-设备自检完整工作流)
+     - [获取批次设备指令](#104-获取批次设备指令)
+     - [提交指令反馈](#105-提交指令反馈)
+   - [Rice 智能决策集成](#11-rice-智能决策集成)
 6. [典型业务流程](#典型业务流程)
 7. [错误码说明](#错误码说明)
 8. [常见问题](#常见问题)
@@ -2187,11 +2193,199 @@ if (alertDevices.length > 0) {
 
 ---
 
-### 10.2 设备自检完整工作流
+### 10.2 根据计划获取设备列表
+
+**接口**: `GET /api/hardware/devices-from-plan`
+
+**功能**: 根据灌溉计划ID获取需要自检的设备列表，简化前端处理逻辑
+
+**使用场景**: 
+- 生成灌溉计划后，快速获取需要自检的设备列表
+- 前端无需手动筛选田块和设备，直接获取unique_no列表
+
+**完整流程**:
+1. 读取灌溉计划文件
+2. 提取需要灌溉的田块ID列表
+3. 查询这些田块对应的设备
+4. 返回设备的unique_no列表
+
+**请求参数**
+
+| 参数名 | 类型 | 必填 | 默认值 | 说明 |
+|--------|------|------|--------|------|
+| farm_id | string | ✅ 是 | - | 农场ID（如：13944136728576） |
+| plan_id | string | ❌ 否 | 最新计划 | 灌溉计划ID或文件名（留空使用最新计划） |
+| scenario_name | string | ❌ 否 | 第一个 | 方案名称（如："P2单独使用"） |
+| app_id | string | ❌ 否 | 环境变量 | iLand平台应用ID |
+| secret | string | ❌ 否 | 环境变量 | iLand平台密钥 |
+| timeout | integer | ❌ 否 | 30 | 请求超时时间（秒） |
+
+**响应数据结构**
+
+```json
+{
+  "success": true,
+  "message": "成功获取 36 个田块对应的 58 个设备",
+  "data": {
+    "unique_no_list": [
+      "477379421064159253",
+      "471743004049787907",
+      "471743004051885071",
+      "992503151729510001"
+    ],
+    "field_count": 36,
+    "device_count": 58,
+    "plan_file": "/app/output/irrigation_plan_20250121_123456.json",
+    "scenario_name": "P2单独使用",
+    "field_device_mapping": {
+      "S3-G2-F1": [
+        {
+          "unique_no": "477379421064159253",
+          "device_name": "300*300闸门",
+          "gate_type": "inout-G"
+        }
+      ],
+      "S3-G3-F2": [
+        {
+          "unique_no": "471743004049787907",
+          "device_name": "300*300闸门",
+          "gate_type": "inout-G"
+        }
+      ]
+    }
+  }
+}
+```
+
+**响应字段说明**
+
+| 字段路径 | 类型 | 说明 |
+|---------|------|------|
+| success | boolean | 是否成功 |
+| message | string | 返回消息 |
+| data.unique_no_list | array | **核心字段**：设备唯一标识列表，可直接用于自检接口 |
+| data.field_count | integer | 需要灌溉的田块数量 |
+| data.device_count | integer | 设备总数量 |
+| data.plan_file | string | 使用的计划文件路径 |
+| data.scenario_name | string | 使用的方案名称 |
+| data.field_device_mapping | object | 田块与设备的详细映射关系（可选） |
+
+**典型调用示例**
+
+```javascript
+// 示例1：使用最新计划
+const response = await fetch(
+  'http://120.55.127.125/api/hardware/devices-from-plan?farm_id=13944136728576',
+  {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+);
+const data = await response.json();
+
+if (data.success) {
+  console.log(`✅ 获取到 ${data.data.device_count} 个设备`);
+  console.log('设备列表:', data.data.unique_no_list);
+  
+  // 直接用于自检接口
+  const checkResponse = await fetch('/api/hardware/device-self-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      unique_no_list: data.data.unique_no_list
+    })
+  });
+}
+
+// 示例2：指定计划文件和方案
+const response2 = await fetch(
+  'http://120.55.127.125/api/hardware/devices-from-plan?' +
+  'farm_id=13944136728576&' +
+  'plan_id=irrigation_plan_20250121_123456.json&' +
+  'scenario_name=P2单独使用',
+  {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  }
+);
+
+// 示例3：完整业务流程（简化版）
+async function irrigationWorkflow() {
+  // 1. 生成灌溉计划
+  const plan = await fetch('/api/irrigation/plan-generation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ farm_id: "13944136728576" })
+  }).then(r => r.json());
+  
+  console.log(`✅ 计划生成成功: ${plan.plan_id}`);
+  
+  // 2. 获取设备列表（使用新接口）
+  const devices = await fetch(
+    `/api/hardware/devices-from-plan?farm_id=13944136728576`
+  ).then(r => r.json());
+  
+  console.log(`✅ 获取到 ${devices.data.device_count} 个设备`);
+  
+  // 3. 设备自检
+  const check = await fetch('/api/hardware/device-self-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      unique_no_list: devices.data.unique_no_list
+    })
+  }).then(r => r.json());
+  
+  console.log(`✅ 自检完成: ${check.data.success_count}/${check.data.total_devices} 设备正常`);
+}
+```
+
+**与原有方案的对比**
+
+| 特性 | 原有方案（前端筛选） | 新接口方案 |
+|------|---------------------|-----------|
+| **接口调用次数** | 3次（生成计划 + 查询所有设备 + 自检） | 3次（生成计划 + **获取设备列表** + 自检） |
+| **前端代码复杂度** | 高（需要筛选逻辑） | 低（直接使用返回的列表） |
+| **数据传输量** | 大（返回所有设备） | 小（只返回需要的设备） |
+| **易用性** | 中等 | ⭐⭐⭐⭐⭐ 高 |
+| **维护性** | 前端需维护筛选逻辑 | 后端统一处理 |
+
+**优势说明**
+
+1. ✅ **简化前端逻辑**：前端无需理解田块筛选逻辑
+2. ✅ **减少数据传输**：只返回需要的设备，不是全部设备
+3. ✅ **提高可维护性**：筛选逻辑在后端统一管理
+4. ✅ **更好的封装**：前端只需关心业务流程，不需关心实现细节
+5. ✅ **易于调试**：可以独立测试设备列表获取功能
+
+**注意事项**
+
+1. ⚠️ **plan_id格式**：
+   - 支持完整路径：`/app/output/irrigation_plan_*.json`
+   - 支持文件名：`irrigation_plan_*.json`
+   - 留空使用最新计划
+   
+2. ⚠️ **scenario_name**：
+   - 不同方案的批次数量可能不同
+   - 建议明确指定，避免误用
+   
+3. ✅ **缓存机制**：接口内部会缓存设备查询结果，提高性能
+
+4. 💡 **调试建议**：
+   - 可以查看 `field_device_mapping` 了解详细映射关系
+   - 日志会输出详细的执行步骤
+
+---
+
+### 10.3 设备自检完整工作流
 
 **接口**: `POST /api/hardware/device-self-check`
 
 **功能**: 触发指定设备的自检任务，并轮询查询自检状态直至完成
+
+**注意**: 此接口需要手动传入 `unique_no_list`。如果是基于灌溉计划的自检，建议使用 `10.2 根据计划获取设备列表` 接口先获取设备列表。
 
 **完整流程**:
 1. 接收设备唯一标识列表（unique_no_list）
@@ -2488,6 +2682,513 @@ const fullWorkflow = async (farmId) => {
 
 // 使用示例
 fullWorkflow("13944136728576");
+```
+
+---
+
+### 10.4 获取批次设备指令
+
+**接口**: `GET /api/execution/batch-commands`
+
+**功能**: 获取批次设备控制指令，供硬件团队轮询调用
+
+**使用场景**: 
+- 硬件团队定期轮询获取待执行的设备控制指令
+- 获取批次启动、执行中、停止阶段的所有设备指令
+- 支持按阶段和状态筛选指令
+
+**完整流程**:
+1. 后端在批次执行时自动生成设备控制指令
+2. 硬件团队定期轮询此接口获取 pending 状态的指令
+3. 接口返回指令列表并自动标记为 sent
+4. 硬件团队执行指令后调用反馈接口
+
+**请求参数**
+
+| 参数名 | 类型 | 必填 | 默认值 | 说明 |
+|--------|------|------|--------|------|
+| execution_id | string | ✅ 是 | - | 执行ID（由启动执行接口返回） |
+| batch_index | integer | ❌ 否 | 当前批次 | 批次索引（可选） |
+| phase | string | ❌ 否 | null | 阶段筛选：start/running/stop |
+| status | string | ❌ 否 | pending | 状态筛选：pending/sent/executed/failed |
+
+**阶段说明**
+
+| 阶段值 | 含义 | 包含的指令类型 |
+|--------|------|----------------|
+| `start` | 批次启动阶段 | 泵站启动、节制闸开启、田块进水阀开启 |
+| `running` | 批次执行中 | 水位达标后的设备关闭指令 |
+| `stop` | 批次停止阶段 | 批次结束时的泵站停止指令 |
+
+**状态说明**
+
+| 状态值 | 含义 | 说明 |
+|--------|------|------|
+| `pending` | 待执行 | 新生成的指令，等待硬件团队获取 |
+| `sent` | 已发送 | 指令已被硬件团队获取，正在执行中 |
+| `executed` | 已执行 | 硬件团队反馈执行成功 |
+| `failed` | 执行失败 | 硬件团队反馈执行失败 |
+
+**响应数据结构**
+
+```json
+{
+  "success": true,
+  "execution_id": "exec_20250121_123456",
+  "batch_index": 1,
+  "phase": "start",
+  "timestamp": "2025-01-21T12:34:56.789Z",
+  "commands": [
+    {
+      "command_id": "cmd_0001",
+      "device_type": "pump",
+      "device_id": "P1",
+      "unique_no": null,
+      "action": "start",
+      "params": {},
+      "priority": 1,
+      "phase": "start",
+      "description": "启动P1泵站",
+      "status": "pending",
+      "reason": null,
+      "created_at": "2025-01-21T12:34:56.789Z"
+    },
+    {
+      "command_id": "cmd_0002",
+      "device_type": "regulator",
+      "device_id": "S3-G2",
+      "unique_no": "477379421064159253",
+      "action": "open",
+      "params": {
+        "open_pct": 100,
+        "gate_degree": 100
+      },
+      "priority": 2,
+      "phase": "start",
+      "description": "开启S3-G2节制闸(100%)",
+      "status": "pending",
+      "reason": null,
+      "created_at": "2025-01-21T12:34:56.789Z"
+    },
+    {
+      "command_id": "cmd_0003",
+      "device_type": "field_inlet_gate",
+      "device_id": "S3-G2-F1",
+      "unique_no": "471743004049787907",
+      "action": "open",
+      "params": {
+        "gate_degree": 100
+      },
+      "priority": 3,
+      "phase": "start",
+      "description": "开启S3-G2-F1进水阀",
+      "status": "pending",
+      "reason": null,
+      "created_at": "2025-01-21T12:34:56.789Z"
+    }
+  ],
+  "total_commands": 36,
+  "has_new_commands": true,
+  "statistics": {
+    "total_commands": 36,
+    "pending": 30,
+    "sent": 6,
+    "executed": 0,
+    "failed": 0
+  }
+}
+```
+
+**响应字段说明**
+
+| 字段路径 | 类型 | 说明 |
+|---------|------|------|
+| success | boolean | 是否成功 |
+| execution_id | string | 执行ID |
+| batch_index | integer | 批次索引 |
+| phase | string | 阶段 |
+| timestamp | string | 查询时间戳 |
+| commands | array | 指令列表 |
+| commands[].command_id | string | 指令唯一ID |
+| commands[].device_type | string | 设备类型：pump/regulator/field_inlet_gate/field_outlet_gate |
+| commands[].device_id | string | 设备ID |
+| commands[].unique_no | string/null | 设备唯一编号（用于实际控制） |
+| commands[].action | string | 动作：start/stop/open/close/set |
+| commands[].params | object | 动作参数 |
+| commands[].priority | integer | 优先级（数字越小优先级越高） |
+| commands[].description | string | 指令描述 |
+| commands[].reason | string/null | 生成原因（如"水位达标"） |
+| total_commands | integer | 指令总数 |
+| has_new_commands | boolean | 是否有新指令 |
+| statistics | object | 统计信息 |
+
+**设备类型说明**
+
+| device_type | 说明 | action 可选值 | 控制方式 |
+|-------------|------|----------------|----------|
+| `pump` | 泵站 | start, stop | 启动/停止 |
+| `regulator` | 节制闸 | open, close | 开启(100%)/关闭(0%) |
+| `field_inlet_gate` | 田块进水阀 | open, close | 开启(100%)/关闭(0%) |
+| `field_outlet_gate` | 田块出水阀 | open, close, set | 开启/关闭/设置开度 |
+
+**典型调用示例**
+
+```javascript
+// 示例1：获取待执行的启动指令（硬件团队首次调用）
+const response = await fetch(
+  'http://120.55.127.125/api/execution/batch-commands?' +
+  'execution_id=exec_20250121_123456&' +
+  'phase=start&' +
+  'status=pending',
+  {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+);
+const data = await response.json();
+
+if (data.success && data.has_new_commands) {
+  console.log(`✅ 获取到 ${data.total_commands} 条待执行指令`);
+  
+  // 按优先级执行指令
+  data.commands.forEach(cmd => {
+    console.log(`[${cmd.priority}] ${cmd.description}`);
+    console.log(`  设备: ${cmd.device_id}, unique_no: ${cmd.unique_no}`);
+    console.log(`  动作: ${cmd.action}, 参数:`, cmd.params);
+    
+    // 执行硬件控制
+    executeHardwareCommand(cmd);
+  });
+}
+
+// 示例2：轮询获取执行中的关闭指令
+const pollCommands = async (executionId) => {
+  const response = await fetch(
+    `http://120.55.127.125/api/execution/batch-commands?` +
+    `execution_id=${executionId}&` +
+    `phase=running&` +
+    `status=pending`,
+    { method: 'GET' }
+  );
+  const data = await response.json();
+  
+  if (data.has_new_commands) {
+    console.log(`🔄 检测到 ${data.total_commands} 条新指令`);
+    data.commands.forEach(cmd => {
+      if (cmd.reason) {
+        console.log(`  原因: ${cmd.reason}`);
+      }
+      executeHardwareCommand(cmd);
+    });
+  }
+};
+
+// 每30秒轮询一次
+setInterval(() => pollCommands('exec_20250121_123456'), 30000);
+
+// 示例3：查看所有指令统计
+const response3 = await fetch(
+  'http://120.55.127.125/api/execution/batch-commands?' +
+  'execution_id=exec_20250121_123456',
+  { method: 'GET' }
+);
+const data3 = await response3.json();
+
+console.log('📊 指令统计:');
+console.log(`  总计: ${data3.statistics.total_commands}`);
+console.log(`  待执行: ${data3.statistics.pending}`);
+console.log(`  已发送: ${data3.statistics.sent}`);
+console.log(`  已执行: ${data3.statistics.executed}`);
+console.log(`  失败: ${data3.statistics.failed}`);
+```
+
+**注意事项**
+
+1. ⚠️ **自动状态转换**: 调用此接口获取 `pending` 状态的指令后，这些指令会自动标记为 `sent`
+2. ⚠️ **轮询频率**: 建议每30秒轮询一次，不要设置过小（< 10秒）
+3. ⚠️ **优先级执行**: 指令按 `priority` 字段排序，数字越小优先级越高，建议按顺序执行
+4. ⚠️ **unique_no 字段**: 
+   - 泵站指令的 `unique_no` 可能为 `null`（需要硬件团队根据 `device_id` 映射）
+   - 节制闸和田块闸门的 `unique_no` 通常都有值
+5. ✅ **幂等性**: 同一个 `command_id` 多次获取不会重复执行
+6. ✅ **完整性**: 包含批次启动、执行中、停止的所有设备控制指令
+7. 💡 **阶段筛选**: 
+   - `start`: 批次开始时获取，执行泵站启动、闸门开启
+   - `running`: 持续轮询，获取水位达标后的关闭指令
+   - `stop`: 批次结束时获取，执行泵站停止
+
+**工作流程图**
+
+```
+批次启动
+  ↓
+后端生成启动指令 (phase: start)
+  ↓
+硬件团队获取指令 (GET /batch-commands?phase=start&status=pending)
+  ↓
+指令自动标记为 sent
+  ↓
+硬件团队执行指令（启动泵站、开启闸门）
+  ↓
+硬件团队提交反馈 (POST /command-feedback)
+  ↓
+批次执行中
+  ↓
+后端监控水位，生成关闭指令 (phase: running)
+  ↓
+硬件团队轮询获取 (每30秒)
+  ↓
+检测到新指令 → 执行 → 反馈
+  ↓
+所有田块完成
+  ↓
+后端生成停泵指令 (phase: stop)
+  ↓
+硬件团队获取并执行
+  ↓
+批次完成
+```
+
+---
+
+### 10.5 提交指令反馈
+
+**接口**: `POST /api/execution/command-feedback`
+
+**功能**: 硬件团队反馈指令执行结果
+
+**使用场景**: 
+- 硬件团队执行完设备控制指令后，反馈执行状态
+- 记录指令执行结果，用于系统监控和问题追踪
+- 更新指令状态，便于后续统计和分析
+
+**请求参数**
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| command_id | string | ✅ 是 | 指令ID（从获取指令接口获得） |
+| status | string | ✅ 是 | 执行状态：executed（成功）/ failed（失败） |
+| message | string | ❌ 否 | 反馈消息（建议提供详细信息） |
+| execution_time | float | ❌ 否 | 执行耗时（秒） |
+
+**请求示例**
+
+```bash
+# 方式1: FormData（推荐）
+curl -X POST "http://120.55.127.125/api/execution/command-feedback" \
+  -F "command_id=cmd_0001" \
+  -F "status=executed" \
+  -F "message=P1泵站已成功启动，当前转速2800rpm" \
+  -F "execution_time=2.5"
+
+# 方式2: JSON（也支持）
+curl -X POST "http://120.55.127.125/api/execution/command-feedback" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "command_id": "cmd_0001",
+    "status": "executed",
+    "message": "P1泵站已成功启动",
+    "execution_time": 2.5
+  }'
+```
+
+**响应示例**
+
+**成功响应**:
+```json
+{
+  "success": true,
+  "message": "反馈已记录",
+  "command_id": "cmd_0001"
+}
+```
+
+**失败响应**:
+```json
+{
+  "success": false,
+  "error": "指令不存在",
+  "command_id": "cmd_9999"
+}
+```
+
+**典型调用示例**
+
+```javascript
+// 示例1：执行成功的反馈
+const submitSuccess = async (commandId) => {
+  const formData = new FormData();
+  formData.append('command_id', commandId);
+  formData.append('status', 'executed');
+  formData.append('message', 'P1泵站已成功启动，当前转速2800rpm');
+  formData.append('execution_time', '2.5');
+  
+  const response = await fetch(
+    'http://120.55.127.125/api/execution/command-feedback',
+    {
+      method: 'POST',
+      body: formData
+    }
+  );
+  
+  const data = await response.json();
+  if (data.success) {
+    console.log(`✅ 指令 ${commandId} 反馈成功`);
+  }
+};
+
+// 示例2：执行失败的反馈
+const submitFailure = async (commandId, errorMsg) => {
+  const formData = new FormData();
+  formData.append('command_id', commandId);
+  formData.append('status', 'failed');
+  formData.append('message', errorMsg);
+  
+  const response = await fetch(
+    'http://120.55.127.125/api/execution/command-feedback',
+    {
+      method: 'POST',
+      body: formData
+    }
+  );
+  
+  const data = await response.json();
+  if (data.success) {
+    console.log(`⚠️ 指令 ${commandId} 执行失败: ${errorMsg}`);
+  }
+};
+
+// 示例3：批量反馈
+const batchFeedback = async (commands) => {
+  const results = await Promise.all(
+    commands.map(cmd => 
+      fetch('http://120.55.127.125/api/execution/command-feedback', {
+        method: 'POST',
+        body: new URLSearchParams({
+          command_id: cmd.command_id,
+          status: cmd.success ? 'executed' : 'failed',
+          message: cmd.message,
+          execution_time: cmd.executionTime
+        })
+      }).then(r => r.json())
+    )
+  );
+  
+  const successCount = results.filter(r => r.success).length;
+  console.log(`📊 批量反馈完成: ${successCount}/${results.length}`);
+};
+
+// 示例4：完整的指令执行流程
+const executeCommand = async (command) => {
+  console.log(`🔧 执行指令: ${command.description}`);
+  
+  try {
+    // 1. 执行硬件控制
+    const startTime = Date.now();
+    
+    if (command.device_type === 'pump') {
+      await controlPump(command.device_id, command.action);
+    } else if (command.device_type === 'regulator') {
+      await controlRegulator(command.unique_no, command.params.gate_degree);
+    } else if (command.device_type === 'field_inlet_gate') {
+      await controlGate(command.unique_no, command.params.gate_degree);
+    }
+    
+    const executionTime = (Date.now() - startTime) / 1000;
+    
+    // 2. 反馈执行成功
+    const formData = new FormData();
+    formData.append('command_id', command.command_id);
+    formData.append('status', 'executed');
+    formData.append('message', `${command.description} 执行成功`);
+    formData.append('execution_time', executionTime.toString());
+    
+    await fetch('http://120.55.127.125/api/execution/command-feedback', {
+      method: 'POST',
+      body: formData
+    });
+    
+    console.log(`✅ ${command.description} 完成 (${executionTime}s)`);
+    
+  } catch (error) {
+    // 3. 反馈执行失败
+    const formData = new FormData();
+    formData.append('command_id', command.command_id);
+    formData.append('status', 'failed');
+    formData.append('message', `执行失败: ${error.message}`);
+    
+    await fetch('http://120.55.127.125/api/execution/command-feedback', {
+      method: 'POST',
+      body: formData
+    });
+    
+    console.error(`❌ ${command.description} 失败: ${error.message}`);
+  }
+};
+```
+
+**反馈消息建议**
+
+**成功示例**:
+```
+- "P1泵站已成功启动，当前转速2800rpm"
+- "S3-G2节制闸已开启至100%，当前开度100%"
+- "S3-G2-F1进水阀已开启，流量正常"
+- "P1泵站已停止，运行时长2.5小时"
+```
+
+**失败示例**:
+```
+- "P1泵站启动失败：电机过热保护"
+- "S3-G2节制闸无响应，请检查设备连接"
+- "S3-G2-F1进水阀开启失败：阀门卡死"
+- "设备离线，无法控制"
+```
+
+**注意事项**
+
+1. ⚠️ **及时反馈**: 执行完指令后应立即提交反馈，不要延迟
+2. ⚠️ **详细消息**: 建议提供详细的反馈消息，便于问题排查
+3. ⚠️ **失败原因**: 执行失败时必须提供具体的失败原因
+4. ⚠️ **执行时间**: 建议记录执行耗时，用于性能分析
+5. ✅ **幂等性**: 同一个 command_id 可以多次提交反馈（会更新最后一次）
+6. ✅ **异步处理**: 反馈接口是异步的，不会阻塞硬件团队的其他操作
+7. 💡 **日志记录**: 所有反馈都会记录到系统日志中
+8. 💡 **统计分析**: 可以通过获取指令接口的 statistics 字段查看执行统计
+
+**完整工作流程**
+
+```javascript
+// 硬件团队的完整工作流
+const hardwareWorker = async (executionId) => {
+  while (true) {
+    // 1. 获取待执行指令
+    const response = await fetch(
+      `http://120.55.127.125/api/execution/batch-commands?` +
+      `execution_id=${executionId}&status=pending`
+    );
+    const data = await response.json();
+    
+    if (data.has_new_commands) {
+      console.log(`📥 获取到 ${data.total_commands} 条新指令`);
+      
+      // 2. 按优先级执行指令
+      for (const command of data.commands) {
+        await executeCommand(command);
+      }
+    } else {
+      console.log('⏸️  暂无新指令');
+    }
+    
+    // 3. 等待30秒后继续轮询
+    await new Promise(resolve => setTimeout(resolve, 30000));
+  }
+};
+
+// 启动硬件工作线程
+hardwareWorker('exec_20250121_123456');
 ```
 
 ---
@@ -3062,6 +3763,260 @@ if (adjustData.validation.is_valid) {
 ```
 生成计划 → 分析批次 → 识别优化点 → 调整田块分配 → 验证计划 → 执行
 ```
+
+---
+
+### 流程7：设备指令管理与硬件对接
+
+**适用场景**: 后端生成设备控制指令，硬件团队执行并反馈
+
+**架构说明**:
+- **后端职责**: 生成设备控制指令（包含 unique_no），提供查询接口
+- **硬件团队职责**: 轮询获取指令，执行硬件控制，提交执行反馈
+
+**完整流程**:
+
+```javascript
+// ========== 后端侧（自动执行） ==========
+
+// 步骤1: 启动灌溉执行（集成设备指令生成）
+const execResponse = await fetch(`${BASE_URL}/api/execution/start`, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify({
+    plan_file_path: planId,
+    farm_id: "13944136728576",
+    auto_start: true,
+    enable_plan_regeneration: true
+  })
+});
+const execData = await execResponse.json();
+const executionId = execData.data.execution_id;
+
+console.log('✅ 执行已启动，后端开始生成设备控制指令');
+
+// 后端会自动执行以下操作：
+// - 批次启动时：生成泵站启动、节制闸开启、田块进水阀开启指令
+// - 批次执行中：监控水位，生成田块、节制闸、泵站关闭指令
+// - 批次结束时：生成泵站停止指令
+
+// ========== 硬件团队侧（轮询执行） ==========
+
+// 步骤2: 硬件团队获取批次启动指令
+const getStartCommands = async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/execution/batch-commands?` +
+    `execution_id=${executionId}&` +
+    `phase=start&` +
+    `status=pending`,
+    { method: 'GET' }
+  );
+  const data = await response.json();
+  
+  if (data.has_new_commands) {
+    console.log(`📥 获取到 ${data.total_commands} 条启动指令`);
+    
+    // 按优先级执行
+    for (const cmd of data.commands) {
+      console.log(`[优先级${cmd.priority}] ${cmd.description}`);
+      console.log(`  设备类型: ${cmd.device_type}`);
+      console.log(`  设备ID: ${cmd.device_id}`);
+      console.log(`  unique_no: ${cmd.unique_no}`);
+      console.log(`  动作: ${cmd.action}, 参数:`, cmd.params);
+      
+      // 执行硬件控制
+      await executeHardwareCommand(cmd);
+    }
+  }
+};
+
+// 步骤3: 执行硬件控制并反馈
+const executeHardwareCommand = async (command) => {
+  const startTime = Date.now();
+  
+  try {
+    // 根据设备类型执行控制
+    if (command.device_type === 'pump') {
+      // 泵站控制
+      await controlPump(command.device_id, command.action);
+    } else if (command.device_type === 'regulator') {
+      // 节制闸控制（0% 或 100%）
+      await controlGate(command.unique_no, command.params.gate_degree);
+    } else if (command.device_type === 'field_inlet_gate') {
+      // 田块进水阀控制
+      await controlGate(command.unique_no, command.params.gate_degree);
+    } else if (command.device_type === 'field_outlet_gate') {
+      // 田块出水阀控制
+      await controlGate(command.unique_no, command.params.gate_degree);
+    }
+    
+    const executionTime = (Date.now() - startTime) / 1000;
+    
+    // 反馈成功
+    const formData = new FormData();
+    formData.append('command_id', command.command_id);
+    formData.append('status', 'executed');
+    formData.append('message', `${command.description} 执行成功`);
+    formData.append('execution_time', executionTime.toString());
+    
+    await fetch(`${BASE_URL}/api/execution/command-feedback`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    console.log(`✅ ${command.description} 完成 (${executionTime}s)`);
+    
+  } catch (error) {
+    // 反馈失败
+    const formData = new FormData();
+    formData.append('command_id', command.command_id);
+    formData.append('status', 'failed');
+    formData.append('message', `执行失败: ${error.message}`);
+    
+    await fetch(`${BASE_URL}/api/execution/command-feedback`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    console.error(`❌ ${command.description} 失败: ${error.message}`);
+  }
+};
+
+// 步骤4: 持续轮询获取执行中的指令
+const pollRunningCommands = async () => {
+  while (true) {
+    const response = await fetch(
+      `${BASE_URL}/api/execution/batch-commands?` +
+      `execution_id=${executionId}&` +
+      `phase=running&` +
+      `status=pending`,
+      { method: 'GET' }
+    );
+    const data = await response.json();
+    
+    if (data.has_new_commands) {
+      console.log(`🔄 检测到 ${data.total_commands} 条新指令`);
+      
+      for (const cmd of data.commands) {
+        if (cmd.reason) {
+          console.log(`  原因: ${cmd.reason}`);
+        }
+        await executeHardwareCommand(cmd);
+      }
+    } else {
+      console.log('⏸️  暂无新指令');
+    }
+    
+    // 查看统计
+    console.log('📊 指令统计:');
+    console.log(`  待执行: ${data.statistics.pending}`);
+    console.log(`  已发送: ${data.statistics.sent}`);
+    console.log(`  已执行: ${data.statistics.executed}`);
+    console.log(`  失败: ${data.statistics.failed}`);
+    
+    // 等待30秒
+    await new Promise(resolve => setTimeout(resolve, 30000));
+  }
+};
+
+// 步骤5: 启动硬件工作线程
+getStartCommands();  // 立即获取启动指令
+pollRunningCommands();  // 持续轮询执行中的指令
+
+// ========== 人工调整水位触发设备关闭 ==========
+
+// 步骤6: 人工调整水位后自动触发设备检查
+const manualAdjustWaterLevel = async () => {
+  const response = await fetch(`${BASE_URL}/api/regeneration/manual`, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      batch_index: 1,
+      custom_water_levels: {
+        "S3-G2-F1": 95.0,  // 人工调整为95mm（达标）
+        "S3-G3-F2": 92.0   // 人工调整为92mm（达标）
+      }
+    })
+  });
+  const data = await response.json();
+  
+  console.log('✅ 水位已调整，后端自动触发设备检查');
+  
+  // 后端会自动：
+  // 1. 更新监控器中的水位
+  // 2. 检查是否达标
+  // 3. 生成关闭指令（如果达标）
+  
+  // 硬件团队：
+  // 轮询时会自动获取到新生成的关闭指令
+};
+```
+
+**流程图**:
+```
+启动执行
+  ↓
+后端生成启动指令 (泵站、节制闸、进水阀)
+  ↓
+硬件团队获取指令 (GET /batch-commands?phase=start)
+  ↓
+执行硬件控制
+  ↓
+反馈执行结果 (POST /command-feedback)
+  ↓
+批次执行中 (每30秒轮询)
+  ↓
+后端监控水位 → 达标 → 生成关闭指令
+  ↓
+硬件团队获取指令 (GET /batch-commands?phase=running)
+  ↓
+执行关闭操作 → 反馈
+  ↓
+人工调整水位（可选）
+  ↓
+后端立即触发检查 → 生成指令
+  ↓
+硬件团队轮询获取 → 执行 → 反馈
+  ↓
+所有田块完成
+  ↓
+后端生成停泵指令 (phase=stop)
+  ↓
+硬件团队获取并执行
+  ↓
+批次完成
+```
+
+**关键点说明**:
+
+1. **后端职责**:
+   - ✅ 生成所有设备控制指令（包含 unique_no）
+   - ✅ 提供指令查询接口
+   - ✅ 实时监控水位，动态生成关闭指令
+   - ✅ 人工调整水位后自动触发设备检查
+   - ❌ 不直接执行硬件控制
+
+2. **硬件团队职责**:
+   - ✅ 定期轮询获取待执行指令（建议30秒）
+   - ✅ 根据 device_type 和 unique_no 执行硬件控制
+   - ✅ 及时反馈执行结果（成功/失败）
+   - ❌ 不需要理解灌溉逻辑
+
+3. **指令优先级**:
+   - 优先级1: 泵站控制（最高）
+   - 优先级2: 节制闸控制
+   - 优先级3: 田块闸门控制
+
+4. **设备类型对应**:
+   - `pump`: 泵站 → 根据 device_id 映射（如 P1, P2）
+   - `regulator`: 节制闸 → 使用 unique_no 控制（只有0%或100%）
+   - `field_inlet_gate`: 田块进水阀 → 使用 unique_no 控制
+   - `field_outlet_gate`: 田块出水阀 → 使用 unique_no 控制
+
+5. **错误处理**:
+   - 执行失败时，必须反馈详细错误信息
+   - 后端会记录所有反馈到日志
+   - 可通过 statistics 字段查看执行统计
 
 ---
 

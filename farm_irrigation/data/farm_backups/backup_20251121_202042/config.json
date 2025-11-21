@@ -1,0 +1,794 @@
+{
+  "farm_id": "84911829811210",
+  "t_win_h": 20.0,
+  "d_target_mm": 90.0,
+  "pump": {
+    "name": "AUTO",
+    "q_rated_m3ph": 300.0,
+    "efficiency": 0.8,
+    "power_kw": 60.0,
+    "electricity_price": 0.6
+  },
+  "pumps": [
+    {
+      "name": "P1",
+      "q_rated_m3ph": 300.0,
+      "efficiency": 0.8,
+      "power_kw": 60.0,
+      "electricity_price": 0.6
+    }
+  ],
+  "pump_time_constraints": [
+    {
+      "pump_name": "P1",
+      "start_hour": 0,
+      "end_hour": 8
+    },
+    {
+      "pump_name": "P2",
+      "start_hour": 8,
+      "end_hour": 16
+    }
+  ],
+  "segments": [
+    {
+      "id": "S1",
+      "canal_id": "C_A",
+      "distance_rank": 1,
+      "regulator_gate_ids": [
+        "S1-G1",
+        "S1-G6",
+        "S1-G7",
+        "S1-G27"
+      ],
+      "regulator_gate_id": "S1-G1",
+      "feed_by": [
+        "P1"
+      ]
+    },
+    {
+      "id": "S2",
+      "canal_id": "C_A",
+      "distance_rank": 2,
+      "regulator_gate_ids": [],
+      "regulator_gate_id": null,
+      "feed_by": [
+        "P1"
+      ]
+    },
+    {
+      "id": "S4",
+      "canal_id": "C_A",
+      "distance_rank": 4,
+      "regulator_gate_ids": [],
+      "regulator_gate_id": null,
+      "feed_by": [
+        "P1"
+      ]
+    },
+    {
+      "id": "S5",
+      "canal_id": "C_A",
+      "distance_rank": 5,
+      "regulator_gate_ids": [],
+      "regulator_gate_id": null,
+      "feed_by": [
+        "P1"
+      ]
+    },
+    {
+      "id": "S3",
+      "canal_id": "C_A",
+      "distance_rank": 3,
+      "regulator_gate_ids": [],
+      "regulator_gate_id": null,
+      "feed_by": [
+        "P1"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "S1-G1",
+      "type": "main-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G2",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G3",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G4",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G5",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G6",
+      "type": "main-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G7",
+      "type": "main-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G27",
+      "type": "main-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "P1",
+      "type": "pump",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G29",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G2",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G3",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G15",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G4",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G5",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G8",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G9",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G10",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G11",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G12",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G13",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G14",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S2-G15",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G8",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G9",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G10",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G11",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G12",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G13",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G14",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G22",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G23",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G16",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G17",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G18",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G19",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G20",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G21",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G22",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G23",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G24",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G25",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G26",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G28",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G16",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G17",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G18",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G19",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G20",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G21",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G24",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G23",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "G26",
+      "type": "drain-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G28",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G29",
+      "type": "inlet-G",
+      "q_max_m3ph": 9999.0
+    }
+  ],
+  "fields": [
+    {
+      "id": "S1-G2-F1",
+      "sectionID": "10256831545345",
+      "sectionCode": "S1-G2-F1",
+      "name": "YG34",
+      "area_mu": 2.431,
+      "canal_id": "C_A",
+      "segment_id": "S1",
+      "distance_rank": 1,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S1-G2"
+    },
+    {
+      "id": "S1-G3-F2",
+      "sectionID": "10256838164481",
+      "sectionCode": "S1-G3-F2",
+      "name": "YG37",
+      "area_mu": 16.356,
+      "canal_id": "C_A",
+      "segment_id": "S1",
+      "distance_rank": 2,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S1-G3"
+    },
+    {
+      "id": "S1-G5-F4",
+      "sectionID": "1541323906013712384",
+      "sectionCode": "S1-G5-F4",
+      "name": "YG40",
+      "area_mu": 2.566,
+      "canal_id": "C_A",
+      "segment_id": "S1",
+      "distance_rank": 4,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S1-G5"
+    },
+    {
+      "id": "S4-G28-F24",
+      "sectionID": "84914581667960",
+      "sectionCode": "S4-G28-F24",
+      "name": "YG07",
+      "area_mu": 58.939,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 24,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G28"
+    },
+    {
+      "id": "S5-G29-F25",
+      "sectionID": "84914581667910",
+      "sectionCode": "S5-G29-F25",
+      "name": "YG12",
+      "area_mu": 19.985,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 25,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G29"
+    },
+    {
+      "id": "S2-G8-F5",
+      "sectionID": "84914581667950",
+      "sectionCode": "S2-G8-F5",
+      "name": "YG14",
+      "area_mu": 8.334,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 5,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G8"
+    },
+    {
+      "id": "S2-G9-F6",
+      "sectionID": "84914581667970",
+      "sectionCode": "S2-G9-F6",
+      "name": "YG16",
+      "area_mu": 7.958,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 6,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G9"
+    },
+    {
+      "id": "S2-G10-F7",
+      "sectionID": "84914581667980",
+      "sectionCode": "S2-G10-F7",
+      "name": "YG18",
+      "area_mu": 8.448,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 7,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G10"
+    },
+    {
+      "id": "S2-G11-F8",
+      "sectionID": "84914581667990",
+      "sectionCode": "S2-G11-F8",
+      "name": "YG20",
+      "area_mu": 13.368,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 8,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G11"
+    },
+    {
+      "id": "S3-G18-F15",
+      "sectionID": "84914581668000",
+      "sectionCode": "S3-G18-F15",
+      "name": "YG17",
+      "area_mu": 7.892,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 15,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G18"
+    },
+    {
+      "id": "S2-G12-F9",
+      "sectionID": "84914581668010",
+      "sectionCode": "S2-G12-F9",
+      "name": "YG22",
+      "area_mu": 12.878,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 9,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G12"
+    },
+    {
+      "id": "S2-G13-F10",
+      "sectionID": "84914581668040",
+      "sectionCode": "S2-G13-F10",
+      "name": "YG26",
+      "area_mu": 14.989,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 10,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G13"
+    },
+    {
+      "id": "S3-G19-F16",
+      "sectionID": "84914581668050",
+      "sectionCode": "S3-G19-F16",
+      "name": "YG19",
+      "area_mu": 12.192,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 16,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G19"
+    },
+    {
+      "id": "S2-G14-F11",
+      "sectionID": "84914581668070",
+      "sectionCode": "S2-G14-F11",
+      "name": "YG30",
+      "area_mu": 11.875,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 11,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G14"
+    },
+    {
+      "id": "S3-G20-F17",
+      "sectionID": "84914581668080",
+      "sectionCode": "S3-G20-F17",
+      "name": "YG21",
+      "area_mu": 14.727,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 17,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G20"
+    },
+    {
+      "id": "S1-G4-F3",
+      "sectionID": "84914581668090",
+      "sectionCode": "S1-G4-F3",
+      "name": "YG39",
+      "area_mu": 8.189,
+      "canal_id": "C_A",
+      "segment_id": "S1",
+      "distance_rank": 3,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S1-G4"
+    },
+    {
+      "id": "S3-G21-F18",
+      "sectionID": "84914581668110",
+      "sectionCode": "S3-G21-F18",
+      "name": "YG25",
+      "area_mu": 16.739,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 18,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G21"
+    },
+    {
+      "id": "S2-G15-F12",
+      "sectionID": "84914581668140",
+      "sectionCode": "S2-G15-F12",
+      "name": "YG38",
+      "area_mu": 36.392,
+      "canal_id": "C_A",
+      "segment_id": "S2",
+      "distance_rank": 12,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S2-G15"
+    },
+    {
+      "id": "S3-G22-F19",
+      "sectionID": "84914581668150",
+      "sectionCode": "S3-G22-F19",
+      "name": "YG32",
+      "area_mu": 22.117,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 19,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G22"
+    },
+    {
+      "id": "S3-G24-F21",
+      "sectionID": "84914581668160",
+      "sectionCode": "S3-G24-F21",
+      "name": "YG24",
+      "area_mu": 9.01,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 21,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G24"
+    },
+    {
+      "id": "S3-G23-F20",
+      "sectionID": "84914581668190",
+      "sectionCode": "S3-G23-F20",
+      "name": "YG31",
+      "area_mu": 28.073,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 20,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G23"
+    },
+    {
+      "id": "S3-G25-F22",
+      "sectionID": "84914581668220",
+      "sectionCode": "S3-G25-F22",
+      "name": "YG35",
+      "area_mu": 15.978,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 22,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G25"
+    },
+    {
+      "id": "S3-G17-F14",
+      "sectionID": "84914581668230",
+      "sectionCode": "S3-G17-F14",
+      "name": "YG15",
+      "area_mu": 7.443,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 14,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G17"
+    },
+    {
+      "id": "S3-G16-F13",
+      "sectionID": "84914581668240",
+      "sectionCode": "S3-G16-F13",
+      "name": "YG13",
+      "area_mu": 8.281,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 13,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G16"
+    },
+    {
+      "id": "S3-G26-F23",
+      "sectionID": "84914581668180",
+      "sectionCode": "S3-G26-F23",
+      "name": "YG23",
+      "area_mu": 3.472,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 23,
+      "wl_mm": null,
+      "wl_low": 30.0,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G26"
+    }
+  ]
+}
