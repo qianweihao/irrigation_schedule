@@ -344,6 +344,18 @@ class BatchReorderResponse(BaseModel):
     validation: Dict[str, Any] = {}
     output_file: Optional[str] = None
 
+class FarmSwitchResponse(BaseModel):
+    """农场切换响应模型"""
+    success: bool
+    message: str
+    farm_id: str
+    farm_name: str
+    backup_path: Optional[str] = None
+    files_processed: Dict[str, str] = {}
+    config_path: Optional[str] = None
+    validation: Dict[str, Any] = {}
+    timestamp: str
+
 # 系统启动时间
 _system_start_time = datetime.now()
 
@@ -562,6 +574,136 @@ def save_uploaded_files(files: List[UploadFile]) -> bool:
     except Exception as e:
         logger.error(f"保存文件失败: {e}")
         return False
+
+# 农场切换辅助函数
+def detect_shp_file_type(filename: str) -> Optional[str]:
+    """根据文件名自动检测SHP文件类型"""
+    name_lower = filename.lower()
+    
+    # 关键词匹配
+    keywords = {
+        'fields': ['田块', '地块', 'field', 'plot', '田', 'tian'],
+        'segments': ['水路', '渠道', 'canal', 'segment', '水', 'shui', 'line'],
+        'gates': ['阀门', '闸门', 'gate', 'valve', '闸', 'zha', '阀', 'fa']
+    }
+    
+    for file_type, kw_list in keywords.items():
+        if any(kw in name_lower for kw in kw_list):
+            return file_type
+    
+    return None
+
+def convert_shp_to_geojson(shp_path: str, output_path: str) -> bool:
+    """转换单个SHP文件为GeoJSON"""
+    try:
+        gdf = gpd.read_file(shp_path)
+        gdf.to_file(output_path, driver='GeoJSON')
+        return True
+    except Exception as e:
+        logger.error(f"转换失败 {shp_path}: {e}")
+        return False
+
+def update_yaml_config(farm_id: str, farm_name: str, geojson_files: Dict[str, str]) -> bool:
+    """更新auto_config_params.yaml配置"""
+    try:
+        import yaml
+        yaml_path = os.path.join(os.path.dirname(__file__), "auto_config_params.yaml")
+        
+        with open(yaml_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        
+        # 更新配置
+        config['default_farm_id'] = farm_id
+        config['default_filenames'] = {
+            'segments': geojson_files['segments'],
+            'gates': geojson_files['gates'],
+            'fields': geojson_files['fields']
+        }
+        
+        with open(yaml_path, 'w', encoding='utf-8') as f:
+            yaml.dump(config, f, allow_unicode=True, sort_keys=False)
+        
+        return True
+    except Exception as e:
+        logger.error(f"更新YAML配置失败: {e}")
+        return False
+
+def update_farm_id_mapping(farm_id: str, farm_name: str) -> bool:
+    """更新farm_id_mapping.json"""
+    try:
+        mapping_file = os.path.join(GZP_FARM_DIR, "farm_id_mapping.json")
+        
+        # 读取现有映射
+        if os.path.exists(mapping_file):
+            with open(mapping_file, 'r', encoding='utf-8') as f:
+                mapping = json.load(f)
+        else:
+            mapping = {}
+        
+        # 添加新农场
+        mapping[farm_id] = farm_name
+        
+        # 保存
+        with open(mapping_file, 'w', encoding='utf-8') as f:
+            json.dump(mapping, f, ensure_ascii=False, indent=2)
+        
+        return True
+    except Exception as e:
+        logger.error(f"更新农场映射失败: {e}")
+        return False
+
+def generate_config_from_geojson() -> bool:
+    """调用auto_to_config.py生成config.json"""
+    try:
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, "src/converter/auto_to_config.py"],
+            cwd=os.path.dirname(__file__),
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            timeout=60
+        )
+        
+        if result.returncode == 0:
+            logger.info("config.json 生成成功")
+            return True
+        else:
+            logger.error(f"config.json 生成失败: {result.stderr}")
+            return False
+    except Exception as e:
+        logger.error(f"生成config.json出错: {e}")
+        return False
+
+def validate_generated_config(farm_id: str) -> Dict[str, Any]:
+    """验证生成的config.json"""
+    try:
+        config_file = os.path.join(os.path.dirname(__file__), "config.json")
+        
+        if not os.path.exists(config_file):
+            return {"valid": False, "error": "config.json不存在"}
+        
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # 验证农场ID
+        if config.get('farm_id') != farm_id:
+            return {
+                "valid": False, 
+                "error": f"农场ID不匹配: 期望 {farm_id}, 实际 {config.get('farm_id')}"
+            }
+        
+        # 统计信息
+        return {
+            "valid": True,
+            "farm_id": config['farm_id'],
+            "fields_count": len(config.get('fields', [])),
+            "segments_count": len(config.get('segments', [])),
+            "gates_count": len(config.get('gates', [])),
+            "pumps_count": len(config.get('pumps', [])),
+        }
+    except Exception as e:
+        return {"valid": False, "error": str(e)}
 
 @app.on_event("startup")
 async def startup_event():
@@ -3325,6 +3467,235 @@ async def list_config_backups():
             status_code=500,
             detail=f"列出备份文件失败: {str(e)}"
         )
+
+@app.post("/api/farm/switch", response_model=FarmSwitchResponse)
+async def switch_farm_with_upload(
+    farm_id: str = Form(..., description="农场ID"),
+    farm_name: str = Form(..., description="农场名称"),
+    auto_generate_plan: bool = Form(False, description="是否自动生成灌溉计划"),
+    skip_backup: bool = Form(False, description="是否跳过备份（谨慎使用）"),
+    files: List[UploadFile] = File(..., description="SHP文件及配套文件（.shp, .dbf, .shx等）")
+):
+    """
+    农场一键切换API - 上传SHP文件自动完成所有配置
+    
+    功能：
+    1. 自动检测文件类型（田块、水路、闸门）
+    2. 备份当前配置
+    3. 转换SHP为GeoJSON
+    4. 更新所有配置文件
+    5. 生成config.json
+    6. 验证配置完整性
+    7. 可选：自动生成灌溉计划
+    
+    使用示例（Postman）：
+    - Method: POST
+    - URL: http://localhost:8000/api/farm/switch
+    - Body: form-data
+        - farm_id: "新农场ID"
+        - farm_name: "新农场名称"
+        - auto_generate_plan: false
+        - files: [选择所有SHP相关文件]
+    """
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_path = None
+    
+    try:
+        logger.info(f"========== 开始农场切换流程 ==========")
+        logger.info(f"农场ID: {farm_id}, 农场名称: {farm_name}")
+        logger.info(f"上传文件数量: {len(files)}")
+        
+        # ========== 步骤1: 验证文件 ==========
+        if not files or len(files) == 0:
+            raise HTTPException(status_code=400, detail="未上传任何文件")
+        
+        # 检查文件扩展名
+        uploaded_files = {}
+        for file in files:
+            if file.filename:
+                ext = os.path.splitext(file.filename)[1].lower()
+                base_name = os.path.splitext(file.filename)[0]
+                
+                if base_name not in uploaded_files:
+                    uploaded_files[base_name] = []
+                uploaded_files[base_name].append(ext)
+                
+                logger.info(f"  上传文件: {file.filename}")
+        
+        # 验证每组文件都有必需的扩展名
+        required_exts = {'.shp', '.dbf', '.shx'}
+        shp_groups = {}
+        
+        for base_name, exts in uploaded_files.items():
+            ext_set = set(exts)
+            if '.shp' in ext_set:  # 这是一个SHP文件组
+                if not required_exts.issubset(ext_set):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"SHP文件组 {base_name} 缺少必需文件（需要.shp, .dbf, .shx）"
+                    )
+                shp_groups[base_name] = exts
+        
+        if len(shp_groups) < 3:
+            raise HTTPException(
+                status_code=400,
+                detail=f"需要至少3组SHP文件（田块、水路、闸门），当前只有 {len(shp_groups)} 组"
+            )
+        
+        logger.info(f"找到 {len(shp_groups)} 组SHP文件")
+        
+        # ========== 步骤2: 自动检测文件类型 ==========
+        detected_files = {'fields': None, 'segments': None, 'gates': None}
+        
+        for base_name in shp_groups.keys():
+            file_type = detect_shp_file_type(base_name)
+            if file_type and not detected_files[file_type]:
+                detected_files[file_type] = base_name
+                logger.info(f"检测到 {file_type}: {base_name}")
+        
+        # 验证是否检测到所有类型
+        missing_types = [k for k, v in detected_files.items() if v is None]
+        if missing_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"无法自动识别文件类型: {', '.join(missing_types)}。请确保文件名包含关键词（田块/field, 水路/canal, 阀门/gate）"
+            )
+        
+        # ========== 步骤3: 备份当前配置 ==========
+        if not skip_backup:
+            logger.info("备份当前配置...")
+            backup_base = os.path.join(os.path.dirname(__file__), "data", "farm_backups")
+            os.makedirs(backup_base, exist_ok=True)
+            backup_path = os.path.join(backup_base, f"backup_{timestamp}")
+            os.makedirs(backup_path, exist_ok=True)
+            
+            # 备份config.json
+            config_file = os.path.join(os.path.dirname(__file__), "config.json")
+            if os.path.exists(config_file):
+                shutil.copy2(config_file, os.path.join(backup_path, "config.json"))
+            
+            # 备份GeoJSON文件
+            if os.path.exists(GZP_FARM_DIR):
+                for filename in os.listdir(GZP_FARM_DIR):
+                    if filename.endswith('_code.geojson'):
+                        src = os.path.join(GZP_FARM_DIR, filename)
+                        dst = os.path.join(backup_path, filename)
+                        shutil.copy2(src, dst)
+            
+            logger.info(f"备份完成: {backup_path}")
+        
+        # ========== 步骤4: 保存上传的SHP文件 ==========
+        logger.info("保存上传的SHP文件...")
+        os.makedirs(GZP_FARM_DIR, exist_ok=True)
+        
+        saved_shp_files = {}
+        
+        for file in files:
+            if file.filename:
+                # 保存到gzp_farm目录
+                file_path = os.path.join(GZP_FARM_DIR, file.filename)
+                content = await file.read()
+                with open(file_path, "wb") as f:
+                    f.write(content)
+                await file.seek(0)
+                
+                # 记录主SHP文件
+                if file.filename.endswith('.shp'):
+                    base_name = os.path.splitext(file.filename)[0]
+                    for file_type, detected_base in detected_files.items():
+                        if detected_base == base_name:
+                            saved_shp_files[file_type] = file.filename
+        
+        logger.info(f"SHP文件保存完成: {saved_shp_files}")
+        
+        # ========== 步骤5: 转换为GeoJSON ==========
+        logger.info("转换SHP为GeoJSON...")
+        geojson_files = {}
+        
+        for file_type, shp_filename in saved_shp_files.items():
+            shp_path = os.path.join(GZP_FARM_DIR, shp_filename)
+            base_name = os.path.splitext(shp_filename)[0]
+            geojson_filename = f"{base_name}_code.geojson"
+            geojson_path = os.path.join(GZP_FARM_DIR, geojson_filename)
+            
+            if not convert_shp_to_geojson(shp_path, geojson_path):
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"转换失败: {shp_filename} → {geojson_filename}"
+                )
+            
+            geojson_files[file_type] = geojson_filename
+            logger.info(f"  转换成功: {shp_filename} → {geojson_filename}")
+        
+        # ========== 步骤6: 更新配置文件 ==========
+        logger.info("更新配置文件...")
+        
+        # 更新auto_config_params.yaml
+        if not update_yaml_config(farm_id, farm_name, geojson_files):
+            raise HTTPException(status_code=500, detail="更新YAML配置失败")
+        
+        # 更新farm_id_mapping.json
+        if not update_farm_id_mapping(farm_id, farm_name):
+            raise HTTPException(status_code=500, detail="更新农场映射失败")
+        
+        logger.info("配置文件更新完成")
+        
+        # ========== 步骤7: 生成config.json ==========
+        logger.info("生成config.json...")
+        if not generate_config_from_geojson():
+            raise HTTPException(status_code=500, detail="生成config.json失败")
+        
+        # ========== 步骤8: 验证配置 ==========
+        logger.info("验证配置...")
+        validation = validate_generated_config(farm_id)
+        
+        if not validation.get("valid"):
+            raise HTTPException(
+                status_code=500,
+                detail=f"配置验证失败: {validation.get('error')}"
+            )
+        
+        config_path = os.path.join(os.path.dirname(__file__), "config.json")
+        
+        logger.info("========== 农场切换成功 ==========")
+        
+        # ========== 可选：自动生成灌溉计划 ==========
+        plan_file = None
+        if auto_generate_plan:
+            logger.info("自动生成灌溉计划...")
+            try:
+                # 调用灌溉计划生成
+                plan_request = IrrigationPlanRequest(
+                    farm_id=farm_id,
+                    config_path=config_path,
+                    scenario_name=f"{farm_name}_initial"
+                )
+                plan_response = await generate_irrigation_plan(plan_request)
+                logger.info(f"灌溉计划生成完成: {plan_response.message}")
+            except Exception as e:
+                logger.warning(f"自动生成计划失败: {e}")
+        
+        # 返回响应
+        return FarmSwitchResponse(
+            success=True,
+            message=f"农场切换成功！已切换到 {farm_name}",
+            farm_id=farm_id,
+            farm_name=farm_name,
+            backup_path=backup_path,
+            files_processed=saved_shp_files,
+            config_path=config_path,
+            validation=validation,
+            timestamp=timestamp
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"农场切换失败: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"农场切换失败: {str(e)}")
 
 @app.get("/api/irrigation/rice-status")
 async def check_rice_service_status(

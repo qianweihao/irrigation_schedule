@@ -88,6 +88,129 @@
               }
             }
           ]
+        },
+        {
+          "name": "农场一键切换",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "farm_id",
+                  "value": "新农场ID",
+                  "description": "农场唯一标识符",
+                  "type": "text"
+                },
+                {
+                  "key": "farm_name",
+                  "value": "新农场名称",
+                  "description": "农场名称",
+                  "type": "text"
+                },
+                {
+                  "key": "auto_generate_plan",
+                  "value": "false",
+                  "description": "是否自动生成灌溉计划",
+                  "type": "text"
+                },
+                {
+                  "key": "skip_backup",
+                  "value": "false",
+                  "description": "是否跳过备份（谨慎使用）",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "description": "SHP文件及配套文件（.shp, .dbf, .shx等），可多选上传",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/farm/switch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farm", "switch"]
+            },
+            "description": "农场一键切换API - 上传SHP文件自动完成所有配置\n\n**功能**：\n1. 自动检测文件类型（田块/fields、水路/segments、闸门/gates）\n2. 备份当前配置到 data/farm_backups/\n3. 转换SHP为GeoJSON格式\n4. 更新 auto_config_params.yaml 配置\n5. 更新 farm_id_mapping.json\n6. 自动生成 config.json\n7. 验证配置完整性\n\n**使用方法**：\n1. 准备3组SHP文件（每组包含.shp, .dbf, .shx等）\n2. 设置 farm_id 和 farm_name\n3. 点击 files 字段，一次性选择所有文件（可多选）\n4. 发送请求，系统自动识别并处理\n\n**文件命名建议**：\n- 田块文件名包含：田块/field/plot/地块\n- 水路文件名包含：水路/canal/segment/渠道\n- 闸门文件名包含：阀门/gate/valve/闸门\n\n**参数说明**：\n- farm_id: 新农场的唯一标识符（必填）\n- farm_name: 新农场的名称（必填）\n- auto_generate_plan: 切换后是否自动生成灌溉计划（默认false）\n- skip_backup: 是否跳过备份当前配置（默认false，不建议跳过）\n- files: 上传所有SHP相关文件（至少需要3组完整的SHP文件集）\n\n**注意事项**：\n- 每组SHP必须包含 .shp, .dbf, .shx 文件（.prj, .cpg 可选）\n- 文件会自动备份，如需恢复可到 data/farm_backups/ 查找\n- 切换成功后会返回详细的验证信息"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"农场切换成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    ",
+                  "    // 保存农场信息到环境变量",
+                  "    if (jsonData.farm_id) {",
+                  "        pm.environment.set('farm_id', jsonData.farm_id);",
+                  "        console.log('✅ 已切换到农场:', jsonData.farm_name, '(ID:', jsonData.farm_id + ')');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"配置文件生成成功\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.config_path) {",
+                  "        pm.expect(jsonData.config_path).to.be.a('string');",
+                  "        console.log('📄 配置文件:', jsonData.config_path);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"文件处理完成\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.files_processed) {",
+                  "        console.log('\\n=== 文件处理结果 ===');",
+                  "        if (jsonData.files_processed.fields) {",
+                  "            console.log('✅ 田块文件:', jsonData.files_processed.fields);",
+                  "        }",
+                  "        if (jsonData.files_processed.segments) {",
+                  "            console.log('✅ 水路文件:', jsonData.files_processed.segments);",
+                  "        }",
+                  "        if (jsonData.files_processed.gates) {",
+                  "            console.log('✅ 闸门文件:', jsonData.files_processed.gates);",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"配置验证通过\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.validation) {",
+                  "        pm.expect(jsonData.validation.valid).to.be.true;",
+                  "        ",
+                  "        console.log('\\n=== 配置验证结果 ===');",
+                  "        console.log('✅ 田块数量:', jsonData.validation.fields_count);",
+                  "        console.log('✅ 片区数量:', jsonData.validation.segments_count);",
+                  "        console.log('✅ 闸门数量:', jsonData.validation.gates_count);",
+                  "        console.log('✅ 水泵数量:', jsonData.validation.pumps_count);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"备份文件已创建\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.backup_path) {",
+                  "        console.log('\\n💾 备份路径:', jsonData.backup_path);",
+                  "    }",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log('=== 农场切换 ===');",
+                  "console.log('准备上传SHP文件并切换农场配置...');"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

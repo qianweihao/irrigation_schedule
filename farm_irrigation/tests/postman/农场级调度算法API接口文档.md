@@ -2187,6 +2187,311 @@ if (alertDevices.length > 0) {
 
 ---
 
+### 10.2 设备自检完整工作流
+
+**接口**: `POST /api/hardware/device-self-check`
+
+**功能**: 触发指定设备的自检任务，并轮询查询自检状态直至完成
+
+**完整流程**:
+1. 接收设备唯一标识列表（unique_no_list）
+2. 调用硬件网关触发自检任务（`/device_self_check`）
+3. 轮询查询自检状态（`/devices_status`）
+4. 返回最终自检结果
+
+**请求参数**
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| unique_no_list | array | 是 | 设备唯一标识列表（如：["477379421064159253", "477379421064159255"]） |
+| timeout | integer | 否 | 超时时间（秒），默认300秒 |
+| poll_interval | integer | 否 | 轮询间隔（秒），默认5秒 |
+
+**设备自检状态说明**
+
+| 状态值 | 含义 | 说明 |
+|--------|------|------|
+| `initialized` | 已初始化 | 设备已初始化，等待自检任务 |
+| `scheduled` | 已调度 | 自检任务已被调度，等待执行 |
+| `checking` | 自检中 | 设备正在执行自检 |
+| `check_success` | 自检成功 | 设备自检通过，状态正常 |
+| `check_failed` | 自检失败 | 设备自检失败，可能存在故障 |
+
+**响应数据结构**
+
+```json
+{
+  "success": true,
+  "message": "设备自检完成，2 个成功，0 个失败",
+  "data": {
+    "total_devices": 2,
+    "success_count": 2,
+    "failed_count": 0,
+    "timeout_count": 0,
+    "devices": [
+      {
+        "unique_no": "477379421064159253",
+        "status": "check_success",
+        "check_duration_seconds": 12.5,
+        "status_history": [
+          {
+            "status": "scheduled",
+            "timestamp": "2025-01-10T10:30:00.123Z"
+          },
+          {
+            "status": "checking",
+            "timestamp": "2025-01-10T10:30:05.456Z"
+          },
+          {
+            "status": "check_success",
+            "timestamp": "2025-01-10T10:30:12.789Z"
+          }
+        ]
+      },
+      {
+        "unique_no": "477379421064159255",
+        "status": "check_success",
+        "check_duration_seconds": 10.8,
+        "status_history": [
+          {
+            "status": "scheduled",
+            "timestamp": "2025-01-10T10:30:00.123Z"
+          },
+          {
+            "status": "checking",
+            "timestamp": "2025-01-10T10:30:04.321Z"
+          },
+          {
+            "status": "check_success",
+            "timestamp": "2025-01-10T10:30:11.098Z"
+          }
+        ]
+      }
+    ],
+    "total_duration_seconds": 15.2,
+    "hardware_api_url": "http://101.201.78.54:8100"
+  }
+}
+```
+
+**响应字段说明**
+
+| 字段路径 | 类型 | 说明 |
+|---------|------|------|
+| success | boolean | 是否成功（所有设备都完成自检即为成功） |
+| message | string | 返回消息 |
+| data.total_devices | integer | 设备总数 |
+| data.success_count | integer | 自检成功设备数 |
+| data.failed_count | integer | 自检失败设备数 |
+| data.timeout_count | integer | 自检超时设备数 |
+| data.devices | array | 设备列表 |
+| data.devices[].unique_no | string | 设备唯一标识 |
+| data.devices[].status | string | 最终状态（check_success/check_failed/timeout） |
+| data.devices[].check_duration_seconds | float | 自检耗时（秒） |
+| data.devices[].status_history | array | 状态变化历史 |
+| data.devices[].status_history[].status | string | 状态值 |
+| data.devices[].status_history[].timestamp | string | 状态变更时间 |
+| data.total_duration_seconds | float | 总耗时（秒） |
+| data.hardware_api_url | string | 硬件网关地址 |
+
+**使用场景**
+
+| 场景 | 说明 | 典型用法 |
+|------|------|----------|
+| **灌溉前检查** | 执行灌溉计划前检查设备状态 | 调用此接口确认所有闸门正常 |
+| **定期巡检** | 定时检查设备健康状态 | 每日定时触发自检 |
+| **故障排查** | 设备异常时触发自检确认问题 | 闸门控制失败后触发自检 |
+| **系统初始化** | 系统启动时检查设备就绪状态 | 启动时对所有设备执行自检 |
+
+**典型调用示例**
+
+```javascript
+// 示例1：灌溉前设备自检
+const response = await fetch(
+  'http://120.55.127.125/api/hardware/device-self-check',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      unique_no_list: [
+        "477379421064159253",
+        "477379421064159255"
+      ],
+      timeout: 300,
+      poll_interval: 5
+    })
+  }
+);
+const data = await response.json();
+
+// 处理结果
+if (data.success) {
+  console.log(`✅ 自检完成: ${data.data.success_count}/${data.data.total_devices} 设备正常`);
+  
+  // 检查是否有失败设备
+  if (data.data.failed_count > 0) {
+    const failedDevices = data.data.devices.filter(d => d.status === 'check_failed');
+    console.log('⚠️ 以下设备自检失败:');
+    failedDevices.forEach(device => {
+      console.log(`  - ${device.unique_no}`);
+    });
+  }
+} else {
+  console.log('❌ 自检失败:', data.message);
+}
+
+// 示例2：配合田块设备状态查询使用
+// 步骤1: 查询农场所有田块设备
+const fieldsResponse = await fetch(
+  'http://120.55.127.125/api/hardware/fields-device-status?farm_id=13944136728576'
+);
+const fieldsData = await fieldsResponse.json();
+
+// 步骤2: 提取所有设备的 unique_no
+const allUniqueNos = fieldsData.data.fields
+  .flatMap(field => field.devices)
+  .map(device => device.unique_no);
+
+console.log(`准备对 ${allUniqueNos.length} 个设备执行自检`);
+
+// 步骤3: 批量自检
+const checkResponse = await fetch(
+  'http://120.55.127.125/api/hardware/device-self-check',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      unique_no_list: allUniqueNos
+    })
+  }
+);
+const checkData = await checkResponse.json();
+
+// 步骤4: 分析结果
+console.log(`自检完成，耗时 ${checkData.data.total_duration_seconds} 秒`);
+console.log(`成功: ${checkData.data.success_count}, 失败: ${checkData.data.failed_count}`);
+
+// 示例3：错误处理
+try {
+  const response = await fetch('/api/hardware/device-self-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      unique_no_list: ["477379421064159253"]
+    })
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('自检请求失败:', error.detail);
+  }
+  
+  const data = await response.json();
+  
+  // 检查是否有超时设备
+  if (data.data.timeout_count > 0) {
+    console.log('⚠️ 部分设备自检超时，请检查网络或设备状态');
+  }
+  
+} catch (error) {
+  console.error('网络错误:', error);
+}
+```
+
+**注意事项**
+
+1. ⚠️ **批量自检限制**: 建议单次自检设备数量 ≤ 50 个，避免超时
+2. ⚠️ **超时设置**: 默认超时 300 秒，可根据设备数量调整
+3. ⚠️ **轮询间隔**: 默认 5 秒轮询一次，不建议设置过小（< 3 秒）
+4. ⚠️ **网络依赖**: 依赖硬件网关（101.201.78.54:8100）连通性
+5. ✅ **状态追踪**: 返回完整状态历史，可用于分析自检过程
+6. ✅ **异步执行**: 接口内部处理轮询，前端只需等待最终结果
+7. 💡 **自检耗时**: 单个设备自检通常 5-15 秒，批量自检会并行执行
+8. 💡 **失败重试**: 如果部分设备失败，可以只对失败设备重新自检
+
+**工作流程图**
+
+```
+前端请求
+  ↓
+API 接口: /api/hardware/device-self-check
+  ↓
+调用硬件网关: POST /device_self_check
+  ↓
+触发自检任务（返回 accepted）
+  ↓
+轮询查询状态: GET /devices_status
+  ├─> scheduled（已调度）
+  ├─> checking（自检中）
+  └─> check_success / check_failed（完成）
+  ↓
+返回最终结果给前端
+```
+
+**与田块设备状态查询的配合使用**
+
+```javascript
+// 完整工作流：查询设备 → 自检 → 验证
+const fullWorkflow = async (farmId) => {
+  // 1. 查询农场所有设备
+  const fieldsResp = await fetch(
+    `/api/hardware/fields-device-status?farm_id=${farmId}`
+  );
+  const fields = await fieldsResp.json();
+  
+  console.log(`📊 农场共有 ${fields.data.total_fields} 个田块`);
+  
+  // 2. 筛选需要自检的设备（如：只检查进出水闸）
+  const inoutGates = fields.data.fields
+    .flatMap(f => f.devices)
+    .filter(d => d.gate_type === 'inout-G');
+  
+  const uniqueNos = inoutGates.map(d => d.unique_no);
+  
+  console.log(`🔍 准备对 ${uniqueNos.length} 个进出水闸进行自检`);
+  
+  // 3. 执行自检
+  const checkResp = await fetch('/api/hardware/device-self-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ unique_no_list: uniqueNos })
+  });
+  const checkResult = await checkResp.json();
+  
+  // 4. 分析结果
+  console.log(`✅ 自检完成`);
+  console.log(`  正常: ${checkResult.data.success_count} 个`);
+  console.log(`  异常: ${checkResult.data.failed_count} 个`);
+  console.log(`  超时: ${checkResult.data.timeout_count} 个`);
+  
+  // 5. 处理异常设备
+  if (checkResult.data.failed_count > 0) {
+    const failedDevices = checkResult.data.devices
+      .filter(d => d.status === 'check_failed');
+    
+    console.log('⚠️ 需要维护的设备:');
+    failedDevices.forEach(device => {
+      // 查找设备所属田块
+      const field = fields.data.fields.find(f => 
+        f.devices.some(d => d.unique_no === device.unique_no)
+      );
+      
+      console.log(`  - 田块 ${field.field_name} (${field.section_code})`);
+      console.log(`    设备: ${device.unique_no}`);
+    });
+  }
+  
+  return checkResult;
+};
+
+// 使用示例
+fullWorkflow("13944136728576");
+```
+
+---
+
 ### 11. Rice 智能决策集成
 
 #### 11.1 检查 Rice 服务状态
