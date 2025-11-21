@@ -366,15 +366,64 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "data", "output")
 # GeoJson相关常量
 ROOT = os.path.abspath(os.path.dirname(__file__))
 GEOJSON_DIR = os.path.join(ROOT, "data", "gzp_farm")
-VALVE_FILE = "港中坪阀门与节制闸_code.geojson"
-FIELD_FILE = "港中坪田块_code.geojson"
-WATERWAY_FILE = "港中坪水路_code.geojson"
+# 这些常量已弃用，改为动态从config.json获取farm_id
+# VALVE_FILE = "港中坪阀门与节制闸_code.geojson"
+# FIELD_FILE = "港中坪田块_code.geojson"
+# WATERWAY_FILE = "港中坪水路_code.geojson"
 
 # 标注后的文件（优先使用）
 LABELED_DIR = os.path.join(ROOT, "data", "labeled_output")
 LABELED_FIELDS = os.path.join(LABELED_DIR, "fields_labeled.geojson")
 LABELED_GATES = os.path.join(LABELED_DIR, "gates_labeled.geojson")
 LABELED_SEGMENT = os.path.join(LABELED_DIR, "segments_labeled.geojson")
+
+def get_current_farm_geojson_files() -> Dict[str, str]:
+    """
+    动态获取当前农场的GeoJSON文件名
+    
+    Returns:
+        dict: {'fields': 'xxx_fields_code.geojson', 'gates': '...', 'segments': '...'}
+    """
+    try:
+        # 方法1: 从auto_config_params.yaml读取
+        import yaml
+        yaml_path = os.path.join(ROOT, "auto_config_params.yaml")
+        if os.path.exists(yaml_path):
+            with open(yaml_path, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+                if 'default_filenames' in config:
+                    return {
+                        'fields': config['default_filenames'].get('fields', ''),
+                        'gates': config['default_filenames'].get('gates', ''),
+                        'segments': config['default_filenames'].get('segments', '')
+                    }
+        
+        # 方法2: 从config.json读取farm_id并构造文件名
+        config_path = os.path.join(ROOT, "config.json")
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                farm_id = config.get('farm_id', '13944136728576')
+                return {
+                    'fields': f"{farm_id}_fields_code.geojson",
+                    'gates': f"{farm_id}_gates_code.geojson",
+                    'segments': f"{farm_id}_segments_code.geojson"
+                }
+        
+        # 兜底：返回港中坪农场文件名
+        return {
+            'fields': "13944136728576_fields_code.geojson",
+            'gates': "13944136728576_gates_code.geojson", 
+            'segments': "13944136728576_segments_code.geojson"
+        }
+    except Exception as e:
+        logger.error(f"获取农场GeoJSON文件名失败: {e}")
+        # 返回港中坪农场作为兜底
+        return {
+            'fields': "13944136728576_fields_code.geojson",
+            'gates': "13944136728576_gates_code.geojson",
+            'segments': "13944136728576_segments_code.geojson"
+        }
 
 # GeoJson辅助函数
 def _looks_like_lonlat(bounds):
@@ -620,9 +669,28 @@ def update_yaml_config(farm_id: str, farm_name: str, geojson_files: Dict[str, st
             'fields': geojson_files['fields']
         }
         
-        with open(yaml_path, 'w', encoding='utf-8') as f:
-            yaml.dump(config, f, allow_unicode=True, sort_keys=False)
+        # 确保file_search_paths包含正确的路径
+        if 'file_search_paths' not in config:
+            config['file_search_paths'] = {}
+        if 'data_paths' not in config['file_search_paths']:
+            config['file_search_paths']['data_paths'] = []
         
+        # 添加data/gzp_farm路径（如果不存在）
+        data_paths = config['file_search_paths']['data_paths']
+        if 'data/gzp_farm' not in data_paths:
+            data_paths.insert(0, 'data/gzp_farm')  # 放在最前面，优先搜索
+        
+        # 使用正确的YAML写入配置，确保中文正确保存
+        with open(yaml_path, 'w', encoding='utf-8') as f:
+            yaml.dump(
+                config, 
+                f, 
+                allow_unicode=True,  # 允许Unicode字符
+                sort_keys=False,     # 保持键的顺序
+                default_flow_style=False  # 使用块样式而不是流样式
+            )
+        
+        logger.info(f"YAML配置已更新，搜索路径: {config['file_search_paths']['data_paths']}")
         return True
     except Exception as e:
         logger.error(f"更新YAML配置失败: {e}")
@@ -656,20 +724,39 @@ def generate_config_from_geojson() -> bool:
     """调用auto_to_config.py生成config.json"""
     try:
         import subprocess
+        
+        # 获取项目根目录
+        project_root = os.path.dirname(__file__)
+        
+        # 设置环境变量，确保可以正确导入模块和处理中文
+        env = os.environ.copy()
+        env['PYTHONPATH'] = project_root
+        env['PYTHONIOENCODING'] = 'utf-8'  # 强制Python使用UTF-8编码
+        env['PYTHONUTF8'] = '1'  # Python 3.7+ 启用UTF-8模式
+        
         result = subprocess.run(
-            [sys.executable, "src/converter/auto_to_config.py"],
-            cwd=os.path.dirname(__file__),
+            [sys.executable, "-X", "utf8", "src/converter/auto_to_config.py"],  # 添加 -X utf8 参数
+            cwd=project_root,
             capture_output=True,
             text=True,
             encoding='utf-8',
-            timeout=60
+            errors='ignore',  # 忽略编码错误，防止中文输出导致崩溃
+            timeout=60,
+            env=env  # 传入修改后的环境变量
         )
         
         if result.returncode == 0:
             logger.info("config.json 生成成功")
             return True
         else:
-            logger.error(f"config.json 生成失败: {result.stderr}")
+            # 尝试使用GBK解码stderr（Windows中文环境）
+            stderr_msg = result.stderr
+            if not stderr_msg and result.stderr:
+                try:
+                    stderr_msg = result.stderr.encode('latin1').decode('gbk', errors='ignore')
+                except:
+                    stderr_msg = result.stderr
+            logger.error(f"config.json 生成失败: {stderr_msg}")
             return False
     except Exception as e:
         logger.error(f"生成config.json出错: {e}")
@@ -2090,11 +2177,14 @@ async def cleanup_old_data(retention_days: int = 30):
 
 @app.get("/geojson/fields")
 async def api_fields():
-    """获取田块GeoJson数据"""
+    """获取田块GeoJson数据（动态适配当前农场）"""
     try:
-        p = _first_existing(LABELED_FIELDS, os.path.join(GEOJSON_DIR, FIELD_FILE))
+        geojson_files = get_current_farm_geojson_files()
+        field_file = geojson_files.get('fields', '')
+        
+        p = _first_existing(LABELED_FIELDS, os.path.join(GEOJSON_DIR, field_file))
         if not p:
-            raise HTTPException(status_code=404, detail="未找到田块图层")
+            raise HTTPException(status_code=404, detail=f"未找到田块图层，尝试的文件: {field_file}")
         
         gdf = read_geo_ensure_wgs84(p)
         return JSONResponse(content=json.loads(gdf.to_json()))
@@ -2107,11 +2197,14 @@ async def api_fields():
 
 @app.get("/geojson/gates")
 async def api_gates():
-    """获取闸门GeoJson数据"""
+    """获取闸门GeoJson数据（动态适配当前农场）"""
     try:
-        p = _first_existing(LABELED_GATES, os.path.join(GEOJSON_DIR, VALVE_FILE))
+        geojson_files = get_current_farm_geojson_files()
+        gates_file = geojson_files.get('gates', '')
+        
+        p = _first_existing(LABELED_GATES, os.path.join(GEOJSON_DIR, gates_file))
         if not p:
-            raise HTTPException(status_code=404, detail="未找到闸门图层")
+            raise HTTPException(status_code=404, detail=f"未找到闸门图层，尝试的文件: {gates_file}")
         
         gdf = read_geo_ensure_wgs84(p)
         return JSONResponse(content=json.loads(gdf.to_json()))
@@ -2138,9 +2231,12 @@ async def api_geojson(type: Optional[str] = Query(None, description="数据类�
             return await api_gates()
         
         if typ in ("waterway", "segments", "lines"):
-            p = _first_existing(LABELED_SEGMENT, os.path.join(GEOJSON_DIR, WATERWAY_FILE))
+            geojson_files = get_current_farm_geojson_files()
+            segments_file = geojson_files.get('segments', '')
+            
+            p = _first_existing(LABELED_SEGMENT, os.path.join(GEOJSON_DIR, segments_file))
             if not p:
-                raise HTTPException(status_code=404, detail="未找到水路图层")
+                raise HTTPException(status_code=404, detail=f"未找到水路图层，尝试的文件: {segments_file}")
             
             gdf = read_geo_ensure_wgs84(p)
             return JSONResponse(content=json.loads(gdf.to_json()))
@@ -3613,10 +3709,17 @@ async def switch_farm_with_upload(
         logger.info("转换SHP为GeoJSON...")
         geojson_files = {}
         
+        # 文件类型到英文名称的映射
+        type_to_english = {
+            'fields': 'fields',
+            'segments': 'segments',  
+            'gates': 'gates'
+        }
+        
         for file_type, shp_filename in saved_shp_files.items():
             shp_path = os.path.join(GZP_FARM_DIR, shp_filename)
-            base_name = os.path.splitext(shp_filename)[0]
-            geojson_filename = f"{base_name}_code.geojson"
+            # 使用安全的英文文件名，避免中文编码问题
+            geojson_filename = f"{farm_id}_{type_to_english[file_type]}_code.geojson"
             geojson_path = os.path.join(GZP_FARM_DIR, geojson_filename)
             
             if not convert_shp_to_geojson(shp_path, geojson_path):
@@ -3638,6 +3741,19 @@ async def switch_farm_with_upload(
         # 更新farm_id_mapping.json
         if not update_farm_id_mapping(farm_id, farm_name):
             raise HTTPException(status_code=500, detail="更新农场映射失败")
+        
+        # 保存文件名映射（用于追溯原始中文文件名）
+        file_mapping = {
+            'farm_id': farm_id,
+            'farm_name': farm_name,
+            'original_files': saved_shp_files,  # 原始上传的文件名（可能是中文）
+            'generated_files': geojson_files,    # 生成的英文文件名
+            'timestamp': timestamp
+        }
+        mapping_file = os.path.join(GZP_FARM_DIR, f"{farm_id}_file_mapping.json")
+        with open(mapping_file, 'w', encoding='utf-8') as f:
+            json.dump(file_mapping, f, ensure_ascii=False, indent=2)
+        logger.info(f"文件映射已保存: {mapping_file}")
         
         logger.info("配置文件更新完成")
         
@@ -3677,13 +3793,17 @@ async def switch_farm_with_upload(
                 logger.warning(f"自动生成计划失败: {e}")
         
         # 返回响应
+        response_message = f"农场切换成功！已切换到 {farm_name}"
+        if any(ord(c) > 127 for name in saved_shp_files.values() for c in name):
+            response_message += "\n💡 提示：已将中文文件名转换为英文格式以确保跨平台兼容性"
+        
         return FarmSwitchResponse(
             success=True,
-            message=f"农场切换成功！已切换到 {farm_name}",
+            message=response_message,
             farm_id=farm_id,
             farm_name=farm_name,
             backup_path=backup_path,
-            files_processed=saved_shp_files,
+            files_processed=saved_shp_files,  # 显示原始上传的文件名
             config_path=config_path,
             validation=validation,
             timestamp=timestamp

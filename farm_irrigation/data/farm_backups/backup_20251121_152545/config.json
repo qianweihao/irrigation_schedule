@@ -1,0 +1,1482 @@
+{
+  "farm_id": "13944136728576",
+  "t_win_h": 20.0,
+  "d_target_mm": 90.0,
+  "pump": {
+    "name": "AUTO",
+    "q_rated_m3ph": 300.0,
+    "efficiency": 0.8,
+    "power_kw": 60.0,
+    "electricity_price": 0.6
+  },
+  "pumps": [
+    {
+      "name": "P2",
+      "q_rated_m3ph": 300.0,
+      "efficiency": 0.8,
+      "power_kw": 60.0,
+      "electricity_price": 0.6
+    },
+    {
+      "name": "P1",
+      "q_rated_m3ph": 300.0,
+      "efficiency": 0.8,
+      "power_kw": 60.0,
+      "electricity_price": 0.6
+    }
+  ],
+  "pump_time_constraints": [
+    {
+      "pump_name": "P1",
+      "start_hour": 0,
+      "end_hour": 8
+    },
+    {
+      "pump_name": "P2",
+      "start_hour": 8,
+      "end_hour": 16
+    }
+  ],
+  "segments": [
+    {
+      "id": "S1",
+      "canal_id": "C_A",
+      "distance_rank": 1,
+      "regulator_gate_ids": [
+        "S1-G1",
+        "S1-G26"
+      ],
+      "regulator_gate_id": "S1-G1",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S9",
+      "canal_id": "C_A",
+      "distance_rank": 9,
+      "regulator_gate_ids": [],
+      "regulator_gate_id": null,
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S8",
+      "canal_id": "C_A",
+      "distance_rank": 8,
+      "regulator_gate_ids": [
+        "S8-G54"
+      ],
+      "regulator_gate_id": "S8-G54",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S7",
+      "canal_id": "C_A",
+      "distance_rank": 7,
+      "regulator_gate_ids": [
+        "S7-G48",
+        "S7-G52"
+      ],
+      "regulator_gate_id": "S7-G48",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S6",
+      "canal_id": "C_A",
+      "distance_rank": 6,
+      "regulator_gate_ids": [
+        "S6-G38",
+        "S6-G41",
+        "S6-G44",
+        "S6-G46"
+      ],
+      "regulator_gate_id": "S6-G38",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S5",
+      "canal_id": "C_A",
+      "distance_rank": 5,
+      "regulator_gate_ids": [
+        "S5-G28",
+        "S5-G31",
+        "S5-G34",
+        "S5-G36"
+      ],
+      "regulator_gate_id": "S5-G28",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S2",
+      "canal_id": "C_A",
+      "distance_rank": 2,
+      "regulator_gate_ids": [],
+      "regulator_gate_id": null,
+      "feed_by": [
+        "P2"
+      ]
+    },
+    {
+      "id": "S4",
+      "canal_id": "C_A",
+      "distance_rank": 4,
+      "regulator_gate_ids": [
+        "S4-G13",
+        "S4-G16",
+        "S4-G25"
+      ],
+      "regulator_gate_id": "S4-G13",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "S3",
+      "canal_id": "C_A",
+      "distance_rank": 3,
+      "regulator_gate_ids": [
+        "S3-G4",
+        "S3-G9",
+        "S3-G12"
+      ],
+      "regulator_gate_id": "S3-G4",
+      "feed_by": [
+        "P1",
+        "P2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "S1-G1",
+      "type": "main-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S1-G26",
+      "type": "main-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "P2",
+      "type": "pump",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G2",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G3",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G4",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G5",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G6",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G7",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G8",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G9",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G10",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G11",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S3-G12",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G13",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G14",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G15",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G16",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G17",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G18",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G19",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G20",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G21",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G22",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G23",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G24",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S4-G25",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G27",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G28",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G29",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G30",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G31",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G32",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G33",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G34",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G35",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S5-G36",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G37",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G38",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G39",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G40",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G41",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G42",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G43",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G44",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G45",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S6-G46",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S7-G47",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S7-G48",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S7-G49",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S7-G50",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S7-G51",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S7-G52",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S8-G52",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S8-G53",
+      "type": "inout-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "S8-G54",
+      "type": "branch-G",
+      "q_max_m3ph": 9999.0
+    },
+    {
+      "id": "P1",
+      "type": "pump",
+      "q_max_m3ph": 9999.0
+    }
+  ],
+  "fields": [
+    {
+      "id": "S3-G2-F1",
+      "sectionID": "1901477857038049280",
+      "sectionCode": "S3-G2-F1",
+      "name": "1",
+      "area_mu": 5.225,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 1,
+      "wl_mm": 3.0,
+      "wl_low": 4.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G2"
+    },
+    {
+      "id": "S3-G5-F3",
+      "sectionID": "1901478066941992960",
+      "sectionCode": "S3-G5-F3",
+      "name": "2",
+      "area_mu": 5.15,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 3,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G5"
+    },
+    {
+      "id": "S3-G7-F5",
+      "sectionID": "1901478159908741120",
+      "sectionCode": "S3-G7-F5",
+      "name": "3",
+      "area_mu": 5.21,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 5,
+      "wl_mm": 1.2,
+      "wl_low": 2.2,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G7"
+    },
+    {
+      "id": "S3-G10-F7",
+      "sectionID": "1901478250698645504",
+      "sectionCode": "S3-G10-F7",
+      "name": "4",
+      "area_mu": 5.332,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 7,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G10"
+    },
+    {
+      "id": "S3-G3-F2",
+      "sectionID": "1901478465031774208",
+      "sectionCode": "S3-G3-F2",
+      "name": "6",
+      "area_mu": 5.199,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 2,
+      "wl_mm": 0.5,
+      "wl_low": 1.5,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G3"
+    },
+    {
+      "id": "S3-G8-F6",
+      "sectionID": "1901478711140950016",
+      "sectionCode": "S3-G8-F6",
+      "name": "8",
+      "area_mu": 4.922,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 6,
+      "wl_mm": 1.5,
+      "wl_low": 2.5,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G8"
+    },
+    {
+      "id": "S3-G11-F8",
+      "sectionID": "1901478816942268416",
+      "sectionCode": "S3-G11-F8",
+      "name": "9",
+      "area_mu": 5.266,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 8,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G11"
+    },
+    {
+      "id": "S4-G20-F14",
+      "sectionID": "1901480136478695424",
+      "sectionCode": "S4-G20-F14",
+      "name": "19",
+      "area_mu": 4.626,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 14,
+      "wl_mm": 3.8,
+      "wl_low": 4.8,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G20"
+    },
+    {
+      "id": "S4-G22-F16",
+      "sectionID": "1901480278892093440",
+      "sectionCode": "S4-G22-F16",
+      "name": "20",
+      "area_mu": 5.984,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 16,
+      "wl_mm": 3.8,
+      "wl_low": 4.8,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G22"
+    },
+    {
+      "id": "S8-G53-F36",
+      "sectionID": "1891823874275188736",
+      "sectionCode": "S8-G53-F36",
+      "name": "41",
+      "area_mu": 3.656,
+      "canal_id": "C_A",
+      "segment_id": "S8",
+      "distance_rank": 36,
+      "wl_mm": 1.2,
+      "wl_low": 2.2,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S8-G53"
+    },
+    {
+      "id": "S6-G37-F25",
+      "sectionID": "1891819219625353216",
+      "sectionCode": "S6-G37-F25",
+      "name": "30",
+      "area_mu": 8.36,
+      "canal_id": "C_A",
+      "segment_id": "S6",
+      "distance_rank": 25,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S6-G37"
+    },
+    {
+      "id": "S6-G39-F26",
+      "sectionID": "1891820536309653504",
+      "sectionCode": "S6-G39-F26",
+      "name": "31",
+      "area_mu": 8.446,
+      "canal_id": "C_A",
+      "segment_id": "S6",
+      "distance_rank": 26,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S6-G39"
+    },
+    {
+      "id": "S6-G42-F28",
+      "sectionID": "1891821697230086144",
+      "sectionCode": "S6-G42-F28",
+      "name": "33",
+      "area_mu": 12.532,
+      "canal_id": "C_A",
+      "segment_id": "S6",
+      "distance_rank": 28,
+      "wl_mm": 0.8,
+      "wl_low": 1.8,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S6-G42"
+    },
+    {
+      "id": "S7-G49-F32",
+      "sectionID": "1891822967093370880",
+      "sectionCode": "S7-G49-F32",
+      "name": "37",
+      "area_mu": 10.288,
+      "canal_id": "C_A",
+      "segment_id": "S7",
+      "distance_rank": 32,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S7-G49"
+    },
+    {
+      "id": "S7-G50-F33",
+      "sectionID": "1891823144638259200",
+      "sectionCode": "S7-G50-F33",
+      "name": "38",
+      "area_mu": 9.098,
+      "canal_id": "C_A",
+      "segment_id": "S7",
+      "distance_rank": 33,
+      "wl_mm": 0.9,
+      "wl_low": 1.9,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S7-G50"
+    },
+    {
+      "id": "S7-G51-F34",
+      "sectionID": "1891823423307816960",
+      "sectionCode": "S7-G51-F34",
+      "name": "39",
+      "area_mu": 8.303,
+      "canal_id": "C_A",
+      "segment_id": "S7",
+      "distance_rank": 34,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S7-G51"
+    },
+    {
+      "id": "S8-G52-F35",
+      "sectionID": "1891823619731267584",
+      "sectionCode": "S8-G52-F35",
+      "name": "40",
+      "area_mu": 8.921,
+      "canal_id": "C_A",
+      "segment_id": "S8",
+      "distance_rank": 35,
+      "wl_mm": null,
+      "wl_low": 999,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S8-G52"
+    },
+    {
+      "id": "S6-G40-F27",
+      "sectionID": "1891820867219267584",
+      "sectionCode": "S6-G40-F27",
+      "name": "32",
+      "area_mu": 8.494,
+      "canal_id": "C_A",
+      "segment_id": "S6",
+      "distance_rank": 27,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S6-G40"
+    },
+    {
+      "id": "S7-G47-F31",
+      "sectionID": "1891822716580175872",
+      "sectionCode": "S7-G47-F31",
+      "name": "36",
+      "area_mu": 9.432,
+      "canal_id": "C_A",
+      "segment_id": "S7",
+      "distance_rank": 31,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S7-G47"
+    },
+    {
+      "id": "S4-G24-F18",
+      "sectionID": "1901480445254967296",
+      "sectionCode": "S4-G24-F18",
+      "name": "21",
+      "area_mu": 4.606,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 18,
+      "wl_mm": 2.8,
+      "wl_low": 3.8,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G24"
+    },
+    {
+      "id": "S5-G27-F19",
+      "sectionID": "1901480688168083456",
+      "sectionCode": "S5-G27-F19",
+      "name": "24",
+      "area_mu": 7.672,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 19,
+      "wl_mm": 1.9,
+      "wl_low": 2.9,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G27"
+    },
+    {
+      "id": "S5-G29-F20",
+      "sectionID": "1901480806573285376",
+      "sectionCode": "S5-G29-F20",
+      "name": "25",
+      "area_mu": 7.93,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 20,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G29"
+    },
+    {
+      "id": "S5-G30-F21",
+      "sectionID": "1901480933362900992",
+      "sectionCode": "S5-G30-F21",
+      "name": "26",
+      "area_mu": 7.916,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 21,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G30"
+    },
+    {
+      "id": "S5-G32-F22",
+      "sectionID": "1901481053940752384",
+      "sectionCode": "S5-G32-F22",
+      "name": "27",
+      "area_mu": 10.752,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 22,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G32"
+    },
+    {
+      "id": "S5-G33-F23",
+      "sectionID": "1901481203845177344",
+      "sectionCode": "S5-G33-F23",
+      "name": "28",
+      "area_mu": 8.19,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 23,
+      "wl_mm": 1.2,
+      "wl_low": 2.2,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G33"
+    },
+    {
+      "id": "S5-G35-F24",
+      "sectionID": "1901481355163082752",
+      "sectionCode": "S5-G35-F24",
+      "name": "29",
+      "area_mu": 3.882,
+      "canal_id": "C_A",
+      "segment_id": "S5",
+      "distance_rank": 24,
+      "wl_mm": 1.9,
+      "wl_low": 2.9,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S5-G35"
+    },
+    {
+      "id": "S6-G45-F30",
+      "sectionID": "1901482275678593024",
+      "sectionCode": "S6-G45-F30",
+      "name": "35",
+      "area_mu": 6.069,
+      "canal_id": "C_A",
+      "segment_id": "S6",
+      "distance_rank": 30,
+      "wl_mm": 2.7,
+      "wl_low": 3.7,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S6-G45"
+    },
+    {
+      "id": "S3-G6-F4",
+      "sectionID": "1901478578525446144",
+      "sectionCode": "S3-G6-F4",
+      "name": "7",
+      "area_mu": 5.118,
+      "canal_id": "C_A",
+      "segment_id": "S3",
+      "distance_rank": 4,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S3-G6"
+    },
+    {
+      "id": "S4-G14-F9",
+      "sectionID": "1901479091472048128",
+      "sectionCode": "S4-G14-F9",
+      "name": "11",
+      "area_mu": 5.778,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 9,
+      "wl_mm": 0.7,
+      "wl_low": 1.7,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G14"
+    },
+    {
+      "id": "S4-G17-F11",
+      "sectionID": "1901479235957432320",
+      "sectionCode": "S4-G17-F11",
+      "name": "12",
+      "area_mu": 5.944,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 11,
+      "wl_mm": 3.2,
+      "wl_low": 4.2,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G17"
+    },
+    {
+      "id": "S4-G19-F13",
+      "sectionID": "1901479349740511232",
+      "sectionCode": "S4-G19-F13",
+      "name": "13",
+      "area_mu": 5.963,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 13,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G19"
+    },
+    {
+      "id": "S4-G21-F15",
+      "sectionID": "1901479503096848384",
+      "sectionCode": "S4-G21-F15",
+      "name": "14",
+      "area_mu": 7.287,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 15,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G21"
+    },
+    {
+      "id": "S4-G23-F17",
+      "sectionID": "1901479631820038144",
+      "sectionCode": "S4-G23-F17",
+      "name": "15",
+      "area_mu": 6.504,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 17,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G23"
+    },
+    {
+      "id": "S4-G15-F10",
+      "sectionID": "1901479888112984064",
+      "sectionCode": "S4-G15-F10",
+      "name": "17",
+      "area_mu": 4.853,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 10,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G15"
+    },
+    {
+      "id": "S4-G18-F12",
+      "sectionID": "1901480038592028672",
+      "sectionCode": "S4-G18-F12",
+      "name": "18",
+      "area_mu": 4.521,
+      "canal_id": "C_A",
+      "segment_id": "S4",
+      "distance_rank": 12,
+      "wl_mm": null,
+      "wl_low": 999,
+      "wl_opt": 80.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S4-G18"
+    },
+    {
+      "id": "S6-G43-F29",
+      "sectionID": "1901482103712129024",
+      "sectionCode": "S6-G43-F29",
+      "name": "34",
+      "area_mu": 8.983,
+      "canal_id": "C_A",
+      "segment_id": "S6",
+      "distance_rank": 29,
+      "wl_mm": 0.0,
+      "wl_low": 1.0,
+      "wl_opt": 50.0,
+      "wl_high": 140.0,
+      "has_drain_gate": true,
+      "rel_to_regulator": "downstream",
+      "inlet_G_id": "S6-G43"
+    }
+  ],
+  "_rice_integration": {
+    "timestamp": "20251120_144014",
+    "source": "rice_smart_irrigation",
+    "farm_id": "13944136728576",
+    "modified_fields": {
+      "S3-G2-F1": {
+        "original": {
+          "wl_low": 4.0,
+          "wl_opt": 50.0,
+          "wl_mm": 3.0
+        },
+        "rice_decision": {
+          "wl_low": 4.0,
+          "wl_opt": 50.0,
+          "wl_mm": 3.0
+        }
+      },
+      "S3-G5-F3": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S3-G7-F5": {
+        "original": {
+          "wl_low": 2.2,
+          "wl_opt": 50.0,
+          "wl_mm": 1.2
+        },
+        "rice_decision": {
+          "wl_low": 2.2,
+          "wl_opt": 50.0,
+          "wl_mm": 1.2
+        }
+      },
+      "S3-G10-F7": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S3-G3-F2": {
+        "original": {
+          "wl_low": 1.5,
+          "wl_opt": 50.0,
+          "wl_mm": 0.5
+        },
+        "rice_decision": {
+          "wl_low": 1.5,
+          "wl_opt": 50.0,
+          "wl_mm": 0.5
+        }
+      },
+      "S3-G8-F6": {
+        "original": {
+          "wl_low": 2.5,
+          "wl_opt": 50.0,
+          "wl_mm": 1.5
+        },
+        "rice_decision": {
+          "wl_low": 2.5,
+          "wl_opt": 50.0,
+          "wl_mm": 1.5
+        }
+      },
+      "S3-G11-F8": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S4-G20-F14": {
+        "original": {
+          "wl_low": 4.8,
+          "wl_opt": 50.0,
+          "wl_mm": 3.8
+        },
+        "rice_decision": {
+          "wl_low": 4.8,
+          "wl_opt": 50.0,
+          "wl_mm": 3.8
+        }
+      },
+      "S4-G22-F16": {
+        "original": {
+          "wl_low": 999,
+          "wl_opt": 80.0,
+          "wl_mm": null
+        },
+        "rice_decision": {
+          "wl_low": 4.8,
+          "wl_opt": 50.0,
+          "wl_mm": 3.8
+        }
+      },
+      "S8-G53-F36": {
+        "original": {
+          "wl_low": 2.9,
+          "wl_opt": 50.0,
+          "wl_mm": 1.9
+        },
+        "rice_decision": {
+          "wl_low": 2.2,
+          "wl_opt": 50.0,
+          "wl_mm": 1.2
+        }
+      },
+      "S6-G37-F25": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S6-G39-F26": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S6-G42-F28": {
+        "original": {
+          "wl_low": 1.8,
+          "wl_opt": 50.0,
+          "wl_mm": 0.8
+        },
+        "rice_decision": {
+          "wl_low": 1.8,
+          "wl_opt": 50.0,
+          "wl_mm": 0.8
+        }
+      },
+      "S7-G49-F32": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S7-G50-F33": {
+        "original": {
+          "wl_low": 1.9,
+          "wl_opt": 50.0,
+          "wl_mm": 0.9
+        },
+        "rice_decision": {
+          "wl_low": 1.9,
+          "wl_opt": 50.0,
+          "wl_mm": 0.9
+        }
+      },
+      "S7-G51-F34": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S6-G40-F27": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S7-G47-F31": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S4-G24-F18": {
+        "original": {
+          "wl_low": 3.8,
+          "wl_opt": 50.0,
+          "wl_mm": 2.8
+        },
+        "rice_decision": {
+          "wl_low": 3.8,
+          "wl_opt": 50.0,
+          "wl_mm": 2.8
+        }
+      },
+      "S5-G27-F19": {
+        "original": {
+          "wl_low": 2.6,
+          "wl_opt": 50.0,
+          "wl_mm": 1.6
+        },
+        "rice_decision": {
+          "wl_low": 2.9,
+          "wl_opt": 50.0,
+          "wl_mm": 1.9
+        }
+      },
+      "S5-G29-F20": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S5-G30-F21": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S5-G32-F22": {
+        "original": {
+          "wl_low": 2.2,
+          "wl_opt": 50.0,
+          "wl_mm": 1.2
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S5-G33-F23": {
+        "original": {
+          "wl_low": 1.9,
+          "wl_opt": 50.0,
+          "wl_mm": 0.9
+        },
+        "rice_decision": {
+          "wl_low": 2.2,
+          "wl_opt": 50.0,
+          "wl_mm": 1.2
+        }
+      },
+      "S5-G35-F24": {
+        "original": {
+          "wl_low": 2.9,
+          "wl_opt": 50.0,
+          "wl_mm": 1.9
+        },
+        "rice_decision": {
+          "wl_low": 2.9,
+          "wl_opt": 50.0,
+          "wl_mm": 1.9
+        }
+      },
+      "S6-G45-F30": {
+        "original": {
+          "wl_low": 3.7,
+          "wl_opt": 50.0,
+          "wl_mm": 2.7
+        },
+        "rice_decision": {
+          "wl_low": 3.7,
+          "wl_opt": 50.0,
+          "wl_mm": 2.7
+        }
+      },
+      "S3-G6-F4": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S4-G14-F9": {
+        "original": {
+          "wl_low": 1.9,
+          "wl_opt": 50.0,
+          "wl_mm": 0.9
+        },
+        "rice_decision": {
+          "wl_low": 1.7,
+          "wl_opt": 50.0,
+          "wl_mm": 0.7
+        }
+      },
+      "S4-G17-F11": {
+        "original": {
+          "wl_low": 4.2,
+          "wl_opt": 50.0,
+          "wl_mm": 3.2
+        },
+        "rice_decision": {
+          "wl_low": 4.2,
+          "wl_opt": 50.0,
+          "wl_mm": 3.2
+        }
+      },
+      "S4-G19-F13": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S4-G21-F15": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S4-G23-F17": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S4-G15-F10": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      },
+      "S6-G43-F29": {
+        "original": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        },
+        "rice_decision": {
+          "wl_low": 1.0,
+          "wl_opt": 50.0,
+          "wl_mm": 0.0
+        }
+      }
+    }
+  }
+}

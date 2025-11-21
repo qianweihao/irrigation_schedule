@@ -1,0 +1,15 @@
+{
+  "farm_id": "84911829811210",
+  "farm_name": "岳麓",
+  "original_files": {
+    "gates": "岳麓阀门与节制闸.shp",
+    "segments": "岳麓水路.shp",
+    "fields": "岳麓田块.shp"
+  },
+  "generated_files": {
+    "gates": "84911829811210_gates_code.geojson",
+    "segments": "84911829811210_segments_code.geojson",
+    "fields": "84911829811210_fields_code.geojson"
+  },
+  "timestamp": "20251121_161828"
+}

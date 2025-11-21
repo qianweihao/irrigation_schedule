@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "岳麓水路_code",
+"features": [
+{ "type": "Feature", "properties": { "Id": 0, "code": "S1", "type": "main-S", "feed_by": "P1" }, "geometry": { "type": "LineString", "coordinates": [ [ 112.805947905226844, 28.136126180404347 ], [ 112.819013430431369, 28.14216182601325 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S2", "type": "branch-S", "feed_by": "P1" }, "geometry": { "type": "LineString", "coordinates": [ [ 112.810294430954059, 28.138187917930679 ], [ 112.809826866866388, 28.138933878956038 ], [ 112.81459530672214, 28.141178900415127 ], [ 112.814952225873071, 28.141239576670785 ], [ 112.815187792512688, 28.141503696842392 ], [ 112.816136483615651, 28.141931999823385 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S4", "type": "branch-S", "feed_by": "P1" }, "geometry": { "type": "LineString", "coordinates": [ [ 112.806050624848467, 28.136219188962002 ], [ 112.809776352750305, 28.138506032606415 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S5", "type": "branch-S", "feed_by": "P1" }, "geometry": { "type": "LineString", "coordinates": [ [ 112.80647473573606, 28.136229105970926 ], [ 112.810153382452313, 28.137809068079434 ] ] } },
+{ "type": "Feature", "properties": { "Id": 0, "code": "S3", "type": "branch-S", "feed_by": "P1" }, "geometry": { "type": "LineString", "coordinates": [ [ 112.810253740185999, 28.138165098898298 ], [ 112.809770709601594, 28.138945562108461 ], [ 112.814397571528957, 28.141137045695586 ], [ 112.813138836656549, 28.143264283835549 ] ] } }
+]
+}
