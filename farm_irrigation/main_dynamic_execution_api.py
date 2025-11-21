@@ -66,7 +66,8 @@ from src.hardware.hw_batch_field_status import get_all_fields_device_status
 from src.hardware.hw_device_self_check import (
     trigger_device_self_check,
     query_device_status,
-    filter_successful_devices
+    filter_successful_devices,
+    get_device_status_summary
 )
 
 # 全局缓存和线程池
@@ -305,7 +306,10 @@ class DeviceSelfCheckRequest(BaseModel):
     plan_id: Optional[str] = Field(None, description="灌溉计划ID或文件路径（留空则使用最新计划）")
     farm_id: str = Field(..., description="农场ID")
     scenario_name: Optional[str] = Field(None, description="方案名称（留空则使用默认方案）")
-    wait_minutes: int = Field(5, description="等待设备自检的时间（分钟），默认5分钟", ge=1, le=30)
+    wait_minutes: int = Field(5, description="初次等待时间（分钟），默认5分钟", ge=1, le=30)
+    enable_polling: bool = Field(True, description="是否启用轮询模式（持续查询直到完成）")
+    max_polling_attempts: int = Field(10, description="最大轮询次数", ge=1, le=50)
+    polling_interval_seconds: int = Field(30, description="轮询间隔（秒）", ge=10, le=300)
     app_id: Optional[str] = Field(None, description="iLand平台应用ID")
     secret: Optional[str] = Field(None, description="iLand平台密钥")
     timeout: int = Field(30, description="API请求超时时间（秒）")
@@ -2198,13 +2202,18 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
     工作流程：
     1. 获取当前灌溉计划，提取需要灌溉的田块
     2. 通过田块ID获取设备unique_no列表
-    3. 预检查设备是否在硬件系统中（过滤出存在的设备）
-    4. 调用设备自检接口
-    5. 等待指定时间（默认5分钟）
-    6. 查询设备状态
-    7. 过滤自检成功的设备，找到对应田块
-    8. 移除自检失败的田块，重新生成灌溉计划
-    9. 返回新计划中需要灌溉的设备ID列表
+    3. 调用设备自检接口
+    4. 等待指定时间（默认5分钟）
+    5. 查询设备状态（支持轮询模式，持续查询直到完成）
+    6. 过滤自检成功的设备，找到对应田块
+    7. 移除自检失败的田块，重新生成灌溉计划
+    8. 返回新计划中需要灌溉的设备ID列表
+    
+    轮询模式：
+    - enable_polling=True: 持续查询设备状态，直到所有设备完成自检或达到最大次数
+    - enable_polling=False: 只查询一次（可能有设备还在自检中）
+    
+    注意：已移除预检查步骤，直接对所有iLand平台返回的设备触发自检
     """
     try:
         logger.info(f"========== 开始设备自检工作流 ==========")
@@ -2322,33 +2331,8 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
                 error="灌溉田块可能没有关联设备"
             )
         
-        # 步骤3: 预检查 - 过滤出硬件系统中存在的设备
-        logger.info("步骤3: 预检查设备是否在硬件系统中...")
-        
-        pre_check_result = query_device_status(all_unique_nos, timeout=request.timeout)
-        
-        if pre_check_result.get("success"):
-            # 从预检查结果中提取存在的设备
-            existing_devices_data = pre_check_result.get("devices", [])
-            existing_device_nos = [d.get("no") for d in existing_devices_data if d.get("no")]
-            
-            logger.info(f"预检查结果: 硬件系统中存在 {len(existing_device_nos)}/{len(all_unique_nos)} 个设备")
-            
-            if not existing_device_nos:
-                return DeviceSelfCheckResponse(
-                    success=False,
-                    message="硬件系统中没有找到可自检的设备",
-                    error=f"已查询 {len(all_unique_nos)} 个设备，但硬件系统中都不存在。请检查设备映射关系或联系硬件系统管理员。"
-                )
-            
-            # 只对存在的设备进行自检
-            all_unique_nos = existing_device_nos
-            logger.info(f"将对以下 {len(all_unique_nos)} 个设备进行自检")
-        else:
-            logger.warning(f"预检查失败: {pre_check_result.get('error')}，继续进行自检...")
-        
-        # 步骤4: 触发设备自检
-        logger.info("步骤4: 触发设备自检...")
+        # 步骤3: 触发设备自检（已移除预检查步骤）
+        logger.info("步骤3: 触发设备自检...")
         
         check_result = trigger_device_self_check(all_unique_nos, timeout=request.timeout)
         
@@ -2362,31 +2346,76 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
         accepted_devices = check_result.get("accepted_no_list", [])
         logger.info(f"✅ 自检任务已接受，设备数: {len(accepted_devices)}")
         
-        # 步骤5: 等待设备自检完成
+        # 步骤4: 等待设备自检完成
         wait_seconds = request.wait_minutes * 60
-        logger.info(f"步骤5: 等待 {request.wait_minutes} 分钟，让设备完成自检...")
+        logger.info(f"步骤4: 等待 {request.wait_minutes} 分钟，让设备完成自检...")
         
         await asyncio.sleep(wait_seconds)
         
-        # 步骤6: 查询设备状态
-        logger.info("步骤6: 查询设备自检状态...")
+        # 步骤5: 查询设备状态（支持轮询）
+        logger.info("步骤5: 查询设备自检状态...")
         
-        status_result = query_device_status(all_unique_nos, timeout=request.timeout)
+        devices_status = []
+        if request.enable_polling:
+            # 轮询模式：持续查询直到所有设备完成或达到最大次数
+            logger.info(f"🔄 启用轮询模式，最多尝试 {request.max_polling_attempts} 次，间隔 {request.polling_interval_seconds} 秒")
+            
+            for attempt in range(1, request.max_polling_attempts + 1):
+                logger.info(f"📊 第 {attempt}/{request.max_polling_attempts} 次查询...")
+                
+                status_result = query_device_status(all_unique_nos, timeout=request.timeout)
+                
+                if not status_result.get("success"):
+                    logger.warning(f"⚠️ 查询失败: {status_result.get('error')}")
+                    if attempt == request.max_polling_attempts:
+                        return DeviceSelfCheckResponse(
+                            success=False,
+                            message="查询设备状态失败",
+                            error=status_result.get("error")
+                        )
+                    await asyncio.sleep(request.polling_interval_seconds)
+                    continue
+                
+                devices_status = status_result.get("devices", [])
+                summary = get_device_status_summary(devices_status)
+                
+                logger.info(f"状态统计: 成功={len(summary['successful'])}, 自检中={len(summary['checking'])}, 失败={len(summary['failed'])}")
+                
+                # 如果没有设备还在自检中，就退出轮询
+                if not summary['checking']:
+                    logger.info(f"✅ 所有设备已完成自检（成功+失败）")
+                    break
+                
+                # 如果不是最后一次尝试，等待后继续
+                if attempt < request.max_polling_attempts:
+                    logger.info(f"还有 {len(summary['checking'])} 个设备在自检中，{request.polling_interval_seconds}秒后重试...")
+                    await asyncio.sleep(request.polling_interval_seconds)
+                else:
+                    logger.warning(f"⚠️ 已达到最大轮询次数，仍有 {len(summary['checking'])} 个设备在自检中")
+        else:
+            # 单次查询模式
+            status_result = query_device_status(all_unique_nos, timeout=request.timeout)
+            
+            if not status_result.get("success"):
+                return DeviceSelfCheckResponse(
+                    success=False,
+                    message="查询设备状态失败",
+                    error=status_result.get("error")
+                )
+            
+            devices_status = status_result.get("devices", [])
         
-        if not status_result.get("success"):
-            return DeviceSelfCheckResponse(
-                success=False,
-                message="查询设备状态失败",
-                error=status_result.get("error")
-            )
-        
-        devices_status = status_result.get("devices", [])
-        
-        # 步骤7: 过滤自检成功的设备
-        logger.info("步骤7: 过滤自检成功的设备...")
+        # 步骤6: 过滤自检成功的设备
+        logger.info("步骤6: 过滤自检成功的设备...")
         
         successful_devices = filter_successful_devices(devices_status)
-        failed_devices = [d["no"] for d in devices_status if d.get("status") != "check_success"]
+        failed_devices = [d["no"] for d in devices_status if d.get("status") not in ["check_success", "checking"]]
+        checking_devices = [d["no"] for d in devices_status if d.get("status") == "checking"]
+        
+        # 将还在自检中的设备也视为失败（因为超时了）
+        if checking_devices:
+            logger.warning(f"⚠️ 有 {len(checking_devices)} 个设备超时仍在自检中，将被视为失败")
+            failed_devices.extend(checking_devices)
         
         logger.info(f"自检成功: {len(successful_devices)} 个设备, 失败: {len(failed_devices)} 个设备")
         
@@ -2399,12 +2428,12 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
         
         logger.info(f"需要移除的田块（设备自检失败）: {len(failed_fields)} 个")
         
-        # 步骤8: 重新生成灌溉计划
+        # 步骤7: 重新生成灌溉计划
         new_plan_file = None
         final_device_list = []
         
         if request.auto_regenerate and failed_fields:
-            logger.info("步骤8: 重新生成灌溉计划，排除自检失败的田块...")
+            logger.info("步骤7: 重新生成灌溉计划，排除自检失败的田块...")
             
             try:
                 modified_plan = json.loads(json.dumps(plan_data))
@@ -2440,8 +2469,8 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
             for field_id in successful_fields:
                 final_device_list.extend(field_to_devices.get(field_id, []))
         
-        # 步骤9: 返回结果
-        logger.info("步骤9: 整理结果...")
+        # 步骤8: 返回结果
+        logger.info("步骤8: 整理结果...")
         
         result_data = {
             "total_devices": len(all_unique_nos),

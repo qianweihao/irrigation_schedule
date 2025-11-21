@@ -133,6 +133,44 @@ def query_device_status(unique_no_list: List[str], timeout: int = 30) -> Dict[st
         return {"success": False, "devices": [], "message": "", "error": error_msg}
 
 
+def get_device_status_summary(devices_status: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    获取设备状态统计摘要
+    
+    Args:
+        devices_status: 设备状态列表 [{"no": str, "status": str}, ...]
+        
+    Returns:
+        dict: {
+            "successful": List[str],
+            "checking": List[str],
+            "failed": List[str],
+            "other": List[str]
+        }
+    """
+    summary = {
+        "successful": [],
+        "checking": [],
+        "failed": [],
+        "other": []
+    }
+    
+    for device in devices_status:
+        status = device.get("status")
+        device_no = device.get("no")
+        
+        if status == "check_success":
+            summary["successful"].append(device_no)
+        elif status == "checking":
+            summary["checking"].append(device_no)
+        elif status == "check_failed":
+            summary["failed"].append(device_no)
+        else:
+            summary["other"].append(device_no)
+    
+    return summary
+
+
 def filter_successful_devices(devices_status: List[Dict[str, Any]]) -> List[str]:
     """
     过滤自检成功的设备
@@ -144,10 +182,24 @@ def filter_successful_devices(devices_status: List[Dict[str, Any]]) -> List[str]
         List[str]: 自检成功的设备unique_no列表
     """
     successful = []
-    for device in devices_status:
-        if device.get("status") == "check_success":
-            successful.append(device.get("no"))
+    checking = []
+    failed = []
     
-    logger.info(f"自检成功设备: {len(successful)}/{len(devices_status)}")
+    for device in devices_status:
+        status = device.get("status")
+        device_no = device.get("no")
+        
+        if status == "check_success":
+            successful.append(device_no)
+        elif status == "checking":
+            checking.append(device_no)
+        elif status == "check_failed":
+            failed.append(device_no)
+    
+    logger.info(f"设备状态统计: 成功={len(successful)}, 自检中={len(checking)}, 失败={len(failed)}, 总数={len(devices_status)}")
+    
+    if checking:
+        logger.warning(f"⚠️ 有 {len(checking)} 个设备还在自检中，建议增加等待时间或启用轮询模式")
+    
     return successful
 
