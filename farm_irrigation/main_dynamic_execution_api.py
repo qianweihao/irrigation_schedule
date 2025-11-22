@@ -4129,7 +4129,7 @@ async def get_batch_commands(
         execution_id: 执行ID
         batch_index: 批次索引（可选）
         phase: 阶段筛选（可选）
-        status: 状态筛选（可选，默认返回pending）
+        status: 状态筛选（可选，None表示返回所有状态的指令）
     
     Returns:
         {
@@ -4166,14 +4166,11 @@ async def get_batch_commands(
                 "error": "指令队列未初始化"
             }
         
-        # 默认返回待执行指令
-        if status is None:
-            status = "pending"
-        
         # 获取指令列表
+        # 如果status为None，则返回所有状态的指令；否则按指定状态过滤
         commands = scheduler.command_queue.get_commands(
             phase=phase,
-            status=status
+            status=status  # None表示查询所有状态
         )
         
         # 标记为已发送（仅对pending状态）

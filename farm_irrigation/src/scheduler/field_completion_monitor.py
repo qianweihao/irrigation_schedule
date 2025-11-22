@@ -12,6 +12,8 @@
 - 参考批次划分逻辑（farm_irr_full_device_modified.py）
 - 节制闸只有开/关（0%/100%），不调整开度
 - 三级联动：田块 → 节制闸 → 泵站
+- 监控器只负责判断逻辑和标记，不直接调用硬件API
+- 实际硬件控制通过指令队列交给硬件团队执行
 """
 
 import asyncio
@@ -21,8 +23,6 @@ import re
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 from dataclasses import dataclass
-
-from src.hardware.hw_control_onoff import close_gate, set_gate_degree
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +149,7 @@ class FieldCompletionMonitor:
             )
         
         # 初始化节制闸状态（只记录开启的节制闸）
-        self.regulators.clear()
+        self.active_regulators.clear()
         for reg in batch_regulators:
             if reg.get('open_pct', 0) > 0:  # 只监控开启的节制闸
                 gate_seq = self._extract_gate_seq(reg['id'])
@@ -276,26 +276,19 @@ class FieldCompletionMonitor:
         return completed_fields
     
     async def _close_inlet_gate(self, field_status: FieldStatus):
-        """关闭田块进水阀"""
-        try:
-            result = close_gate(self.app_id, self.secret, field_status.inlet_device)
-            if result and result.get("success"):
-                logger.info(f"  └─ 已关闭进水阀: {field_status.field_id}")
-                self.total_closures += 1
-            else:
-                error_msg = result.get("error", "未知错误") if result else "无响应"
-                logger.error(f"  └─ 关闭进水阀失败: {field_status.field_id} - {error_msg}")
-        except Exception as e:
-            logger.error(f"  └─ 关闭进水阀异常: {field_status.field_id} - {e}")
+        """
+        记录需要关闭的田块进水阀
+        注意：不实际调用硬件API，只记录日志，由后续生成指令
+        """
+        logger.info(f"  └─ 标记关闭进水阀: {field_status.field_id}")
+        self.total_closures += 1
     
     async def _open_outlet_for_emergency(self, field_status: FieldStatus):
-        """紧急排水（全开出水阀）"""
-        try:
-            result = set_gate_degree(self.app_id, self.secret, field_status.outlet_device, 100)
-            if result and result.get("success"):
-                logger.info(f"  └─ 紧急排水(100%): {field_status.field_id}")
-        except Exception as e:
-            logger.error(f"  └─ 紧急排水失败: {field_status.field_id} - {e}")
+        """
+        记录需要紧急排水的田块（全开出水阀）
+        注意：不实际调用硬件API，只记录日志，由后续生成指令
+        """
+        logger.info(f"  └─ 标记紧急排水(100%): {field_status.field_id}")
     
     # ============ P1: 支渠节制闸关闭逻辑 ============
     
@@ -362,21 +355,15 @@ class FieldCompletionMonitor:
         return closed_regulators
     
     async def _close_regulator(self, reg_info: RegulatorInfo):
-        """关闭节制闸"""
+        """
+        记录需要关闭的节制闸
+        注意：不实际调用硬件API，只记录日志，由后续生成指令
+        """
         if not reg_info.unique_no:
-            logger.warning(f"  └─ 节制闸 {reg_info.reg_id} 无 unique_no，跳过")
-            return
+            logger.warning(f"  └─ 节制闸 {reg_info.reg_id} 无 unique_no（配置中缺失）")
         
-        try:
-            result = close_gate(self.app_id, self.secret, reg_info.unique_no)
-            if result and result.get("success"):
-                logger.info(f"  └─ 已关闭{reg_info.gate_type}节制闸: {reg_info.reg_id} (支渠{reg_info.segment_id})")
-                self.total_closures += 1
-            else:
-                error_msg = result.get("error", "未知错误") if result else "无响应"
-                logger.error(f"  └─ 关闭节制闸失败: {reg_info.reg_id} - {error_msg}")
-        except Exception as e:
-            logger.error(f"  └─ 关闭节制闸异常: {reg_info.reg_id} - {e}")
+        logger.info(f"  └─ 标记关闭{reg_info.gate_type}节制闸: {reg_info.reg_id} (支渠{reg_info.segment_id})")
+        self.total_closures += 1
     
     # ============ P2: 泵站停止逻辑 ============
     
@@ -418,10 +405,11 @@ class FieldCompletionMonitor:
         return stopped_pumps
     
     async def _stop_pump(self, pump_id: str):
-        """停止泵站"""
-        # TODO: 实现实际的泵站控制接口
-        # 目前只记录日志
-        logger.info(f"  └─ 停止泵站: {pump_id}")
+        """
+        记录需要停止的泵站
+        注意：不实际调用硬件API，只记录日志，由后续生成指令
+        """
+        logger.info(f"  └─ 标记停止泵站: {pump_id}")
         self.total_closures += 1
     
     # ============ 辅助方法 ============
@@ -475,8 +463,8 @@ class FieldCompletionMonitor:
             'completed_fields': sum(1 for f in self.active_fields.values() if f.status == "completed"),
             'irrigating_fields': sum(1 for f in self.active_fields.values() if f.status == "irrigating"),
             'overflow_fields': sum(1 for f in self.active_fields.values() if f.status == "overflow"),
-            'total_regulators': len(self.regulators),
-            'closed_regulators': sum(1 for r in self.regulators.values() if r.status == "closed"),
+            'total_regulators': len(self.active_regulators),
+            'closed_regulators': sum(1 for r in self.active_regulators.values() if r.status == "closed"),
             'active_pumps': len(self.active_pumps),
             'total_closures': self.total_closures,
             'total_completions': self.total_field_completions

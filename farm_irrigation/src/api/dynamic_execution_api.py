@@ -81,6 +81,8 @@ class ExecutionStatusResponse(BaseModel):
     completed_batches: List[int] = []
     selected_scenario: Optional[ScenarioInfo] = None
     error_message: Optional[str] = None
+    command_statistics: Optional[Dict[str, int]] = None  # 设备指令统计
+    monitor_statistics: Optional[Dict[str, int]] = None  # 监控器统计
 
 class WaterLevelUpdateRequest(BaseModel):
     """水位更新请求模型"""
@@ -127,6 +129,9 @@ class ManualRegenerationResponse(BaseModel):
     wl_high: float = 140.0  # 高水位阈值（mm），超过则不需要灌溉（全局默认值）
     d_target_mm: float = 90.0  # 目标灌溉水深（mm），每次灌溉增加的水深
     field_water_level_standards: Optional[Dict[str, Dict[str, float]]] = None  # 田块级水位标准（如果有自定义）
+    # 设备关闭触发信息（人工调整水位后自动触发）
+    triggered_closures: Optional[Dict[str, List[str]]] = None  # 触发的设备关闭信息
+    new_commands_generated: int = 0  # 新生成的设备指令数量
 
 class ExecutionHistoryResponse(BaseModel):
     """执行历史响应模型"""
@@ -219,22 +224,22 @@ async def start_dynamic_execution(request: DynamicExecutionRequest) -> DynamicEx
                 detail="启动动态执行失败: 调度器启动失败"
             )
         
-        # 获取状态信息
+        # 获取状态信息（启动后scheduler.is_running应该为True）
         status = scheduler.get_execution_status()
         
         # 获取所有方案信息
         scenarios_info = scheduler.get_all_scenarios_info()
         
-        # 生成执行ID
-        execution_id = f"exec_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        # 使用调度器自己的execution_id，如果没有则生成新的
+        execution_id = status.get("execution_id") or scheduler.execution_id or f"exec_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
         return DynamicExecutionResponse(
             success=True,
             message="动态执行已启动",
             execution_id=execution_id,
-            scheduler_status="running" if status.get("is_running") else "stopped",
-            total_batches=status.get("total_batches", 0),  # 保持兼容性
-            current_batch=0,  # 刚启动时当前批次为0
+            scheduler_status=status.get("status", "running"),  # 使用status字段而不是is_running
+            total_batches=status.get("total_batches", 0),
+            current_batch=status.get("current_batch", 1),  # 使用实际的当前批次
             selected_scenario=scenarios_info.get("selected_scenario"),
             all_scenarios=scenarios_info.get("all_scenarios", [])
         )
@@ -337,6 +342,22 @@ async def get_execution_status() -> ExecutionStatusResponse:
         except Exception as e:
             logger.warning(f"获取选中scenario信息失败: {e}")
         
+        # 获取设备指令统计
+        command_statistics = None
+        if scheduler.command_queue:
+            try:
+                command_statistics = scheduler.command_queue.get_statistics()
+            except Exception as e:
+                logger.warning(f"获取指令统计失败: {e}")
+        
+        # 获取监控器统计
+        monitor_statistics = None
+        if scheduler.completion_monitor:
+            try:
+                monitor_statistics = scheduler.completion_monitor.get_statistics()
+            except Exception as e:
+                logger.warning(f"获取监控器统计失败: {e}")
+        
         return ExecutionStatusResponse(
             execution_id=status.get("execution_id", ""),
             status=status.get("status", "unknown"),
@@ -350,7 +371,9 @@ async def get_execution_status() -> ExecutionStatusResponse:
             active_fields=status.get("active_fields", []),
             completed_batches=status.get("completed_batches", []),
             selected_scenario=selected_scenario,
-            error_message=status.get("error_message")
+            error_message=status.get("error_message"),
+            command_statistics=command_statistics,
+            monitor_statistics=monitor_statistics
         )
         
     except HTTPException:
@@ -708,6 +731,9 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             message += f"（使用了 {len(field_standards)} 个田块的自定义水位标准）"
         
         # 如果使用了自定义水位，更新监控器并触发设备关闭检查
+        triggered_closures = None
+        new_commands_generated = 0
+        
         if request.custom_water_levels and scheduler.completion_monitor:
             logger.info("人工调整水位，更新监控器并触发设备检查")
             
@@ -717,6 +743,13 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             # 立即触发一次设备关闭检查
             try:
                 check_result = await scheduler.completion_monitor.check_and_close_devices(request.custom_water_levels)
+                
+                # 记录触发的关闭信息
+                triggered_closures = {
+                    'completed_fields': check_result.get('completed_fields', []),
+                    'closed_regulators': check_result.get('closed_regulators', []),
+                    'stopped_pumps': check_result.get('stopped_pumps', [])
+                }
                 
                 # 将生成的关闭指令加入队列
                 if check_result.get('completed_fields'):
@@ -736,6 +769,7 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
                                 "description": f"关闭{field_id}进水阀(人工调整触发)"
                             }
                             scheduler.command_queue.add_command(close_cmd)
+                            new_commands_generated += 1
                 
                 if check_result.get('closed_regulators'):
                     logger.info(f"人工调整后，{len(check_result['closed_regulators'])}个节制闸需关闭")
@@ -754,6 +788,7 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
                                 "description": f"关闭{reg_id}节制闸(人工调整触发)"
                             }
                             scheduler.command_queue.add_command(close_cmd)
+                            new_commands_generated += 1
                 
                 if check_result.get('stopped_pumps'):
                     logger.info(f"人工调整后，{len(check_result['stopped_pumps'])}个泵站需停止")
@@ -772,6 +807,7 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
                             "description": f"停止{pump_id}泵站(人工调整触发)"
                         }
                         scheduler.command_queue.add_command(stop_cmd)
+                        new_commands_generated += 1
                         
             except Exception as e:
                 logger.warning(f"人工调整后触发设备检查失败: {e}")
@@ -791,7 +827,9 @@ async def manual_regenerate_batch(request: ManualRegenerationRequest) -> ManualR
             wl_opt=wl_opt,
             wl_high=wl_high,
             d_target_mm=d_target_mm,
-            field_water_level_standards=field_standards  # 返回田块级别的标准（如果有）
+            field_water_level_standards=field_standards,  # 返回田块级别的标准（如果有）
+            triggered_closures=triggered_closures,  # 触发的设备关闭信息
+            new_commands_generated=new_commands_generated  # 新生成的指令数量
         )
         
     except HTTPException:

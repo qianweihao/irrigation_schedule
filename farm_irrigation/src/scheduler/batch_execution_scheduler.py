@@ -861,7 +861,7 @@ class BatchExecutionScheduler:
         生成批次启动指令
         
         Args:
-            plan: 批次计划
+            plan: 批次计划（可能是完整计划或单个批次）
             batch_index: 批次索引
         
         Returns:
@@ -869,8 +869,33 @@ class BatchExecutionScheduler:
         """
         commands = []
         
+        # 提取步骤和田块列表 - 兼容两种格式
+        steps_list = []
+        fields_list = []
+        
+        # 格式1：plan直接包含steps和fields（单个批次格式）
+        if 'steps' in plan:
+            steps_list = plan.get('steps', [])
+        if 'fields' in plan and plan['fields']:
+            fields_list = plan['fields']
+        
+        # 格式2：plan包含batches数组（完整计划格式）
+        if 'batches' in plan:
+            # 从batches中找到对应批次
+            for batch in plan['batches']:
+                if batch.get('index') == batch_index:
+                    fields_list = batch.get('fields', [])
+                    break
+            # 从steps中找到对应批次的step
+            all_steps = plan.get('steps', [])
+            batch_label = f"批次 {batch_index}"
+            for step in all_steps:
+                if step.get('label') == batch_label:
+                    steps_list = [step]
+                    break
+        
         # 1. 泵站启动指令
-        for step in plan.get('steps', []):
+        for step in steps_list:
             pumps_on = step.get('sequence', {}).get('pumps_on', [])
             for pump_id in pumps_on:
                 # 从配置数据中查找泵站的unique_no
@@ -886,7 +911,7 @@ class BatchExecutionScheduler:
                 })
         
         # 2. 节制闸开启指令
-        for step in plan.get('steps', []):
+        for step in steps_list:
             gates_set = step.get('sequence', {}).get('gates_set', [])
             for gate in gates_set:
                 if gate.get('open_pct', 0) > 0:
@@ -901,7 +926,7 @@ class BatchExecutionScheduler:
                     })
         
         # 3. 田块进水阀开启指令
-        for field in plan.get('fields', []):
+        for field in fields_list:
             commands.append({
                 "device_type": "field_inlet_gate",
                 "device_id": field['id'],
@@ -944,7 +969,7 @@ class BatchExecutionScheduler:
         初始化批次监控
         
         Args:
-            plan: 批次计划
+            plan: 批次计划（可能是完整计划或单个批次）
             batch_index: 批次索引
         """
         # 延迟初始化监控器
@@ -957,9 +982,21 @@ class BatchExecutionScheduler:
                 check_interval=30
             )
         
-        # 提取田块信息
+        # 提取田块信息 - 兼容两种格式
         batch_fields = []
-        for field in plan.get('fields', []):
+        fields_list = []
+        
+        # 格式1：plan直接包含fields（单个批次格式）
+        if 'fields' in plan and plan['fields']:
+            fields_list = plan['fields']
+        # 格式2：plan包含batches数组（完整计划格式）
+        elif 'batches' in plan:
+            for batch in plan['batches']:
+                if batch.get('index') == batch_index:
+                    fields_list = batch.get('fields', [])
+                    break
+        
+        for field in fields_list:
             batch_fields.append({
                 'id': field['id'],
                 'segment_id': field.get('segment_id', ''),
@@ -1014,8 +1051,10 @@ class BatchExecutionScheduler:
         check_count = 0
         max_duration_hours = batch_exec.original_duration * 2  # 超时保护：预计时间的2倍
         max_checks = int(max_duration_hours * 3600 / 30)  # 每30秒检查一次
+        no_data_count = 0  # 无水位数据计数器
         
         logger.info(f"批次 {batch_exec.batch_index} 开始实时监控（预计 {batch_exec.original_duration:.2f}h）")
+        logger.info(f"💡 提示：系统将每30秒检查一次水位，自动关闭达标设备")
         
         while check_count < max_checks:
             check_count += 1
@@ -1024,9 +1063,19 @@ class BatchExecutionScheduler:
             latest_wl = await self._fetch_current_water_levels()
             
             if not latest_wl:
-                logger.warning(f"第 {check_count} 次检查：未获取到水位数据，30秒后重试")
+                no_data_count += 1
+                # 只在第1次和每10次时输出警告，避免日志过多
+                if no_data_count == 1:
+                    logger.warning(f"⚠️ 未获取到实时水位数据，将使用配置文件中的初始水位继续监控")
+                elif no_data_count % 10 == 0:
+                    logger.debug(f"已尝试 {no_data_count} 次，仍未获取到水位数据")
                 await asyncio.sleep(30)
                 continue
+            else:
+                # 成功获取数据后重置计数器
+                if no_data_count > 0:
+                    logger.info(f"✅ 已恢复水位数据获取")
+                    no_data_count = 0
             
             # 2. 检查并生成关闭指令
             result = await self.completion_monitor.check_and_close_devices(latest_wl)
@@ -1127,30 +1176,28 @@ class BatchExecutionScheduler:
         try:
             from src.api.waterlevel_api import fetch_waterlevels
             
-            # 调用水位API获取最新数据
-            response = fetch_waterlevels(
-                app_id=self.app_id,
-                secret=self.secret,
-                farm_id=self.farm_id
-            )
+            # 调用水位API获取最新数据（只需要farm_id）
+            response = fetch_waterlevels(farm_id=self.farm_id)
             
-            if not response or not response.get('success'):
-                logger.warning("获取水位数据失败")
+            if not response:
+                # 使用DEBUG级别，避免过多警告信息
+                logger.debug(f"水位API未返回数据（farm_id={self.farm_id}），将使用配置文件中的初始水位")
                 return {}
             
             # 解析水位数据
             water_levels = {}
-            for item in response.get('data', []):
-                field_id = item.get('section_code')
-                wl_mm = item.get('wl_mm')
-                if field_id and wl_mm is not None:
-                    water_levels[field_id] = wl_mm
+            for item in response:
+                # waterlevel_api 返回格式: {"sectionID": str, "sectionCode": str, "waterlevel_mm": float}
+                section_code = item.get('sectionCode')
+                wl_mm = item.get('waterlevel_mm')
+                if section_code and wl_mm is not None:
+                    water_levels[section_code] = wl_mm
             
-            logger.debug(f"获取到 {len(water_levels)} 个田块的水位数据")
+            logger.info(f"✅ 获取到 {len(water_levels)} 个田块的实时水位数据")
             return water_levels
             
         except Exception as e:
-            logger.error(f"获取水位数据异常: {e}")
+            logger.debug(f"获取水位数据异常: {e}，将使用配置文件中的初始水位")
             return {}
 
 # 示例设备控制回调函数

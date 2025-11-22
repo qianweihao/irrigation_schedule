@@ -4036,3 +4036,2041 @@ C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages
 2025-11-21 21:04:58,412 - INFO - ========== 获取设备列表完成 ==========
 2025-11-21 22:12:06,283 - INFO - 智能灌溉动态执行系统关闭中...
 2025-11-21 22:12:06,283 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 10:02:26,181 - INFO - pipeline模块导入成功
+2025-11-22 10:02:26,182 - INFO - 步骤4: 设置默认参数...
+2025-11-22 10:02:26,182 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 10:02:26,182 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:02:26,182 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 10:02:26,182 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 10:02:26,182 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 10:02:26,183 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 10:02:26,183 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 10:02:26,183 - INFO - Pipeline实例创建成功
+2025-11-22 10:02:26,183 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 10:02:26,183 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 10:02:26,183 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 10:02:26,183 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 10:02:26,183 - INFO - 检查依赖文件...
+2025-11-22 10:02:26,184 - INFO - 依赖文件检查通过
+2025-11-22 10:02:26,184 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 10:02:26,185 - INFO - 找到 15 个GIS数据文件
+2025-11-22 10:02:26,186 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:02:26,186 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 10:02:26,186 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 10:02:26,186 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 10:02:26,186 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 10:02:26,187 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 10:02:27,190 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 10:02:27,191 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 10:02:27,191 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 10:02:27,192 - INFO - 开始执行: GIS数据修复
+2025-11-22 10:02:27,192 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 10:02:27,385 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 10:02:27,387 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 10:02:27,387 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 10:02:27,388 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 10:02:27,388 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json --multi-pump --summary --realtime
+2025-11-22 10:02:28,836 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1102.07元 - 运行30.61h
+推荐方案: 水泵['P1'] (电费: 1102.07元, 运行时间: 30.61h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+
+2025-11-22 10:02:28,836 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 10:02:28,837 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.653814
+2025-11-22 10:02:28,837 - INFO - 生成的文件:
+2025-11-22 10:02:28,837 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 10:02:28,837 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 10:02:28,838 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 10:02:28,838 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 10:02:28,838 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 10:02:28,838 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 10:02:28,838 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 10:02:28,838 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 10:02:28,838 - INFO - Pipeline执行结果: success=True
+2025-11-22 10:02:28,839 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 10:02:28,839 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 10:02:28,839 - INFO - 开始生成多水泵方案对比
+2025-11-22 10:02:29,398 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 10:02:29,398 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 10:02:29,398 - INFO - 灌溉计划生成完成
+2025-11-22 10:03:41,977 - INFO - ========== 开始获取计划中的设备列表 ==========
+2025-11-22 10:03:41,977 - INFO - 农场ID: 84911829811210, 计划ID: 最新
+2025-11-22 10:03:41,978 - INFO - 步骤1: 获取灌溉计划...
+2025-11-22 10:03:41,978 - INFO - 使用计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 10:03:41,979 - INFO - 步骤2: 提取需要灌溉的田块...
+2025-11-22 10:03:41,979 - INFO - 找到需要灌溉的田块: 13 个
+2025-11-22 10:03:41,979 - INFO - 步骤3: 查询田块对应的设备...
+2025-11-22 10:04:18,554 - INFO - 步骤4: 筛选设备...
+2025-11-22 10:04:18,554 - INFO - ✅ 成功获取 13 个田块对应的 10 个设备
+2025-11-22 10:04:18,554 - INFO - ========== 获取设备列表完成 ==========
+2025-11-22 10:06:00,265 - INFO - ========== 开始设备自检工作流 ==========
+2025-11-22 10:06:00,265 - INFO - 农场ID: 84911829811210, 等待时间: 5分钟
+2025-11-22 10:06:00,265 - INFO - 步骤1: 获取当前灌溉计划...
+2025-11-22 10:06:00,266 - INFO - 使用计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 10:06:00,266 - INFO - 找到需要灌溉的田块: 13 个
+2025-11-22 10:06:00,266 - INFO - 步骤2: 获取田块对应的设备unique_no...
+2025-11-22 10:06:37,774 - INFO - 需要自检的设备总数: 10
+2025-11-22 10:06:37,774 - INFO - 步骤3: 触发设备自检...
+2025-11-22 10:06:37,774 - INFO - 触发设备自检，设备数量: 10
+2025-11-22 10:06:37,774 - INFO - 📋 请求URL: http://101.201.78.54:8100/device_self_check
+2025-11-22 10:06:37,774 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-22 10:06:40,712 - INFO - ✅ 设备自检触发成功: 5/10 Task(s) accepted, starting self checking
+2025-11-22 10:06:40,713 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'message': '5/10 Task(s) accepted, starting self checking', 'trigger_result': {'accepted_no_list': ['477379421064159242', '477379421064159255', '477379421064159243', '477379421064159232', '477379421064159246'], 'unaccepted_no_list': {'202511140930590001': "操作失败：'data'", '202511140931130001': "操作失败：'data'", '480887123677298688': 'Trigger failed！Get device open rate failed!', '480892188113780736': 'Trigger failed！Get device open rate failed!', '480911695752478720': 'Trigger failed！Get device open rate failed!'}}}
+2025-11-22 10:06:40,713 - INFO - 📋 接受的设备列表: [], 数量: 0
+2025-11-22 10:06:40,713 - INFO - ✅ 自检任务已接受，设备数: 0
+2025-11-22 10:06:40,713 - INFO - 步骤4: 等待 5 分钟，让设备完成自检...
+2025-11-22 10:11:40,715 - INFO - 步骤5: 查询设备自检状态...
+2025-11-22 10:11:40,715 - INFO - 🔄 启用轮询模式，最多尝试 5 次，间隔 30 秒
+2025-11-22 10:11:40,715 - INFO - 📊 第 1/5 次查询...
+2025-11-22 10:11:40,715 - INFO - 查询设备状态，设备数量: 10
+2025-11-22 10:11:40,716 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-22 10:11:40,716 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-22 10:11:40,818 - INFO - ✅ 设备状态查询成功，共 5 个设备
+2025-11-22 10:11:40,819 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159246', 'status': 'check_success'}], 'message': 'ok'}
+2025-11-22 10:11:40,819 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'check_success'}
+2025-11-22 10:11:40,819 - INFO - 状态统计: 成功=5, 自检中=0, 失败=0
+2025-11-22 10:11:40,820 - INFO - ✅ 所有设备已完成自检（成功+失败）
+2025-11-22 10:11:40,820 - INFO - 步骤6: 过滤自检成功的设备...
+2025-11-22 10:11:40,820 - INFO - 设备状态统计: 成功=5, 自检中=0, 失败=0, 总数=5
+2025-11-22 10:11:40,820 - INFO - 自检成功: 5 个设备, 失败: 0 个设备
+2025-11-22 10:11:40,820 - INFO - 需要移除的田块（设备自检失败）: 0 个
+2025-11-22 10:11:40,820 - INFO - 步骤8: 整理结果...
+2025-11-22 10:11:40,820 - INFO - ========== 设备自检工作流完成 ==========
+2025-11-22 10:11:40,820 - INFO - 总设备: 10, 成功: 5, 失败: 0
+2025-11-22 10:11:40,821 - INFO - 总田块: 13, 保留: 13, 移除: 0
+2025-11-22 10:13:34,779 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_100227.json
+2025-11-22 10:13:34,780 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:13:34,781 - INFO - 配置文件加载成功: config.json
+2025-11-22 10:13:34,781 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 10:13:34,781 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.37h
+2025-11-22 10:13:34,781 - INFO - 批次 2: 开始时间 17.37h, 持续时间 13.25h
+2025-11-22 10:13:34,781 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_100227.json
+2025-11-22 10:13:34,782 - INFO - 共有 2 个批次
+2025-11-22 10:13:34,796 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 10:13:34,799 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_101334
+2025-11-22 10:13:34,801 - INFO - [scheduler] 执行开始时间: 2025-11-22 10:13:34.782905
+2025-11-22 10:13:34,806 - INFO - 开始准备批次 1
+2025-11-22 10:13:34,806 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:13:35,163 - INFO - 批次 1 计划重新生成完成
+2025-11-22 10:13:35,163 - INFO - 开始执行批次 1
+2025-11-22 10:13:35,164 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 10:13:35,164 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 10:13:35,164 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 10:13:35,164 - INFO - 添加指令: cmd_0002 - 启动P1泵站
+2025-11-22 10:13:35,165 - INFO - 添加指令: cmd_0003 - 开启S1-G27节制闸(100%)
+2025-11-22 10:13:35,165 - INFO - 添加指令: cmd_0004 - 开启S2-G10节制闸(100%)
+2025-11-22 10:13:35,165 - INFO - 添加指令: cmd_0005 - 开启S2-G12节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0006 - 开启S2-G13节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0007 - 开启S2-G14节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0008 - 开启S3-G18节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0009 - 开启S3-G19节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0010 - 开启S3-G20节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0011 - 开启S3-G21节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0012 - 开启S1-G27节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0013 - 开启S3-G23节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0014 - 开启S3-G25节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 添加指令: cmd_0015 - 开启S5-G29节制闸(100%)
+2025-11-22 10:13:35,166 - INFO - 批次 1 已生成 15 条启动指令
+2025-11-22 10:13:35,173 - INFO - 初始化批次监控: 0 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 10:13:35,173 - ERROR - 执行批次 1 失败: 'FieldCompletionMonitor' object has no attribute 'regulators'
+2025-11-22 10:14:17,014 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_100227.json
+2025-11-22 10:18:52,222 - INFO - 指令状态更新: cmd_0001 sent → executed
+2025-11-22 10:18:52,223 - INFO -   反馈: P1泵站已成功启动
+2025-11-22 10:18:52,223 - INFO - 收到指令反馈: cmd_0001 - executed
+2025-11-22 10:30:29,542 - INFO - 手动重新生成批次 1
+2025-11-22 10:30:29,543 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:30:29,543 - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-22 10:30:29,543 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 10:30:29,544 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 10:30:29,546 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 10:30:29,546 - ERROR - 批次 1 状态为 failed，无法更新
+2025-11-22 10:30:29,547 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 10:30:29,547 - INFO - 已更新scenario: P1单独使用
+2025-11-22 10:30:29,547 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 10:30:29,549 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 10:30:29,549 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 10:30:29,549 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 10:30:29,550 - INFO - ============================================================
+2025-11-22 10:30:29,550 - INFO - 开始检查水位和设备状态
+2025-11-22 10:30:29,550 - INFO - ============================================================
+2025-11-22 10:30:29,550 - INFO - ============================================================
+2025-11-22 10:30:29,550 - INFO - 检查完成: 田块完成 0, 节制闸关闭 0, 泵站停止 0
+2025-11-22 10:30:29,550 - INFO - ============================================================
+2025-11-22 10:33:29,535 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 10:33:29,535 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 10:49:38,531 - INFO - pipeline模块导入成功
+2025-11-22 10:49:38,532 - INFO - 步骤4: 设置默认参数...
+2025-11-22 10:49:38,532 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 10:49:38,532 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:49:38,532 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 10:49:38,532 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 10:49:38,532 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 10:49:38,533 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 10:49:38,533 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 10:49:38,533 - INFO - Pipeline实例创建成功
+2025-11-22 10:49:38,533 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 10:49:38,533 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 10:49:38,533 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 10:49:38,533 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 10:49:38,534 - INFO - 检查依赖文件...
+2025-11-22 10:49:38,534 - INFO - 依赖文件检查通过
+2025-11-22 10:49:38,534 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 10:49:38,535 - INFO - 找到 15 个GIS数据文件
+2025-11-22 10:49:38,535 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:49:38,536 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 10:49:38,536 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 10:49:38,536 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 10:49:38,536 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 10:49:38,536 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 10:49:39,239 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 10:49:39,239 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 10:49:39,240 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 10:49:39,240 - INFO - 开始执行: GIS数据修复
+2025-11-22 10:49:39,240 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 10:49:39,427 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 10:49:39,429 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 10:49:39,429 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 10:49:39,430 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 10:49:39,430 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json --multi-pump --summary --realtime
+2025-11-22 10:49:40,789 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1108.13元 - 运行30.78h
+推荐方案: 水泵['P1'] (电费: 1108.13元, 运行时间: 30.78h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+
+2025-11-22 10:49:40,790 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 10:49:40,790 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.256934
+2025-11-22 10:49:40,791 - INFO - 生成的文件:
+2025-11-22 10:49:40,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 10:49:40,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 10:49:40,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 10:49:40,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 10:49:40,792 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 10:49:40,793 - INFO - Pipeline执行结果: success=True
+2025-11-22 10:49:40,793 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 10:49:40,794 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 10:49:40,794 - INFO - 开始生成多水泵方案对比
+2025-11-22 10:49:41,366 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 10:49:41,366 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 10:49:41,366 - INFO - 灌溉计划生成完成
+2025-11-22 10:50:08,447 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_100227.json
+2025-11-22 10:50:08,447 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 10:50:08,448 - INFO - 配置文件加载成功: config.json
+2025-11-22 10:50:08,448 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 10:50:08,448 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.37h
+2025-11-22 10:50:08,449 - INFO - 批次 2: 开始时间 17.37h, 持续时间 13.25h
+2025-11-22 10:50:08,449 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_100227.json
+2025-11-22 10:50:08,449 - INFO - 共有 2 个批次
+2025-11-22 10:50:08,451 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 10:50:08,454 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_105008
+2025-11-22 10:50:08,456 - INFO - [scheduler] 执行开始时间: 2025-11-22 10:50:08.449611
+2025-11-22 10:50:08,457 - INFO - 开始准备批次 1
+2025-11-22 10:50:08,457 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:50:08,750 - INFO - 批次 1 计划重新生成完成
+2025-11-22 10:50:08,750 - INFO - 开始执行批次 1
+2025-11-22 10:50:08,750 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 10:50:08,751 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0002 - 启动P1泵站
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0003 - 开启S1-G27节制闸(100%)
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0004 - 开启S2-G10节制闸(100%)
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0005 - 开启S2-G12节制闸(100%)
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0006 - 开启S2-G13节制闸(100%)
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0007 - 开启S2-G14节制闸(100%)
+2025-11-22 10:50:08,751 - INFO - 添加指令: cmd_0008 - 开启S3-G18节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0009 - 开启S3-G19节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0010 - 开启S3-G20节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0011 - 开启S3-G21节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0012 - 开启S1-G27节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0013 - 开启S3-G23节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0014 - 开启S3-G25节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 添加指令: cmd_0015 - 开启S5-G29节制闸(100%)
+2025-11-22 10:50:08,752 - INFO - 批次 1 已生成 15 条启动指令
+2025-11-22 10:50:08,759 - INFO - 初始化批次监控: 0 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 10:50:08,759 - INFO - ✅ 监控初始化完成
+2025-11-22 10:50:08,760 - INFO - 批次 1 监控初始化完成: 0田块, 13节制闸, 1泵站
+2025-11-22 10:50:08,760 - INFO - 批次 1 开始实时监控（预计 17.37h）
+2025-11-22 10:50:08,760 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:50:08,760 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:50:38,751 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:50:38,751 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:50:59,451 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_100227.json
+2025-11-22 10:51:08,750 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:51:08,750 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:51:38,747 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:51:38,747 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:52:08,745 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:52:08,745 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:52:38,748 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:52:38,748 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:53:08,746 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:53:08,746 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:53:38,745 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:53:38,745 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:54:08,755 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:54:08,755 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:54:38,756 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:54:38,756 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:55:08,761 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:55:08,761 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:55:38,756 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:55:38,756 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:56:08,770 - ERROR - 获取水位数据异常: fetch_waterlevels() got an unexpected keyword argument 'app_id'
+2025-11-22 10:56:08,771 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 10:56:34,935 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 10:56:34,935 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 11:03:50,462 - INFO - pipeline模块导入成功
+2025-11-22 11:03:50,462 - INFO - 步骤4: 设置默认参数...
+2025-11-22 11:03:50,463 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:03:50,463 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:03:50,463 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 11:03:50,463 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:03:50,463 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 11:03:50,463 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 11:03:50,464 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 11:03:50,464 - INFO - Pipeline实例创建成功
+2025-11-22 11:03:50,464 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 11:03:50,464 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 11:03:50,464 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 11:03:50,464 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:03:50,464 - INFO - 检查依赖文件...
+2025-11-22 11:03:50,465 - INFO - 依赖文件检查通过
+2025-11-22 11:03:50,465 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 11:03:50,466 - INFO - 找到 15 个GIS数据文件
+2025-11-22 11:03:50,466 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:03:50,466 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 11:03:50,466 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 11:03:50,466 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 11:03:50,466 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 11:03:50,467 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 11:03:51,210 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 11:03:51,211 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 11:03:51,211 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 11:03:51,212 - INFO - 开始执行: GIS数据修复
+2025-11-22 11:03:51,212 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 11:03:51,395 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 11:03:51,397 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 11:03:51,397 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 11:03:51,397 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 11:03:51,397 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json --multi-pump --summary --realtime
+2025-11-22 11:03:52,774 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1108.13元 - 运行30.78h
+推荐方案: 水泵['P1'] (电费: 1108.13元, 运行时间: 30.78h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+
+2025-11-22 11:03:52,775 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 11:03:52,775 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.310868
+2025-11-22 11:03:52,776 - INFO - 生成的文件:
+2025-11-22 11:03:52,776 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 11:03:52,776 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 11:03:52,776 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 11:03:52,776 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 11:03:52,776 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 11:03:52,776 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 11:03:52,777 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 11:03:52,778 - INFO - Pipeline执行结果: success=True
+2025-11-22 11:03:52,778 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 11:03:52,779 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 11:03:52,779 - INFO - 开始生成多水泵方案对比
+2025-11-22 11:03:53,319 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 11:03:53,319 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 11:03:53,319 - INFO - 灌溉计划生成完成
+2025-11-22 11:04:09,742 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_110351.json
+2025-11-22 11:04:09,743 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:04:09,743 - INFO - 配置文件加载成功: config.json
+2025-11-22 11:04:09,744 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 11:04:09,744 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.40h
+2025-11-22 11:04:09,744 - INFO - 批次 2: 开始时间 17.40h, 持续时间 13.38h
+2025-11-22 11:04:09,744 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_110351.json
+2025-11-22 11:04:09,744 - INFO - 共有 2 个批次
+2025-11-22 11:04:09,747 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 11:04:09,749 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_110409
+2025-11-22 11:04:09,751 - INFO - [scheduler] 执行开始时间: 2025-11-22 11:04:09.744869
+2025-11-22 11:04:09,752 - INFO - 开始准备批次 1
+2025-11-22 11:04:10,072 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:04:10,362 - INFO - 批次 1 计划重新生成完成
+2025-11-22 11:04:10,362 - INFO - 开始执行批次 1
+2025-11-22 11:04:10,362 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 11:04:10,362 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-22 11:04:10,363 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0011 - 开启S1-G3-F2进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0012 - 开启S1-G4-F3进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0013 - 开启S2-G10-F7进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0014 - 开启S2-G12-F9进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0015 - 开启S2-G13-F10进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0016 - 开启S2-G14-F11进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0017 - 开启S3-G18-F15进水阀
+2025-11-22 11:04:10,364 - INFO - 添加指令: cmd_0018 - 开启S3-G19-F16进水阀
+2025-11-22 11:04:10,365 - INFO - 添加指令: cmd_0019 - 开启S3-G20-F17进水阀
+2025-11-22 11:04:10,365 - INFO - 添加指令: cmd_0020 - 开启S3-G21-F18进水阀
+2025-11-22 11:04:10,365 - INFO - 批次 1 已生成 20 条启动指令
+2025-11-22 11:04:10,366 - INFO - 初始化批次监控: 10 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 11:04:10,367 - INFO - ✅ 监控初始化完成
+2025-11-22 11:04:10,367 - INFO - 批次 1 监控初始化完成: 10田块, 13节制闸, 1泵站
+2025-11-22 11:04:10,367 - INFO - 批次 1 开始实时监控（预计 17.40h）
+2025-11-22 11:04:10,608 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:04:10,608 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:04:40,924 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:04:40,924 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:05:11,234 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:05:11,234 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:05:41,545 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:05:41,545 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:06:11,858 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:06:11,858 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:06:42,434 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:06:42,434 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:07:12,727 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:07:12,727 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:07:43,032 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:07:43,032 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:08:13,315 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:08:13,315 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:08:43,818 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:08:43,818 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:09:14,142 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:09:14,142 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:09:44,487 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:09:44,487 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:10:14,795 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:10:14,795 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:10:45,167 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:10:45,167 - WARNING - 第 14 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:11:15,491 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:11:15,491 - WARNING - 第 15 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:11:45,856 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:11:45,856 - WARNING - 第 16 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:12:16,166 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:12:16,166 - WARNING - 第 17 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:12:46,464 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:12:46,464 - WARNING - 第 18 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:13:16,779 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:13:16,779 - WARNING - 第 19 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:13:47,070 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:13:47,070 - WARNING - 第 20 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:14:17,397 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:14:17,397 - WARNING - 第 21 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:14:47,772 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:14:47,772 - WARNING - 第 22 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:15:18,305 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:15:18,305 - WARNING - 第 23 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:15:48,821 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:15:48,821 - WARNING - 第 24 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:16:19,188 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:16:19,188 - WARNING - 第 25 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:16:49,449 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:16:49,449 - WARNING - 第 26 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:17:19,759 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:17:19,759 - WARNING - 第 27 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:17:50,068 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:17:50,068 - WARNING - 第 28 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:18:20,366 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:18:20,366 - WARNING - 第 29 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:18:50,688 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:18:50,688 - WARNING - 第 30 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:19:20,997 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:19:20,997 - WARNING - 第 31 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:19:51,291 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:19:51,291 - WARNING - 第 32 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:20:21,562 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:20:21,562 - WARNING - 第 33 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:20:51,869 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:20:51,869 - WARNING - 第 34 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:21:22,180 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:21:22,180 - WARNING - 第 35 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:21:52,468 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:21:52,468 - WARNING - 第 36 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:22:22,753 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:22:22,753 - WARNING - 第 37 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:22:53,080 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:22:53,080 - WARNING - 第 38 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:23:23,413 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:23:23,413 - WARNING - 第 39 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:23:53,715 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:23:53,715 - WARNING - 第 40 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:24:24,010 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:24:24,010 - WARNING - 第 41 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:24:54,298 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:24:54,298 - WARNING - 第 42 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:25:24,599 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:25:24,599 - WARNING - 第 43 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:25:54,929 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:25:54,929 - WARNING - 第 44 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:26:25,330 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:26:25,330 - WARNING - 第 45 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:26:55,673 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:26:55,673 - WARNING - 第 46 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:27:25,996 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:27:25,996 - WARNING - 第 47 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:27:56,497 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:27:56,497 - WARNING - 第 48 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:28:26,799 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:28:26,799 - WARNING - 第 49 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:28:51,845 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 11:28:51,845 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 11:29:50,500 - INFO - pipeline模块导入成功
+2025-11-22 11:29:50,500 - INFO - 步骤4: 设置默认参数...
+2025-11-22 11:29:50,501 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:29:50,501 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:29:50,501 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 11:29:50,501 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:29:50,502 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 11:29:50,502 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 11:29:50,502 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 11:29:50,502 - INFO - Pipeline实例创建成功
+2025-11-22 11:29:50,502 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 11:29:50,503 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 11:29:50,503 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 11:29:50,503 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:29:50,503 - INFO - 检查依赖文件...
+2025-11-22 11:29:50,503 - INFO - 依赖文件检查通过
+2025-11-22 11:29:50,503 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 11:29:50,504 - INFO - 找到 15 个GIS数据文件
+2025-11-22 11:29:50,504 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:29:50,504 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 11:29:50,505 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 11:29:50,505 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 11:29:50,505 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 11:29:50,505 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 11:29:51,218 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 11:29:51,218 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 11:29:51,219 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 11:29:51,219 - INFO - 开始执行: GIS数据修复
+2025-11-22 11:29:51,219 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 11:29:51,413 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 11:29:51,415 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 11:29:51,416 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 11:29:51,416 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 11:29:51,416 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json --multi-pump --summary --realtime
+2025-11-22 11:29:53,040 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1110.91元 - 运行30.86h
+推荐方案: 水泵['P1'] (电费: 1110.91元, 运行时间: 30.86h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+
+2025-11-22 11:29:53,040 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 11:29:53,040 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.538433
+2025-11-22 11:29:53,041 - INFO - 生成的文件:
+2025-11-22 11:29:53,041 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 11:29:53,041 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 11:29:53,041 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 11:29:53,041 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 11:29:53,042 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 11:29:53,043 - INFO - Pipeline执行结果: success=True
+2025-11-22 11:29:53,043 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-22 11:29:53,044 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 11:29:53,044 - INFO - 开始生成多水泵方案对比
+2025-11-22 11:29:53,877 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 11:29:53,877 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 11:29:53,877 - INFO - 灌溉计划生成完成
+2025-11-22 11:30:41,719 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_110351.json
+2025-11-22 11:30:41,720 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:30:41,720 - INFO - 配置文件加载成功: config.json
+2025-11-22 11:30:41,721 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 11:30:41,721 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.40h
+2025-11-22 11:30:41,721 - INFO - 批次 2: 开始时间 17.40h, 持续时间 13.38h
+2025-11-22 11:30:41,721 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_110351.json
+2025-11-22 11:30:41,721 - INFO - 共有 2 个批次
+2025-11-22 11:30:41,724 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 11:30:41,727 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_113041
+2025-11-22 11:30:41,729 - INFO - [scheduler] 执行开始时间: 2025-11-22 11:30:41.722257
+2025-11-22 11:30:41,730 - INFO - 开始准备批次 1
+2025-11-22 11:30:42,034 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:30:42,327 - INFO - 批次 1 计划重新生成完成
+2025-11-22 11:30:42,327 - INFO - 开始执行批次 1
+2025-11-22 11:30:42,327 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-22 11:30:42,328 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0011 - 开启S1-G3-F2进水阀
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0012 - 开启S1-G4-F3进水阀
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0013 - 开启S2-G10-F7进水阀
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0014 - 开启S2-G12-F9进水阀
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0015 - 开启S2-G13-F10进水阀
+2025-11-22 11:30:42,329 - INFO - 添加指令: cmd_0016 - 开启S2-G14-F11进水阀
+2025-11-22 11:30:42,330 - INFO - 添加指令: cmd_0017 - 开启S3-G18-F15进水阀
+2025-11-22 11:30:42,330 - INFO - 添加指令: cmd_0018 - 开启S3-G19-F16进水阀
+2025-11-22 11:30:42,330 - INFO - 添加指令: cmd_0019 - 开启S3-G20-F17进水阀
+2025-11-22 11:30:42,330 - INFO - 添加指令: cmd_0020 - 开启S3-G21-F18进水阀
+2025-11-22 11:30:42,330 - INFO - 批次 1 已生成 20 条启动指令
+2025-11-22 11:30:42,332 - INFO - 初始化批次监控: 10 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 11:30:42,332 - INFO - ✅ 监控初始化完成
+2025-11-22 11:30:42,332 - INFO - 批次 1 监控初始化完成: 10田块, 13节制闸, 1泵站
+2025-11-22 11:30:42,332 - INFO - 批次 1 开始实时监控（预计 17.40h）
+2025-11-22 11:30:42,591 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:30:42,591 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:31:12,869 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:31:12,869 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:31:40,648 - INFO - 手动重新生成批次 1
+2025-11-22 11:31:40,649 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:31:40,649 - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-22 11:31:40,650 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 11:31:40,650 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 11:31:40,652 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 11:31:40,652 - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-22 11:31:40,653 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 11:31:40,653 - INFO - 已更新scenario: P1单独使用
+2025-11-22 11:31:40,653 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 11:31:40,655 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-22 11:31:40,656 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 11:31:40,656 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 11:31:40,656 - INFO - 更新 S1-G3-F2 水位: 100.0mm
+2025-11-22 11:31:40,656 - INFO - ============================================================
+2025-11-22 11:31:40,656 - INFO - 开始检查水位和设备状态
+2025-11-22 11:31:40,656 - INFO - ============================================================
+2025-11-22 11:31:40,656 - WARNING - 🚨 田块 S1-G3-F2 水位过高: 100.0mm > 80.0mm，紧急排水
+2025-11-22 11:31:40,744 - ERROR -   └─ 关闭进水阀失败: S1-G3-F2 - 未知错误
+2025-11-22 11:31:40,744 - INFO - ============================================================
+2025-11-22 11:31:40,744 - INFO - 检查完成: 田块完成 0, 节制闸关闭 0, 泵站停止 0
+2025-11-22 11:31:40,744 - INFO - ============================================================
+2025-11-22 11:31:43,175 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:31:43,175 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:32:13,479 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:32:13,479 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:32:43,777 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:32:43,777 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:33:14,072 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:33:14,072 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:33:30,965 - INFO - 手动重新生成批次 1
+2025-11-22 11:33:30,965 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 11:33:30,965 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 11:33:30,968 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 11:33:30,968 - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-22 11:33:30,968 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 11:33:30,969 - INFO - 已更新scenario: P1单独使用
+2025-11-22 11:33:30,969 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 11:33:30,971 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-22 11:33:30,971 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 11:33:30,971 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 11:33:30,971 - INFO - 更新 S1-G3-F2 水位: 75.0mm
+2025-11-22 11:33:30,971 - INFO - ============================================================
+2025-11-22 11:33:30,971 - INFO - 开始检查水位和设备状态
+2025-11-22 11:33:30,971 - INFO - ============================================================
+2025-11-22 11:33:30,972 - INFO - ============================================================
+2025-11-22 11:33:30,972 - INFO - 检查完成: 田块完成 0, 节制闸关闭 0, 泵站停止 0
+2025-11-22 11:33:30,972 - INFO - ============================================================
+2025-11-22 11:33:44,378 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:33:44,378 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:34:14,671 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:34:14,671 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:34:15,150 - INFO - 手动重新生成批次 1
+2025-11-22 11:34:15,151 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 11:34:15,151 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 11:34:15,153 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 11:34:15,153 - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-22 11:34:15,154 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 11:34:15,154 - INFO - 已更新scenario: P1单独使用
+2025-11-22 11:34:15,154 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 11:34:15,156 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-22 11:34:15,156 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 11:34:15,156 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 11:34:15,156 - INFO - 更新 S1-G4-F3 水位: 75.0mm
+2025-11-22 11:34:15,157 - INFO - ============================================================
+2025-11-22 11:34:15,157 - INFO - 开始检查水位和设备状态
+2025-11-22 11:34:15,157 - INFO - ============================================================
+2025-11-22 11:34:15,157 - INFO - ✅ 田块 S1-G4-F3 水位达标: 75.0mm (目标: 50.0mm)
+2025-11-22 11:34:15,199 - ERROR -   └─ 关闭进水阀失败: S1-G4-F3 - 未知错误
+2025-11-22 11:34:15,199 - INFO - 本轮完成田块数: 1
+2025-11-22 11:34:15,200 - WARNING -   └─ 节制闸 S3-G23 无 unique_no，跳过
+2025-11-22 11:34:15,200 - WARNING -   └─ 节制闸 S3-G25 无 unique_no，跳过
+2025-11-22 11:34:15,200 - WARNING -   └─ 节制闸 S5-G29 无 unique_no，跳过
+2025-11-22 11:34:15,200 - INFO - ✅ 本轮关闭节制闸: S3-G23, S3-G25, S5-G29
+2025-11-22 11:34:15,200 - INFO - ============================================================
+2025-11-22 11:34:15,200 - INFO - 检查完成: 田块完成 1, 节制闸关闭 3, 泵站停止 0
+2025-11-22 11:34:15,200 - INFO - ============================================================
+2025-11-22 11:34:15,200 - INFO - 人工调整后，1个田块达标
+2025-11-22 11:34:15,201 - INFO - 添加指令: cmd_0021 - 关闭S1-G4-F3进水阀(人工调整触发)
+2025-11-22 11:34:15,201 - INFO - 人工调整后，3个节制闸需关闭
+2025-11-22 11:34:15,201 - INFO - 添加指令: cmd_0022 - 关闭S3-G23节制闸(人工调整触发)
+2025-11-22 11:34:15,201 - INFO - 添加指令: cmd_0023 - 关闭S3-G25节制闸(人工调整触发)
+2025-11-22 11:34:15,201 - INFO - 添加指令: cmd_0024 - 关闭S5-G29节制闸(人工调整触发)
+2025-11-22 11:34:44,989 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:34:44,989 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:35:15,284 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:35:15,284 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:35:45,586 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:35:45,586 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:36:15,905 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:36:15,905 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:36:46,211 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:36:46,211 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:37:16,520 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:37:16,520 - WARNING - 第 14 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:37:46,867 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:37:46,867 - WARNING - 第 15 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:38:17,244 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:38:17,244 - WARNING - 第 16 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:38:47,623 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:38:47,623 - WARNING - 第 17 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:39:17,925 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:39:17,925 - WARNING - 第 18 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:39:48,300 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:39:48,300 - WARNING - 第 19 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:40:18,594 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:40:18,594 - WARNING - 第 20 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:40:48,932 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:40:48,932 - WARNING - 第 21 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:41:19,256 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:41:19,256 - WARNING - 第 22 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:41:49,709 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:41:49,709 - WARNING - 第 23 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:42:20,017 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:42:20,017 - WARNING - 第 24 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:42:50,315 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:42:50,315 - WARNING - 第 25 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:43:20,750 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:43:20,750 - WARNING - 第 26 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:43:45,738 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 11:43:45,739 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 11:49:50,508 - INFO - pipeline模块导入成功
+2025-11-22 11:49:50,509 - INFO - 步骤4: 设置默认参数...
+2025-11-22 11:49:50,509 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:49:50,509 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:49:50,509 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 11:49:50,509 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:49:50,509 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 11:49:50,509 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 11:49:50,510 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 11:49:50,510 - INFO - Pipeline实例创建成功
+2025-11-22 11:49:50,510 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 11:49:50,510 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 11:49:50,510 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 11:49:50,510 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 11:49:50,510 - INFO - 检查依赖文件...
+2025-11-22 11:49:50,511 - INFO - 依赖文件检查通过
+2025-11-22 11:49:50,511 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 11:49:50,512 - INFO - 找到 15 个GIS数据文件
+2025-11-22 11:49:50,512 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:49:50,512 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 11:49:50,512 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 11:49:50,512 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 11:49:50,512 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 11:49:50,513 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 11:49:51,261 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 11:49:51,262 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 11:49:51,262 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 11:49:51,263 - INFO - 开始执行: GIS数据修复
+2025-11-22 11:49:51,263 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 11:49:51,450 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 11:49:51,452 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 11:49:51,453 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 11:49:51,453 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 11:49:51,453 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json --multi-pump --summary --realtime
+2025-11-22 11:49:52,751 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1114.85元 - 运行30.97h
+推荐方案: 水泵['P1'] (电费: 1114.85元, 运行时间: 30.97h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+
+2025-11-22 11:49:52,752 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 11:49:52,753 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.243567
+2025-11-22 11:49:52,753 - INFO - 生成的文件:
+2025-11-22 11:49:52,753 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 11:49:52,753 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-22 11:49:52,754 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-22 11:49:52,755 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 11:49:52,756 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 11:49:52,756 - INFO - Pipeline执行结果: success=True
+2025-11-22 11:49:52,757 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-22 11:49:52,757 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 11:49:52,757 - INFO - 开始生成多水泵方案对比
+2025-11-22 11:49:53,311 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 11:49:53,311 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 11:49:53,311 - INFO - 灌溉计划生成完成
+2025-11-22 11:50:07,679 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_110351.json
+2025-11-22 11:50:07,680 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:50:07,680 - INFO - 配置文件加载成功: config.json
+2025-11-22 11:50:07,680 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 11:50:07,681 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.40h
+2025-11-22 11:50:07,682 - INFO - 批次 2: 开始时间 17.40h, 持续时间 13.38h
+2025-11-22 11:50:07,682 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_110351.json
+2025-11-22 11:50:07,682 - INFO - 共有 2 个批次
+2025-11-22 11:50:07,684 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 11:50:07,687 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_115007
+2025-11-22 11:50:07,689 - INFO - [scheduler] 执行开始时间: 2025-11-22 11:50:07.682510
+2025-11-22 11:50:07,690 - INFO - 开始准备批次 1
+2025-11-22 11:50:08,051 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:50:08,319 - INFO - 批次 1 计划重新生成完成
+2025-11-22 11:50:08,319 - INFO - 开始执行批次 1
+2025-11-22 11:50:08,319 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 11:50:08,319 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-22 11:50:08,320 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0011 - 开启S1-G3-F2进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0012 - 开启S1-G4-F3进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0013 - 开启S2-G10-F7进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0014 - 开启S2-G12-F9进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0015 - 开启S2-G13-F10进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0016 - 开启S2-G14-F11进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0017 - 开启S3-G18-F15进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0018 - 开启S3-G19-F16进水阀
+2025-11-22 11:50:08,321 - INFO - 添加指令: cmd_0019 - 开启S3-G20-F17进水阀
+2025-11-22 11:50:08,322 - INFO - 添加指令: cmd_0020 - 开启S3-G21-F18进水阀
+2025-11-22 11:50:08,322 - INFO - 批次 1 已生成 20 条启动指令
+2025-11-22 11:50:08,327 - INFO - 初始化批次监控: 10 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 11:50:08,327 - INFO - ✅ 监控初始化完成
+2025-11-22 11:50:08,327 - INFO - 批次 1 监控初始化完成: 10田块, 13节制闸, 1泵站
+2025-11-22 11:50:08,328 - INFO - 批次 1 开始实时监控（预计 17.40h）
+2025-11-22 11:50:08,596 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:50:08,596 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:50:33,429 - INFO - 手动重新生成批次 1
+2025-11-22 11:50:33,430 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 11:50:33,430 - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-22 11:50:33,430 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 11:50:33,430 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 11:50:33,433 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 11:50:33,433 - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-22 11:50:33,433 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 11:50:33,434 - INFO - 已更新scenario: P1单独使用
+2025-11-22 11:50:33,434 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 11:50:33,436 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-22 11:50:33,436 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 11:50:33,436 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 11:50:33,436 - INFO - 更新 S1-G4-F3 水位: 75.0mm
+2025-11-22 11:50:33,437 - INFO - ============================================================
+2025-11-22 11:50:33,437 - INFO - 开始检查水位和设备状态
+2025-11-22 11:50:33,437 - INFO - ============================================================
+2025-11-22 11:50:33,437 - INFO - ✅ 田块 S1-G4-F3 水位达标: 75.0mm (目标: 50.0mm)
+2025-11-22 11:50:33,437 - INFO -   └─ 标记关闭进水阀: S1-G4-F3
+2025-11-22 11:50:33,437 - INFO - 本轮完成田块数: 1
+2025-11-22 11:50:33,437 - WARNING -   └─ 节制闸 S3-G23 无 unique_no（配置中缺失）
+2025-11-22 11:50:33,438 - INFO -   └─ 标记关闭inlet-g节制闸: S3-G23 (支渠S3)
+2025-11-22 11:50:33,438 - WARNING -   └─ 节制闸 S3-G25 无 unique_no（配置中缺失）
+2025-11-22 11:50:33,438 - INFO -   └─ 标记关闭inlet-g节制闸: S3-G25 (支渠S3)
+2025-11-22 11:50:33,438 - WARNING -   └─ 节制闸 S5-G29 无 unique_no（配置中缺失）
+2025-11-22 11:50:33,438 - INFO -   └─ 标记关闭inlet-g节制闸: S5-G29 (支渠S5)
+2025-11-22 11:50:33,438 - INFO - ✅ 本轮关闭节制闸: S3-G23, S3-G25, S5-G29
+2025-11-22 11:50:33,438 - INFO - ============================================================
+2025-11-22 11:50:33,438 - INFO - 检查完成: 田块完成 1, 节制闸关闭 3, 泵站停止 0
+2025-11-22 11:50:33,439 - INFO - ============================================================
+2025-11-22 11:50:33,439 - INFO - 人工调整后，1个田块达标
+2025-11-22 11:50:33,439 - INFO - 添加指令: cmd_0021 - 关闭S1-G4-F3进水阀(人工调整触发)
+2025-11-22 11:50:33,439 - INFO - 人工调整后，3个节制闸需关闭
+2025-11-22 11:50:33,439 - INFO - 添加指令: cmd_0022 - 关闭S3-G23节制闸(人工调整触发)
+2025-11-22 11:50:33,439 - INFO - 添加指令: cmd_0023 - 关闭S3-G25节制闸(人工调整触发)
+2025-11-22 11:50:33,439 - INFO - 添加指令: cmd_0024 - 关闭S5-G29节制闸(人工调整触发)
+2025-11-22 11:50:38,920 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:50:38,920 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:51:09,265 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:51:09,265 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:51:39,545 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:51:39,545 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:52:09,852 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:52:09,852 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:52:40,157 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:52:40,157 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:53:10,501 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:53:10,501 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:53:40,880 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:53:40,880 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:54:11,244 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:54:11,244 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:54:41,550 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:54:41,550 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:55:11,910 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:55:11,910 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:55:42,248 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:55:42,248 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:56:12,559 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:56:12,559 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:56:42,880 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:56:42,880 - WARNING - 第 14 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:57:13,171 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:57:13,171 - WARNING - 第 15 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:57:43,488 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:57:43,488 - WARNING - 第 16 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:58:13,795 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:58:13,795 - WARNING - 第 17 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:58:44,103 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:58:44,103 - WARNING - 第 18 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:59:14,392 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:59:14,392 - WARNING - 第 19 次检查：未获取到水位数据，30秒后重试
+2025-11-22 11:59:44,664 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 11:59:44,664 - WARNING - 第 20 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:00:14,987 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:00:14,987 - WARNING - 第 21 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:00:45,316 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:00:45,316 - WARNING - 第 22 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:01:15,665 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:01:15,665 - WARNING - 第 23 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:01:45,967 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:01:45,967 - WARNING - 第 24 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:02:16,263 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:02:16,263 - WARNING - 第 25 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:02:46,560 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:02:46,560 - WARNING - 第 26 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:03:16,833 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:03:16,833 - WARNING - 第 27 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:03:47,139 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:03:47,139 - WARNING - 第 28 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:04:17,403 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:04:17,403 - WARNING - 第 29 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:04:47,698 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:04:47,698 - WARNING - 第 30 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:05:18,004 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:05:18,004 - WARNING - 第 31 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:05:48,360 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:05:48,360 - WARNING - 第 32 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:06:18,649 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:06:18,649 - WARNING - 第 33 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:06:48,937 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:06:48,937 - WARNING - 第 34 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:07:19,349 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:07:19,349 - WARNING - 第 35 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:07:33,746 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 12:07:33,746 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 12:09:00,622 - INFO - pipeline模块导入成功
+2025-11-22 12:09:00,622 - INFO - 步骤4: 设置默认参数...
+2025-11-22 12:09:00,623 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:09:00,623 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:09:00,623 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 12:09:00,623 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:09:00,623 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 12:09:00,624 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 12:09:00,624 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 12:09:00,624 - INFO - Pipeline实例创建成功
+2025-11-22 12:09:00,624 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 12:09:00,624 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 12:09:00,624 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 12:09:00,625 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:09:00,625 - INFO - 检查依赖文件...
+2025-11-22 12:09:00,625 - INFO - 依赖文件检查通过
+2025-11-22 12:09:00,625 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 12:09:00,627 - INFO - 找到 15 个GIS数据文件
+2025-11-22 12:09:00,627 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:09:00,627 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 12:09:00,628 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 12:09:00,628 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 12:09:00,628 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 12:09:00,628 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 12:09:01,354 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 12:09:01,354 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 12:09:01,355 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 12:09:01,355 - INFO - 开始执行: GIS数据修复
+2025-11-22 12:09:01,355 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 12:09:01,545 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 12:09:01,546 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 12:09:01,547 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 12:09:01,547 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 12:09:01,547 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json --multi-pump --summary --realtime
+2025-11-22 12:09:02,883 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1126.63元 - 运行31.30h
+推荐方案: 水泵['P1'] (电费: 1126.63元, 运行时间: 31.30h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+
+2025-11-22 12:09:02,884 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 12:09:02,884 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.260728
+2025-11-22 12:09:02,884 - INFO - 生成的文件:
+2025-11-22 12:09:02,884 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-22 12:09:02,885 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-22 12:09:02,886 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 12:09:02,887 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 12:09:02,887 - INFO - Pipeline执行结果: success=True
+2025-11-22 12:09:02,888 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-22 12:09:02,888 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 12:09:02,889 - INFO - 开始生成多水泵方案对比
+2025-11-22 12:09:03,535 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 12:09:03,535 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 12:09:03,535 - INFO - 灌溉计划生成完成
+2025-11-22 12:09:50,850 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_120901.json
+2025-11-22 12:09:50,851 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:09:50,852 - INFO - 配置文件加载成功: config.json
+2025-11-22 12:09:50,852 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 12:09:50,852 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.85h
+2025-11-22 12:09:50,852 - INFO - 批次 2: 开始时间 17.85h, 持续时间 13.45h
+2025-11-22 12:09:50,852 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_120901.json
+2025-11-22 12:09:50,853 - INFO - 共有 2 个批次
+2025-11-22 12:09:50,855 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 12:09:50,857 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_120950
+2025-11-22 12:09:50,860 - INFO - [scheduler] 执行开始时间: 2025-11-22 12:09:50.853342
+2025-11-22 12:09:50,861 - INFO - 开始准备批次 1
+2025-11-22 12:09:51,166 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:09:51,501 - INFO - 批次 1 计划重新生成完成
+2025-11-22 12:09:51,501 - INFO - 开始执行批次 1
+2025-11-22 12:09:51,501 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-22 12:09:51,502 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0011 - 开启S1-G3-F2进水阀
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0012 - 开启S1-G4-F3进水阀
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0013 - 开启S2-G10-F7进水阀
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0014 - 开启S2-G12-F9进水阀
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0015 - 开启S2-G13-F10进水阀
+2025-11-22 12:09:51,503 - INFO - 添加指令: cmd_0016 - 开启S2-G14-F11进水阀
+2025-11-22 12:09:51,504 - INFO - 添加指令: cmd_0017 - 开启S3-G18-F15进水阀
+2025-11-22 12:09:51,504 - INFO - 添加指令: cmd_0018 - 开启S3-G19-F16进水阀
+2025-11-22 12:09:51,504 - INFO - 添加指令: cmd_0019 - 开启S3-G20-F17进水阀
+2025-11-22 12:09:51,504 - INFO - 添加指令: cmd_0020 - 开启S3-G21-F18进水阀
+2025-11-22 12:09:51,504 - INFO - 批次 1 已生成 20 条启动指令
+2025-11-22 12:09:51,506 - INFO - 初始化批次监控: 10 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 12:09:51,506 - INFO - ✅ 监控初始化完成
+2025-11-22 12:09:51,506 - INFO - 批次 1 监控初始化完成: 10田块, 13节制闸, 1泵站
+2025-11-22 12:09:51,507 - INFO - 批次 1 开始实时监控（预计 17.85h）
+2025-11-22 12:09:51,769 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:09:51,769 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:10:22,107 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:10:22,107 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:10:52,454 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:10:52,454 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:11:22,760 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:11:22,760 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:11:53,081 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:11:53,081 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:12:23,430 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:12:23,430 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:12:53,752 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:12:53,752 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:13:24,074 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:13:24,074 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:13:54,372 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:13:54,372 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:14:05,460 - INFO - 指令状态更新: cmd_0001 sent → executed
+2025-11-22 12:14:05,460 - INFO -   反馈: P1泵站已成功启动，运行正常
+2025-11-22 12:14:05,460 - INFO - 收到指令反馈: cmd_0001 - executed
+2025-11-22 12:14:24,739 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:14:24,739 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:14:55,047 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:14:55,047 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:15:25,392 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:15:25,392 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:15:28,416 - INFO - 指令状态更新: cmd_0002 sent → executed
+2025-11-22 12:15:28,417 - INFO -   反馈: S1-G27节制闸已开启至100%
+2025-11-22 12:15:28,417 - INFO - 收到指令反馈: cmd_0002 - executed
+2025-11-22 12:15:47,618 - INFO - 指令状态更新: cmd_0003 sent → executed
+2025-11-22 12:15:47,618 - INFO -   反馈: S1-G3-F2进水阀已开启
+2025-11-22 12:15:47,618 - INFO - 收到指令反馈: cmd_0003 - executed
+2025-11-22 12:15:55,697 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:15:55,697 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:16:26,038 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:16:26,038 - WARNING - 第 14 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:16:56,385 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:16:56,385 - WARNING - 第 15 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:17:26,686 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:17:26,686 - WARNING - 第 16 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:17:56,950 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:17:56,950 - WARNING - 第 17 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:18:27,285 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:18:27,285 - WARNING - 第 18 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:18:57,623 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:18:57,623 - WARNING - 第 19 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:19:08,816 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 12:19:08,816 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 12:20:57,576 - INFO - pipeline模块导入成功
+2025-11-22 12:20:57,577 - INFO - 步骤4: 设置默认参数...
+2025-11-22 12:20:57,577 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:20:57,577 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:20:57,577 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 12:20:57,578 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:20:57,578 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 12:20:57,578 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 12:20:57,578 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 12:20:57,578 - INFO - Pipeline实例创建成功
+2025-11-22 12:20:57,578 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 12:20:57,579 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 12:20:57,579 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 12:20:57,579 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:20:57,579 - INFO - 检查依赖文件...
+2025-11-22 12:20:57,579 - INFO - 依赖文件检查通过
+2025-11-22 12:20:57,579 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 12:20:57,580 - INFO - 找到 15 个GIS数据文件
+2025-11-22 12:20:57,580 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:20:57,580 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 12:20:57,581 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 12:20:57,581 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 12:20:57,581 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 12:20:57,581 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 12:20:58,317 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 12:20:58,318 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 12:20:58,319 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 12:20:58,319 - INFO - 开始执行: GIS数据修复
+2025-11-22 12:20:58,319 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 12:20:58,508 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 12:20:58,510 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 12:20:58,511 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 12:20:58,511 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 12:20:58,511 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json --multi-pump --summary --realtime
+2025-11-22 12:21:00,417 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1126.63元 - 运行31.30h
+推荐方案: 水泵['P1'] (电费: 1126.63元, 运行时间: 31.30h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+
+2025-11-22 12:21:00,417 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 12:21:00,417 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.839366
+2025-11-22 12:21:00,418 - INFO - 生成的文件:
+2025-11-22 12:21:00,418 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 12:21:00,418 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 12:21:00,418 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 12:21:00,418 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-22 12:21:00,419 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-22 12:21:00,420 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 12:21:00,421 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 12:21:00,421 - INFO - Pipeline执行结果: success=True
+2025-11-22 12:21:00,422 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-22 12:21:00,422 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 12:21:00,422 - INFO - 开始生成多水泵方案对比
+2025-11-22 12:21:01,477 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 12:21:01,477 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 12:21:01,477 - INFO - 灌溉计划生成完成
+2025-11-22 12:21:12,138 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_122058.json
+2025-11-22 12:21:12,139 - INFO - 配置文件加载成功: config.json
+2025-11-22 12:21:12,140 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 12:21:12,140 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.85h
+2025-11-22 12:21:12,140 - INFO - 批次 2: 开始时间 17.85h, 持续时间 13.45h
+2025-11-22 12:21:12,141 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_122058.json
+2025-11-22 12:21:12,141 - INFO - 共有 2 个批次
+2025-11-22 12:21:12,144 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 12:21:12,147 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_122112
+2025-11-22 12:21:12,150 - INFO - [scheduler] 执行开始时间: 2025-11-22 12:21:12.141592
+2025-11-22 12:21:12,151 - INFO - 开始准备批次 1
+2025-11-22 12:21:12,448 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:21:13,060 - INFO - 批次 1 计划重新生成完成
+2025-11-22 12:21:13,060 - INFO - 开始执行批次 1
+2025-11-22 12:21:13,060 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 12:21:13,060 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 12:21:13,060 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-22 12:21:13,061 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0011 - 开启S1-G3-F2进水阀
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0012 - 开启S1-G4-F3进水阀
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0013 - 开启S2-G10-F7进水阀
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0014 - 开启S2-G12-F9进水阀
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0015 - 开启S2-G13-F10进水阀
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0016 - 开启S2-G14-F11进水阀
+2025-11-22 12:21:13,062 - INFO - 添加指令: cmd_0017 - 开启S3-G18-F15进水阀
+2025-11-22 12:21:13,063 - INFO - 添加指令: cmd_0018 - 开启S3-G19-F16进水阀
+2025-11-22 12:21:13,063 - INFO - 添加指令: cmd_0019 - 开启S3-G20-F17进水阀
+2025-11-22 12:21:13,063 - INFO - 添加指令: cmd_0020 - 开启S3-G21-F18进水阀
+2025-11-22 12:21:13,063 - INFO - 批次 1 已生成 20 条启动指令
+2025-11-22 12:21:13,064 - INFO - 初始化批次监控: 10 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 12:21:13,065 - INFO - ✅ 监控初始化完成
+2025-11-22 12:21:13,065 - INFO - 批次 1 监控初始化完成: 10田块, 13节制闸, 1泵站
+2025-11-22 12:21:13,065 - INFO - 批次 1 开始实时监控（预计 17.85h）
+2025-11-22 12:21:13,356 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:21:13,356 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:21:26,626 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_122058.json
+2025-11-22 12:21:43,651 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:21:43,651 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:22:13,942 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:22:13,942 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:22:38,269 - INFO - 指令状态更新: cmd_0001 sent → executed
+2025-11-22 12:22:38,269 - INFO -   反馈: P1泵站已成功启动，运行正常
+2025-11-22 12:22:38,269 - INFO - 收到指令反馈: cmd_0001 - executed
+2025-11-22 12:22:44,263 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:22:44,263 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:22:59,433 - INFO - 指令状态更新: cmd_0002 sent → executed
+2025-11-22 12:22:59,434 - INFO -   反馈: S1-G27节制闸已开启至100%
+2025-11-22 12:22:59,434 - INFO - 收到指令反馈: cmd_0002 - executed
+2025-11-22 12:23:14,592 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:23:14,592 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:23:17,223 - INFO - 指令状态更新: cmd_0003 sent → executed
+2025-11-22 12:23:17,223 - INFO -   反馈: S1-G3-F2进水阀已开启
+2025-11-22 12:23:17,223 - INFO - 收到指令反馈: cmd_0003 - executed
+2025-11-22 12:23:44,892 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:23:44,892 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:24:15,185 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:24:15,185 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:24:18,605 - INFO - 手动重新生成批次 1
+2025-11-22 12:24:18,605 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:24:18,606 - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-22 12:24:18,606 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 12:24:18,606 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 12:24:18,608 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 12:24:18,608 - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-22 12:24:18,609 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 12:24:18,609 - INFO - 已更新scenario: P1单独使用
+2025-11-22 12:24:18,609 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 12:24:18,611 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-22 12:24:18,611 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 12:24:18,611 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 12:24:18,612 - INFO - 更新 S1-G3-F2 水位: 75.0mm
+2025-11-22 12:24:18,612 - INFO - ============================================================
+2025-11-22 12:24:18,612 - INFO - 开始检查水位和设备状态
+2025-11-22 12:24:18,612 - INFO - ============================================================
+2025-11-22 12:24:18,612 - INFO - ✅ 田块 S1-G3-F2 水位达标: 75.0mm (目标: 50.0mm)
+2025-11-22 12:24:18,612 - INFO -   └─ 标记关闭进水阀: S1-G3-F2
+2025-11-22 12:24:18,612 - INFO - 本轮完成田块数: 1
+2025-11-22 12:24:18,613 - WARNING -   └─ 节制闸 S3-G23 无 unique_no（配置中缺失）
+2025-11-22 12:24:18,613 - INFO -   └─ 标记关闭inlet-g节制闸: S3-G23 (支渠S3)
+2025-11-22 12:24:18,613 - WARNING -   └─ 节制闸 S3-G25 无 unique_no（配置中缺失）
+2025-11-22 12:24:18,613 - INFO -   └─ 标记关闭inlet-g节制闸: S3-G25 (支渠S3)
+2025-11-22 12:24:18,613 - WARNING -   └─ 节制闸 S5-G29 无 unique_no（配置中缺失）
+2025-11-22 12:24:18,613 - INFO -   └─ 标记关闭inlet-g节制闸: S5-G29 (支渠S5)
+2025-11-22 12:24:18,613 - INFO - ✅ 本轮关闭节制闸: S3-G23, S3-G25, S5-G29
+2025-11-22 12:24:18,613 - INFO - ============================================================
+2025-11-22 12:24:18,613 - INFO - 检查完成: 田块完成 1, 节制闸关闭 3, 泵站停止 0
+2025-11-22 12:24:18,614 - INFO - ============================================================
+2025-11-22 12:24:18,614 - INFO - 人工调整后，1个田块达标
+2025-11-22 12:24:18,614 - INFO - 添加指令: cmd_0021 - 关闭S1-G3-F2进水阀(人工调整触发)
+2025-11-22 12:24:18,614 - INFO - 人工调整后，3个节制闸需关闭
+2025-11-22 12:24:18,614 - INFO - 添加指令: cmd_0022 - 关闭S3-G23节制闸(人工调整触发)
+2025-11-22 12:24:18,614 - INFO - 添加指令: cmd_0023 - 关闭S3-G25节制闸(人工调整触发)
+2025-11-22 12:24:18,614 - INFO - 添加指令: cmd_0024 - 关闭S5-G29节制闸(人工调整触发)
+2025-11-22 12:24:45,490 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:24:45,490 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:25:15,769 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:25:15,769 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:25:46,092 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:25:46,092 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:26:16,387 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:26:16,387 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:26:46,718 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:26:46,718 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:27:17,024 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:27:17,024 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:27:47,330 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:27:47,330 - WARNING - 第 14 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:28:17,665 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:28:17,665 - WARNING - 第 15 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:28:47,972 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:28:47,972 - WARNING - 第 16 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:29:07,453 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 12:29:07,453 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-22 12:31:15,377 - INFO - pipeline模块导入成功
+2025-11-22 12:31:15,377 - INFO - 步骤4: 设置默认参数...
+2025-11-22 12:31:15,377 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:31:15,377 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:31:15,377 - INFO - 步骤5: 确保输出目录存在...
+2025-11-22 12:31:15,378 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:31:15,378 - INFO - 步骤6: 构建pipeline参数...
+2025-11-22 12:31:15,378 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-22 12:31:15,378 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-22 12:31:15,378 - INFO - Pipeline实例创建成功
+2025-11-22 12:31:15,379 - INFO - 步骤8: 运行Pipeline...
+2025-11-22 12:31:15,379 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-22 12:31:15,379 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 12:31:15,379 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-22 12:31:15,379 - INFO - 检查依赖文件...
+2025-11-22 12:31:15,380 - INFO - 依赖文件检查通过
+2025-11-22 12:31:15,380 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-22 12:31:15,381 - INFO - 找到 15 个GIS数据文件
+2025-11-22 12:31:15,381 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:31:15,381 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-22 12:31:15,381 - INFO - === 步骤1: 数据预处理 ===
+2025-11-22 12:31:15,381 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-22 12:31:15,381 - INFO - 开始执行: GIS数据格式转换
+2025-11-22 12:31:15,382 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-22 12:31:16,071 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-22 12:31:16,071 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-22 12:31:16,072 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-22 12:31:16,072 - INFO - 开始执行: GIS数据修复
+2025-11-22 12:31:16,072 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-22 12:31:16,257 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-22 12:31:16,259 - INFO - [OK] GIS数据修复 执行成功
+2025-11-22 12:31:16,260 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-22 12:31:16,260 - INFO - 开始执行: 生成灌溉计划
+2025-11-22 12:31:16,260 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json --multi-pump --summary --realtime
+2025-11-22 12:31:17,537 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=10
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 10
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费1126.63元 - 运行31.30h
+推荐方案: 水泵['P1'] (电费: 1126.63元, 运行时间: 31.30h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+
+2025-11-22 12:31:17,537 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-22 12:31:17,537 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.159575
+2025-11-22 12:31:17,538 - INFO - 生成的文件:
+2025-11-22 12:31:17,538 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-22 12:31:17,538 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-22 12:31:17,538 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-22 12:31:17,538 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-22 12:31:17,538 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-22 12:31:17,539 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-22 12:31:17,540 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-22 12:31:17,540 - INFO - Pipeline执行结果: success=True
+2025-11-22 12:31:17,542 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-22 12:31:17,542 - INFO - 成功读取计划数据，包含 3 项
+2025-11-22 12:31:17,542 - INFO - 开始生成多水泵方案对比
+2025-11-22 12:31:18,097 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-22 12:31:18,097 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-22 12:31:18,097 - INFO - 灌溉计划生成完成
+2025-11-22 12:31:30,131 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_123116.json
+2025-11-22 12:31:30,132 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:31:30,132 - INFO - 配置文件加载成功: config.json
+2025-11-22 12:31:30,133 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-22 12:31:30,133 - INFO - 批次 1: 开始时间 0.00h, 持续时间 17.85h
+2025-11-22 12:31:30,133 - INFO - 批次 2: 开始时间 17.85h, 持续时间 13.45h
+2025-11-22 12:31:30,133 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251122_123116.json
+2025-11-22 12:31:30,133 - INFO - 共有 2 个批次
+2025-11-22 12:31:30,137 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-22 12:31:30,139 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251122_123130
+2025-11-22 12:31:30,141 - INFO - [scheduler] 执行开始时间: 2025-11-22 12:31:30.134461
+2025-11-22 12:31:30,142 - INFO - 开始准备批次 1
+2025-11-22 12:31:30,424 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:31:30,708 - INFO - 批次 1 计划重新生成完成
+2025-11-22 12:31:30,708 - INFO - 开始执行批次 1
+2025-11-22 12:31:30,708 - WARNING - 未找到泵站 P1 的unique_no
+2025-11-22 12:31:30,708 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-22 12:31:30,709 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0011 - 开启S1-G3-F2进水阀
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0012 - 开启S1-G4-F3进水阀
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0013 - 开启S2-G10-F7进水阀
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0014 - 开启S2-G12-F9进水阀
+2025-11-22 12:31:30,710 - INFO - 添加指令: cmd_0015 - 开启S2-G13-F10进水阀
+2025-11-22 12:31:30,711 - INFO - 添加指令: cmd_0016 - 开启S2-G14-F11进水阀
+2025-11-22 12:31:30,711 - INFO - 添加指令: cmd_0017 - 开启S3-G18-F15进水阀
+2025-11-22 12:31:30,711 - INFO - 添加指令: cmd_0018 - 开启S3-G19-F16进水阀
+2025-11-22 12:31:30,711 - INFO - 添加指令: cmd_0019 - 开启S3-G20-F17进水阀
+2025-11-22 12:31:30,711 - INFO - 添加指令: cmd_0020 - 开启S3-G21-F18进水阀
+2025-11-22 12:31:30,711 - INFO - 批次 1 已生成 20 条启动指令
+2025-11-22 12:31:30,713 - INFO - 初始化批次监控: 10 个田块, 13 个节制闸, 1 个泵站
+2025-11-22 12:31:30,713 - INFO - ✅ 监控初始化完成
+2025-11-22 12:31:30,713 - INFO - 批次 1 监控初始化完成: 10田块, 13节制闸, 1泵站
+2025-11-22 12:31:30,713 - INFO - 批次 1 开始实时监控（预计 17.85h）
+2025-11-22 12:31:31,032 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:31:31,032 - WARNING - 第 1 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:32:01,320 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:32:01,320 - WARNING - 第 2 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:32:31,619 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:32:31,619 - WARNING - 第 3 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:33:01,945 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:33:01,945 - WARNING - 第 4 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:33:32,414 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:33:32,414 - WARNING - 第 5 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:34:02,741 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:34:02,741 - WARNING - 第 6 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:34:05,442 - INFO - 指令状态更新: cmd_0001 pending → executed
+2025-11-22 12:34:05,443 - INFO -   反馈: P1泵站已成功启动，运行正常
+2025-11-22 12:34:05,443 - INFO - 收到指令反馈: cmd_0001 - executed
+2025-11-22 12:34:20,236 - INFO - 指令状态更新: cmd_0002 pending → executed
+2025-11-22 12:34:20,236 - INFO -   反馈: S1-G27节制闸已开启至100%
+2025-11-22 12:34:20,236 - INFO - 收到指令反馈: cmd_0002 - executed
+2025-11-22 12:34:33,072 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:34:33,072 - WARNING - 第 7 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:34:34,865 - INFO - 指令状态更新: cmd_0003 pending → executed
+2025-11-22 12:34:34,866 - INFO -   反馈: S1-G3-F2进水阀已开启
+2025-11-22 12:34:34,866 - INFO - 收到指令反馈: cmd_0003 - executed
+2025-11-22 12:35:03,425 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:35:03,425 - WARNING - 第 8 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:35:22,625 - INFO - 手动重新生成批次 1
+2025-11-22 12:35:22,626 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-22 12:35:22,626 - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-22 12:35:22,626 - INFO - 当前计划包含 1 个scenarios，使用第一个scenario: 'P1单独使用'
+2025-11-22 12:35:22,626 - INFO - 开始重新生成批次 1 的计划
+2025-11-22 12:35:22,629 - INFO - 批次 1 计划重新生成完成，共 2 项变更
+2025-11-22 12:35:22,629 - ERROR - 批次 1 状态为 executing，无法更新
+2025-11-22 12:35:22,629 - INFO - 原始计划包含 1 个scenarios
+2025-11-22 12:35:22,629 - INFO - 已更新scenario: P1单独使用
+2025-11-22 12:35:22,629 - INFO - 最终保存的计划包含 1 个scenarios
+2025-11-22 12:35:22,631 - INFO - 修改后的计划已保存到: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763786122.json
+2025-11-22 12:35:22,631 - INFO - 使用自定义水位标准：1 个田块
+2025-11-22 12:35:22,631 - INFO - 人工调整水位，更新监控器并触发设备检查
+2025-11-22 12:35:22,631 - INFO - 更新 S1-G3-F2 水位: 75.0mm
+2025-11-22 12:35:22,632 - INFO - ============================================================
+2025-11-22 12:35:22,632 - INFO - 开始检查水位和设备状态
+2025-11-22 12:35:22,632 - INFO - ============================================================
+2025-11-22 12:35:22,632 - INFO - ✅ 田块 S1-G3-F2 水位达标: 75.0mm (目标: 50.0mm)
+2025-11-22 12:35:22,632 - INFO -   └─ 标记关闭进水阀: S1-G3-F2
+2025-11-22 12:35:22,632 - INFO - 本轮完成田块数: 1
+2025-11-22 12:35:22,633 - WARNING -   └─ 节制闸 S3-G23 无 unique_no（配置中缺失）
+2025-11-22 12:35:22,633 - INFO -   └─ 标记关闭inlet-g节制闸: S3-G23 (支渠S3)
+2025-11-22 12:35:22,633 - WARNING -   └─ 节制闸 S3-G25 无 unique_no（配置中缺失）
+2025-11-22 12:35:22,633 - INFO -   └─ 标记关闭inlet-g节制闸: S3-G25 (支渠S3)
+2025-11-22 12:35:22,633 - WARNING -   └─ 节制闸 S5-G29 无 unique_no（配置中缺失）
+2025-11-22 12:35:22,633 - INFO -   └─ 标记关闭inlet-g节制闸: S5-G29 (支渠S5)
+2025-11-22 12:35:22,634 - INFO - ✅ 本轮关闭节制闸: S3-G23, S3-G25, S5-G29
+2025-11-22 12:35:22,634 - INFO - ============================================================
+2025-11-22 12:35:22,634 - INFO - 检查完成: 田块完成 1, 节制闸关闭 3, 泵站停止 0
+2025-11-22 12:35:22,634 - INFO - ============================================================
+2025-11-22 12:35:22,634 - INFO - 人工调整后，1个田块达标
+2025-11-22 12:35:22,634 - INFO - 添加指令: cmd_0021 - 关闭S1-G3-F2进水阀(人工调整触发)
+2025-11-22 12:35:22,635 - INFO - 人工调整后，3个节制闸需关闭
+2025-11-22 12:35:22,635 - INFO - 添加指令: cmd_0022 - 关闭S3-G23节制闸(人工调整触发)
+2025-11-22 12:35:22,635 - INFO - 添加指令: cmd_0023 - 关闭S3-G25节制闸(人工调整触发)
+2025-11-22 12:35:22,635 - INFO - 添加指令: cmd_0024 - 关闭S5-G29节制闸(人工调整触发)
+2025-11-22 12:35:33,738 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:35:33,738 - WARNING - 第 9 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:36:04,046 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:36:04,046 - WARNING - 第 10 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:36:34,357 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:36:34,357 - WARNING - 第 11 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:37:04,674 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:37:04,674 - WARNING - 第 12 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:37:34,999 - WARNING - 获取水位数据失败：返回为空
+2025-11-22 12:37:34,999 - WARNING - 第 13 次检查：未获取到水位数据，30秒后重试
+2025-11-22 12:37:41,773 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-22 12:37:41,773 - INFO - 智能灌溉动态执行系统已关闭
