@@ -61,3 +61,5 @@ env_vars:
   - FARM_ID
   - FARMID
 default_distance_rank: 9999
+iland_app_id: "YJY"
+iland_secret: "test005"
