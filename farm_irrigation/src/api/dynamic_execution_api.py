@@ -145,7 +145,36 @@ def get_scheduler() -> BatchExecutionScheduler:
     """获取调度器实例"""
     global _scheduler_instance
     if _scheduler_instance is None:
-        _scheduler_instance = BatchExecutionScheduler()
+        # 从环境变量读取认证信息
+        import os
+        app_id = os.getenv("ILAND_APP_ID") or os.getenv("APP_ID", "")
+        secret = os.getenv("ILAND_SECRET") or os.getenv("SECRET", "")
+        
+        # 如果环境变量中没有，尝试从配置文件读取
+        if not app_id or not secret:
+            try:
+                import yaml
+                from pathlib import Path
+                config_path = Path(__file__).parent.parent.parent / "auto_config_params.yaml"
+                if config_path.exists():
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        config = yaml.safe_load(f)
+                        app_id = app_id or config.get("iland_app_id", "")
+                        secret = secret or config.get("iland_secret", "")
+            except Exception as e:
+                logger.warning(f"无法从配置文件读取认证信息: {e}")
+        
+        _scheduler_instance = BatchExecutionScheduler(
+            app_id=app_id,
+            secret=secret
+        )
+        
+        if not app_id or not secret:
+            logger.warning("⚠️ 未配置 iLand API 认证信息！")
+            logger.warning("   请设置环境变量 ILAND_APP_ID 和 ILAND_SECRET")
+            logger.warning("   或在 auto_config_params.yaml 中添加 iland_app_id 和 iland_secret")
+            logger.warning("   田块进水阀的 unique_no 将无法自动获取")
+    
     return _scheduler_instance
 
 def get_waterlevel_manager() -> DynamicWaterLevelManager:

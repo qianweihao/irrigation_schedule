@@ -945,10 +945,12 @@ class BatchExecutionScheduler:
             gates_set = step.get('sequence', {}).get('gates_set', [])
             for gate in gates_set:
                 if gate.get('open_pct', 0) > 0:
+                    # 节制闸的 unique_no 从计划中获取（计划生成时应预先填充）
+                    gate_unique_no = gate.get('unique_no')
                     commands.append({
                         "device_type": "regulator",
                         "device_id": gate['id'],
-                        "unique_no": gate.get('unique_no'),
+                        "unique_no": gate_unique_no,
                         "action": "open",
                         "params": {"open_pct": gate['open_pct'], "gate_degree": gate['open_pct']},
                         "priority": 2,
@@ -956,15 +958,28 @@ class BatchExecutionScheduler:
                     })
         
         # 3. 田块进水阀开启指令
-        for field in fields_list:
+        logger.info(f"📝 开始为 {len(fields_list)} 个田块生成进水阀开启指令...")
+        
+        for idx, field in enumerate(fields_list, 1):
+            field_id = field['id']
+            logger.info(f"   处理田块 {idx}/{len(fields_list)}: {field_id}")
+            
+            # 实时通过 API 获取 unique_no
+            field_unique_no = self._get_field_device_unique_no(field_id, 'inlet')
+            
+            if field_unique_no:
+                logger.info(f"   ✅ {field_id} unique_no 获取成功: {field_unique_no}")
+            else:
+                logger.warning(f"   ⚠️ {field_id} unique_no 获取失败，将为 None")
+            
             commands.append({
                 "device_type": "field_inlet_gate",
-                "device_id": field['id'],
-                "unique_no": field.get('inlet_unique_no'),
+                "device_id": field_id,
+                "unique_no": field_unique_no,
                 "action": "open",
                 "params": {"gate_degree": 100},
                 "priority": 3,
-                "description": f"开启{field['id']}进水阀"
+                "description": f"开启{field_id}进水阀"
             })
         
         # 按优先级排序
@@ -974,25 +989,124 @@ class BatchExecutionScheduler:
     
     def _get_pump_unique_no(self, pump_id: str) -> Optional[str]:
         """
-        从配置数据中获取泵站的unique_no
+        获取泵站的 unique_no
+        
+        注意：泵站通常没有 unique_no，返回 None
         
         Args:
             pump_id: 泵站ID（如 "P1"）
         
         Returns:
-            Optional[str]: 泵站的unique_no，如果找不到则返回None
+            Optional[str]: 泵站的 unique_no，通常为 None
+        """
+        # 泵站通常没有 unique_no
+        return None
+    
+    def _get_field_device_unique_no(self, field_id: str, device_type: str = "inlet") -> Optional[str]:
+        """
+        实时通过 API 获取田块设备的 unique_no
+        
+        Args:
+            field_id: 田块ID（S-G-F格式，如 "S1-G2-F1"）
+            device_type: 设备类型，"inlet" 表示进水阀，"outlet" 表示出水阀
+        
+        Returns:
+            Optional[str]: unique_no，如果获取失败则返回 None
         """
         try:
-            pumps = self.config_data.get('pumps', [])
-            for pump in pumps:
-                if pump.get('id') == pump_id:
-                    return pump.get('unique_no')
+            # 从 config.json 中查找对应的 sectionID
+            fields = self.config_data.get('fields', [])
+            section_id = None
             
-            logger.warning(f"未找到泵站 {pump_id} 的unique_no")
+            for field in fields:
+                if field.get('id') == field_id:
+                    section_id = field.get('sectionID')
+                    break
+            
+            if not section_id:
+                logger.warning(f"未找到田块 {field_id} 的 sectionID")
+                return None
+            
+            # 检查是否有 API 认证信息
+            if not self.app_id or not self.secret:
+                logger.warning(f"❌ 缺少 API 认证信息，无法查询 {field_id} 的 unique_no")
+                logger.warning(f"   app_id: {self.app_id}, secret: {'***' if self.secret else None}")
+                return None
+            
+            # 通过 API 实时查询
+            logger.info(f"🔍 开始查询田块 {field_id} (sectionID: {section_id}) 的 {device_type} unique_no...")
+            
+            try:
+                from src.hardware.hw_field_device_mapper import get_field_devices_mapping
+                
+                device_mapping = get_field_devices_mapping(
+                    app_id=self.app_id,
+                    secret=self.secret,
+                    section_id=section_id,
+                    timeout=30,  # 增加到30秒
+                    verbose=True  # 开启详细日志
+                )
+                
+                logger.info(f"📡 API 响应: success={device_mapping.get('success')}, device_count={device_mapping.get('device_count', 0)}")
+                
+                if device_mapping.get('success'):
+                    devices = device_mapping.get('devices', [])
+                    logger.info(f"   找到 {len(devices)} 个设备")
+                    
+                    # 查找对应类型的设备
+                    for idx, device in enumerate(devices, 1):
+                        device_info = device.get('device_info', {})
+                        device_type_code = device_info.get('deviceTypeCode')
+                        device_name = device_info.get('deviceName', 'N/A')
+                        unique_no = device.get('unique_no')
+                        
+                        logger.info(f"   设备{idx}: code={device_type_code}, name={device_name}, unique_no={unique_no}")
+                        
+                        # 101544: 进水阀, 101588: 进出水阀
+                        if device_type == "inlet" and device_type_code in ["101544", "101588"]:
+                            if unique_no:
+                                logger.info(f"✅ 从 API 获取到 {field_id} 的 unique_no: {unique_no}")
+                                return unique_no
+                        
+                        # 如果需要支持出水阀，可以在这里添加逻辑
+                    
+                    logger.warning(f"⚠️ API 查询成功，但未找到 {field_id} 的 {device_type} 设备 (类型需要是 101544 或 101588)")
+                else:
+                    error_msg = device_mapping.get('error', '未知错误')
+                    logger.warning(f"❌ API 查询 {field_id} 失败: {error_msg}")
+            
+            except ImportError as ie:
+                logger.error(f"❌ 无法导入 hw_field_device_mapper 模块: {ie}")
+                import traceback
+                logger.error(traceback.format_exc())
+            except Exception as api_error:
+                logger.error(f"❌ API 查询 {field_id} 异常: {api_error}")
+                import traceback
+                logger.error(traceback.format_exc())
+            
             return None
+            
         except Exception as e:
-            logger.error(f"获取泵站unique_no失败: {e}")
+            logger.error(f"获取田块 {field_id} 的 unique_no 失败: {e}")
             return None
+    
+    def _get_regulator_unique_no(self, regulator_id: str) -> Optional[str]:
+        """
+        获取节制闸的 unique_no
+        
+        注意：节制闸的 unique_no 较难通过 API 实时查询（需要知道其所属田块）
+        目前返回 None，建议在生成计划时预先填充
+        
+        Args:
+            regulator_id: 节制闸ID（如 "S1-G1"）
+        
+        Returns:
+            Optional[str]: unique_no，暂时返回 None
+        """
+        # 节制闸的 unique_no 较难通过 API 查询
+        # 建议在生成灌溉计划时，通过查询田块设备状态接口预先填充到计划中
+        logger.debug(f"节制闸 {regulator_id} 的 unique_no 需要在生成计划时预先填充")
+        return None
     
     def _initialize_batch_monitoring(self, plan: Dict[str, Any], batch_index: int):
         """
@@ -1027,6 +1141,10 @@ class BatchExecutionScheduler:
                     break
         
         for field in fields_list:
+            # 实时通过 API 获取 unique_no
+            inlet_unique_no = self._get_field_device_unique_no(field['id'], 'inlet')
+            outlet_unique_no = self._get_field_device_unique_no(field['id'], 'outlet')
+            
             batch_fields.append({
                 'id': field['id'],
                 'segment_id': field.get('segment_id', ''),
@@ -1034,8 +1152,8 @@ class BatchExecutionScheduler:
                 'wl_mm': field.get('wl_mm', 0.0),
                 'wl_opt': field.get('wl_opt', 50.0),
                 'wl_high': field.get('wl_high', 80.0),
-                'inlet_unique_no': field.get('inlet_unique_no', ''),
-                'outlet_unique_no': field.get('outlet_unique_no', None)
+                'inlet_unique_no': inlet_unique_no or '',
+                'outlet_unique_no': outlet_unique_no
             })
         
         # 提取节制闸信息
@@ -1044,11 +1162,15 @@ class BatchExecutionScheduler:
             for gate in step.get('sequence', {}).get('gates_set', []):
                 if gate.get('open_pct', 0) > 0:
                     segment_id = self._extract_segment_from_gate_id(gate['id'])
+                    
+                    # 节制闸的 unique_no 暂时从计划中获取（计划生成时应预先填充）
+                    gate_unique_no = gate.get('unique_no')
+                    
                     batch_regulators.append({
                         'id': gate['id'],
                         'type': gate.get('type', 'branch-g'),
                         'segment_id': segment_id,
-                        'unique_no': gate.get('unique_no', None),
+                        'unique_no': gate_unique_no,
                         'open_pct': gate['open_pct']
                     })
         

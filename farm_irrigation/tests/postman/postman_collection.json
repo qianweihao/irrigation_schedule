@@ -242,7 +242,7 @@
                 "start"
               ]
             },
-            "description": "启动灌溉计划的动态执行（增强版）\n\n**🆕 新增功能（v2.0）**:\n- ✅ 自动初始化田块水位监控器\n- ✅ 自动生成设备控制指令（泵站、节制闸、进水阀）\n- ✅ 实时监控水位变化，动态生成设备关闭指令\n- ✅ 三级联动控制（田块 → 节制闸 → 泵站）\n\n**后端自动执行的操作**:\n1. 初始化 FieldCompletionMonitor\n2. 生成批次启动指令（phase: start）\n3. 启动实时监控循环（每30秒检查水位）\n4. 水位达标时生成关闭指令（phase: running）\n5. 所有田块完成时生成停泵指令（phase: stop）\n\n**硬件团队对接**:\n- 使用 `GET /api/execution/batch-commands` 获取待执行指令\n- 使用 `POST /api/execution/command-feedback` 提交执行反馈\n\n**参数说明**:\n- `plan_file_path`: 计划文件路径\n- `farm_id`: 农场ID\n- `auto_start`: 是否立即开始执行\n- `water_level_update_interval_minutes`: 水位更新间隔\n- `enable_plan_regeneration`: 是否启用智能重新生成\n- `execution_mode`: 执行模式（simulation/production）"
+            "description": "启动灌溉计划的动态执行（增强版）\n\n**🆕 v2.1 新增功能**:\n- ✅ 田块进水阀的 unique_no 自动通过 iLand API 实时获取\n- ✅ 生成指令时自动查询设备信息，无需手动配置\n- ✅ 增加详细的 API 调用日志，便于问题排查\n- ✅ timeout 从 10秒 增加到 30秒，确保 API 调用成功\n\n**⚠️ 重要：配置 iLand API 认证信息**:\n需要配置以下环境变量才能自动获取 unique_no：\n```bash\n# 方法1：设置环境变量（推荐）\nexport ILAND_APP_ID=\"your_app_id\"\nexport ILAND_SECRET=\"your_secret\"\n\n# 方法2：或在 auto_config_params.yaml 中添加\niland_app_id: \"your_app_id\"\niland_secret: \"your_secret\"\n```\n\n如果未配置，将看到警告日志：\n```\n⚠️ 未配置 iLand API 认证信息！\n   请设置环境变量 ILAND_APP_ID 和 ILAND_SECRET\n   田块进水阀的 unique_no 将无法自动获取\n```\n\n**🆕 v2.0 功能**:\n- ✅ 自动初始化田块水位监控器\n- ✅ 自动生成设备控制指令（泵站、节制闸、进水阀）\n- ✅ 实时监控水位变化，动态生成设备关闭指令\n- ✅ 三级联动控制（田块 → 节制闸 → 泵站）\n\n**后端自动执行的操作**:\n1. 初始化 FieldCompletionMonitor\n2. 生成批次启动指令（phase: start）\n   - 🆕 为每个田块进水阀调用 API 获取 unique_no\n   - 记录详细的查询日志\n3. 启动实时监控循环（每30秒检查水位）\n4. 水位达标时生成关闭指令（phase: running）\n5. 所有田块完成时生成停泵指令（phase: stop）\n\n**硬件团队对接**:\n- 使用 `GET /api/execution/batch-commands` 获取待执行指令\n- 使用 `POST /api/execution/command-feedback` 提交执行反馈\n\n**参数说明**:\n- `plan_file_path`: 计划文件路径\n- `farm_id`: 农场ID\n- `auto_start`: 是否立即开始执行\n- `water_level_update_interval_minutes`: 水位更新间隔\n- `enable_plan_regeneration`: 是否启用智能重新生成\n- `execution_mode`: 执行模式（simulation/production）\n\n**⏱️ 性能说明**:\n- 首次启动可能需要额外时间（每个田块约 1-2 秒）\n- 如果有 10 个田块，首次生成指令可能需要 10-20 秒\n- API 查询失败会记录警告日志，但不会阻止执行\n- 建议在生产环境确保网络稳定"
           },
           "event": [
             {
@@ -1495,7 +1495,7 @@
       ]
     },
     {
-      "name": "硬件设备管理",
+      "name": "8.硬件设备管理",
       "item": [
         {
           "name": "查询所有田块设备状态",
@@ -1902,7 +1902,7 @@
       ]
     },
     {
-      "name": "8.智能决策集成",
+      "name": "9.智能决策集成",
       "item": [
         {
           "name": "检查服务状态",
@@ -2242,7 +2242,7 @@
       ]
     },
     {
-      "name": "8. 设备指令管理",
+      "name": "10. 设备指令管理",
       "item": [
         {
           "name": "获取批次设备指令",
@@ -2282,7 +2282,7 @@
                 }
               ]
             },
-            "description": "获取批次设备控制指令（硬件团队接口）\n\n**使用场景**：\n- 硬件团队轮询获取待执行的设备控制指令\n- 获取批次启动时的泵站、节制闸、进水阀开启指令\n- 获取批次执行中的设备关闭指令\n- 获取批次结束时的停泵指令\n\n**参数说明**：\n- execution_id: 执行ID（必填）\n- batch_index: 批次索引（可选，不填返回当前批次）\n- phase: 阶段筛选（可选）\n  - start: 批次启动阶段指令\n  - running: 批次执行中的指令\n  - stop: 批次停止阶段指令\n- status: 状态筛选（可选，默认pending）\n  - pending: 待执行\n  - sent: 已发送\n  - executed: 已执行\n  - failed: 执行失败\n\n**返回指令格式**：\n```json\n{\n  \"command_id\": \"cmd_001\",\n  \"device_type\": \"pump|regulator|field_inlet_gate|field_outlet_gate\",\n  \"device_id\": \"P1\",\n  \"unique_no\": \"477379421064159253\",\n  \"action\": \"start|stop|open|close\",\n  \"params\": {\"gate_degree\": 100, \"open_pct\": 100},\n  \"priority\": 1,\n  \"description\": \"启动P1泵站\",\n  \"reason\": \"批次1开始\"\n}\n```\n\n**⚠️ 注意**：\n- 调用此接口获取pending状态的指令后，指令会自动标记为sent\n- 硬件团队应定期轮询（建议30秒一次）\n- 执行完指令后，需调用【提交指令反馈】接口"
+            "description": "获取批次设备控制指令（硬件团队接口）\n\n**🆕 v2.1 更新**：\n- ✅ 田块进水阀的 unique_no 现在会实时通过 iLand API 获取\n- ✅ 生成指令时自动查询设备的 unique_no，无需手动配置\n- ✅ 增加详细的 API 调用日志，便于调试\n\n**使用场景**：\n- 硬件团队轮询获取待执行的设备控制指令\n- 获取批次启动时的泵站、节制闸、进水阀开启指令\n- 获取批次执行中的设备关闭指令\n- 获取批次结束时的停泵指令\n\n**参数说明**：\n- execution_id: 执行ID（必填）\n- batch_index: 批次索引（可选，不填返回当前批次）\n- phase: 阶段筛选（可选）\n  - start: 批次启动阶段指令\n  - running: 批次执行中的指令\n  - stop: 批次停止阶段指令\n- status: 状态筛选（可选，默认pending）\n  - pending: 待执行\n  - sent: 已发送\n  - executed: 已执行\n  - failed: 执行失败\n\n**返回指令格式**：\n```json\n{\n  \"command_id\": \"cmd_001\",\n  \"device_type\": \"pump|regulator|field_inlet_gate|field_outlet_gate\",\n  \"device_id\": \"P1\",\n  \"unique_no\": \"477379421064159253\",  // 🆕 田块进水阀自动获取\n  \"action\": \"start|stop|open|close\",\n  \"params\": {\"gate_degree\": 100, \"open_pct\": 100},\n  \"priority\": 1,\n  \"description\": \"启动P1泵站\",\n  \"reason\": \"批次1开始\"\n}\n```\n\n**unique_no 获取说明**：\n- **泵站**：通常为 null（泵站无需 unique_no）\n- **节制闸**：从灌溉计划中获取（需要在计划生成时预先填充）\n- **田块进水阀**：🆕 自动通过 iLand API 实时查询获取\n  - 根据田块ID (S-G-F格式) 找到 sectionID\n  - 调用 `/equipment.listCodeBySection` 获取设备编码\n  - 调用 `/equipment.getByDeviceCode` 获取设备信息和 unique_no\n  - 筛选设备类型 101544（进水阀）或 101588（进出水阀）\n\n**⚠️ 注意**：\n- 调用此接口获取pending状态的指令后，指令会自动标记为sent\n- 硬件团队应定期轮询（建议30秒一次）\n- 执行完指令后，需调用【提交指令反馈】接口\n- 首次生成指令时可能需要30秒左右（需要查询所有田块的设备信息）\n- 后端会记录详细的API调用日志，可查看日志排查问题"
           },
           "event": [
             {
