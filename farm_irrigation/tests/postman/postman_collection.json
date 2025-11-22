@@ -1910,7 +1910,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/irrigation/rice-status",
+              "raw": "{{base_url}}/api/irrigation/rice-status?rice_api_url={{rice_api_url}}/v1/rice_irrigation",
               "host": [
                 "{{base_url}}"
               ],
@@ -1919,7 +1919,13 @@
                 "irrigation",
                 "rice-status"
               ],
-              "query": []
+              "query": [
+                {
+                  "key": "rice_api_url",
+                  "value": "{{rice_api_url}}/v1/rice_irrigation",
+                  "description": "Rice 服务的完整 API 地址（本地开发使用环境变量，生产环境使用 Docker 容器名）"
+                }
+              ]
             },
             "description": "检查 rice_smart_irrigation 服务是否正常运行\n\n**使用场景**:\n- 在生成计划前验证 Rice 服务可用性\n- 监控服务健康状态"
           },
@@ -1962,7 +1968,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farm_id\": \"{{farm_id}}\"\n}"
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"rice_api_url\": \"{{rice_api_url}}/v1/rice_irrigation\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/irrigation/update-config-from-rice",
@@ -2026,7 +2032,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"pumps\": \"P1,P2\",\n  \"time_constraints\": false,\n  \"auto_execute\": false\n}"
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"rice_api_url\": \"{{rice_api_url}}/v1/rice_irrigation\",\n  \"pumps\": \"P1,P2\",\n  \"time_constraints\": false,\n  \"auto_execute\": false\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/irrigation/generate-from-rice",
@@ -2105,7 +2111,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"pumps\": \"P1,P2\",\n  \"time_constraints\": false,\n  \"auto_execute\": true\n}"
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"rice_api_url\": \"{{rice_api_url}}/v1/rice_irrigation\",\n  \"pumps\": \"P1,P2\",\n  \"time_constraints\": false,\n  \"auto_execute\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/irrigation/generate-from-rice",
