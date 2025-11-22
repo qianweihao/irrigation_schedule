@@ -702,15 +702,15 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "message": "动态执行启动成功",
-  "data": {
-    "execution_id": "exec_20250109_123456",
-    "status": "running",
-    "start_time": "2025-01-09T12:34:56.789Z",
-    "plan_file": "/app/output/irrigation_plan_20250109_123456.json",
-    "total_batches": 4,
-    "current_batch": 1,
-    "execution_mode": "simulation"
+  "message": "动态执行已启动",
+  "execution_id": "exec_20250109_123456",
+  "scheduler_status": "running",
+  "total_batches": 4,
+  "current_batch": 1,
+  "selected_scenario": {
+    "scenario_name": "P2单独使用",
+    "pumps_used": ["P2"],
+    "total_batches": 4
   }
 }
 ```
@@ -718,9 +718,10 @@ Content-Type: application/json
 **关键字段说明**
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| execution_id | string | **重要！** 执行ID，用于查询状态和停止执行 |
-| status | string | 执行状态: `running`/`paused`/`completed`/`failed` |
-| current_batch | integer | 当前执行批次 |
+| execution_id | string | **重要！** 执行ID，用于后续查询状态、停止执行、获取指令等操作 |
+| scheduler_status | string | 调度器状态: `running`/`stopped` |
+| current_batch | integer | 当前批次索引 |
+| selected_scenario | object | 执行的方案信息（名称、使用泵站、批次数等） |
 | total_batches | integer | 总批次数 |
 
 ---
@@ -764,6 +765,21 @@ GET /api/execution/status?execution_id=exec_20250109_123456
       "scenario_name": "P2单独使用",
       "pumps_used": ["P2"],
       "total_batches": 4
+    },
+    "command_statistics": {
+      "total_commands": 48,
+      "pending": 2,
+      "sent": 10,
+      "executed": 35,
+      "failed": 1
+    },
+    "monitor_statistics": {
+      "total_fields": 12,
+      "completed_fields": 8,
+      "irrigating_fields": 4,
+      "total_regulators": 8,
+      "closed_regulators": 3,
+      "total_closures": 11
     }
   }
 }
@@ -777,6 +793,8 @@ GET /api/execution/status?execution_id=exec_20250109_123456
 | total_regenerations | integer | 计划重新生成次数 |
 | active_fields | array | 正在灌溉的田块 |
 | selected_scenario | object | 当前执行的方案信息 |
+| command_statistics | object | 设备指令统计（总数/待执行/已发送/已执行/失败） |
+| monitor_statistics | object | 监控器统计（田块/节制闸状态） |
 
 ---
 
@@ -2710,7 +2728,7 @@ fullWorkflow("13944136728576");
 | execution_id | string | ✅ 是 | - | 执行ID（由启动执行接口返回） |
 | batch_index | integer | ❌ 否 | 当前批次 | 批次索引（可选） |
 | phase | string | ❌ 否 | null | 阶段筛选：start/running/stop |
-| status | string | ❌ 否 | pending | 状态筛选：pending/sent/executed/failed |
+| status | string | ❌ 否 | null | 状态筛选：pending/sent/executed/failed，**不传或传null返回所有状态** |
 
 **阶段说明**
 
