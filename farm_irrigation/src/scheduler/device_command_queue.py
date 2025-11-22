@@ -47,14 +47,26 @@ class DeviceCommandQueue:
     
     def add_command(self, command_data: Dict) -> str:
         """
-        添加新指令到队列
+        添加新指令到队列（带去重机制，防止重复指令）
         
         Args:
             command_data: 指令数据字典
         
         Returns:
-            str: 生成的command_id
+            str: 生成的command_id（如果已存在则返回现有ID）
         """
+        # 生成指令指纹（设备ID + 动作 + 阶段）
+        fingerprint = f"{command_data['device_id']}:{command_data['action']}:{command_data.get('phase', 'running')}"
+        
+        # 检查是否已存在相同的待执行指令
+        for cmd in self.commands:
+            if cmd.status in ['pending', 'sent']:
+                cmd_fingerprint = f"{cmd.device_id}:{cmd.action}:{cmd.phase}"
+                if cmd_fingerprint == fingerprint:
+                    logger.debug(f"跳过重复指令: {command_data.get('description', fingerprint)}")
+                    return cmd.command_id  # 返回已存在的指令ID
+        
+        # 不存在重复，添加新指令
         self.command_counter += 1
         command_id = f"cmd_{self.command_counter:04d}"
         
@@ -202,4 +214,36 @@ class DeviceCommandQueue:
             'updated_at': cmd.updated_at,
             'feedback_message': cmd.feedback_message
         }
+    
+    def cleanup_old_commands(self, retention_hours: int = 24) -> int:
+        """
+        清理旧指令，防止内存无限增长
+        
+        保留策略：
+        1. 所有 pending/sent 状态的指令（待执行）
+        2. 最近N小时内的 executed/failed 指令（用于查询历史）
+        
+        Args:
+            retention_hours: 保留时间（小时），默认24小时
+            
+        Returns:
+            int: 清理的指令数量
+        """
+        from datetime import datetime, timedelta
+        
+        original_count = len(self.commands)
+        cutoff_time = datetime.now() - timedelta(hours=retention_hours)
+        
+        # 保留策略
+        self.commands = [
+            cmd for cmd in self.commands
+            if cmd.status in ['pending', 'sent'] or  # 待执行的指令
+               datetime.fromisoformat(cmd.created_at) > cutoff_time  # 最近的历史
+        ]
+        
+        cleaned_count = original_count - len(self.commands)
+        if cleaned_count > 0:
+            logger.info(f"清理了 {cleaned_count} 条旧指令，当前保留 {len(self.commands)} 条")
+        
+        return cleaned_count
 

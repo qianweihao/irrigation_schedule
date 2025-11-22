@@ -302,9 +302,10 @@ class BatchExecutionScheduler:
         self.status_manager.log_info("scheduler", f"执行开始时间: {self.execution_start_time}")
         
         try:
-            # 在后台启动主执行循环，不阻塞当前调用
+            # 在后台启动主执行循环和清理任务
             import asyncio
             asyncio.create_task(self._execution_loop())
+            asyncio.create_task(self._periodic_cleanup_task())
             
         except Exception as e:
             self.status_manager.log_error("scheduler", f"启动执行循环失败: {e}")
@@ -350,10 +351,16 @@ class BatchExecutionScheduler:
             # 等待一段时间后再次检查
             await asyncio.sleep(30)  # 每30秒检查一次
         
-        # 执行完成，更新状态
-        logger.info("所有批次执行完成")
+        # 执行完成，清理资源
+        logger.info("所有批次执行完成，开始清理资源...")
+        
+        # 清理指令队列（保留最近24小时）
+        if self.command_queue:
+            self.command_queue.cleanup_old_commands(retention_hours=24)
+        
         self.is_running = False
         self.execution_status = "completed"
+        logger.info("✅ 执行完成，资源已清理")
     
     def _has_pending_batches(self) -> bool:
         """检查是否还有待执行的批次"""
@@ -855,6 +862,29 @@ class BatchExecutionScheduler:
             logger.info(f"清理 {retention_days} 天前的旧数据完成")
         except Exception as e:
             logger.error(f"清理旧数据失败: {e}")
+    
+    async def _periodic_cleanup_task(self):
+        """
+        定期清理任务（每小时执行一次）
+        清理已执行/失败的旧指令，防止内存无限增长
+        """
+        cleanup_count = 0
+        
+        while self.is_running:
+            await asyncio.sleep(3600)  # 每小时执行一次
+            
+            if not self.is_running:
+                break
+            
+            cleanup_count += 1
+            
+            # 清理24小时前的已执行/失败指令
+            if self.command_queue:
+                cleaned = self.command_queue.cleanup_old_commands(retention_hours=24)
+                if cleaned > 0:
+                    logger.info(f"定期清理任务 #{cleanup_count}：清理了 {cleaned} 条旧指令")
+        
+        logger.debug("定期清理任务已停止")
     
     def _generate_batch_start_commands(self, plan: Dict[str, Any], batch_index: int) -> List[Dict]:
         """

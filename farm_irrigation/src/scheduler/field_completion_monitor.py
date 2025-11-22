@@ -14,6 +14,7 @@
 - 三级联动：田块 → 节制闸 → 泵站
 - 监控器只负责判断逻辑和标记，不直接调用硬件API
 - 实际硬件控制通过指令队列交给硬件团队执行
+- 使用异步锁防止并发冲突（自动检查 vs 手动调整）
 """
 
 import asyncio
@@ -87,6 +88,9 @@ class FieldCompletionMonitor:
         # 统计
         self.total_closures = 0
         self.total_field_completions = 0
+        
+        # 并发控制锁（防止自动检查和手动调整冲突）
+        self._check_lock = asyncio.Lock()
     
     def update_water_levels(self, water_levels: Dict[str, float]):
         """
@@ -169,7 +173,7 @@ class FieldCompletionMonitor:
     
     async def check_and_close_devices(self, latest_waterlevels: Dict[str, float]) -> Dict[str, any]:
         """
-        检查水位并关闭达标设备（核心监控循环）
+        检查水位并关闭达标设备（核心监控循环，带并发锁保护）
         
         Args:
             latest_waterlevels: 最新水位数据 {field_id: wl_mm}
@@ -183,37 +187,39 @@ class FieldCompletionMonitor:
                     'all_completed': bool
                 }
         """
-        logger.info("=" * 60)
-        logger.info("开始检查水位和设备状态")
-        logger.info("=" * 60)
-        
-        result = {
-            'completed_fields': [],
-            'closed_regulators': [],
-            'stopped_pumps': [],
-            'all_completed': False
-        }
-        
-        # P0: 检查田块水位，关闭达标田块的进水阀
-        completed_fields = await self._check_field_completion(latest_waterlevels)
-        result['completed_fields'] = completed_fields
-        
-        if completed_fields:
-            # P1: 检查节制闸是否应该关闭
-            closed_regulators = await self._check_regulator_closure()
-            result['closed_regulators'] = closed_regulators
+        # 获取锁，防止自动检查和手动调整同时执行
+        async with self._check_lock:
+            logger.info("=" * 60)
+            logger.info("开始检查水位和设备状态")
+            logger.info("=" * 60)
             
-            # P2: 检查泵站是否应该停止
-            if closed_regulators or self._all_fields_completed():
-                stopped_pumps = await self._check_pump_station_closure()
-                result['stopped_pumps'] = stopped_pumps
-                result['all_completed'] = len(stopped_pumps) > 0
-        
-        logger.info("=" * 60)
-        logger.info(f"检查完成: 田块完成 {len(completed_fields)}, 节制闸关闭 {len(result['closed_regulators'])}, 泵站停止 {len(result['stopped_pumps'])}")
-        logger.info("=" * 60)
-        
-        return result
+            result = {
+                'completed_fields': [],
+                'closed_regulators': [],
+                'stopped_pumps': [],
+                'all_completed': False
+            }
+            
+            # P0: 检查田块水位，关闭达标田块的进水阀
+            completed_fields = await self._check_field_completion(latest_waterlevels)
+            result['completed_fields'] = completed_fields
+            
+            if completed_fields:
+                # P1: 检查节制闸是否应该关闭
+                closed_regulators = await self._check_regulator_closure()
+                result['closed_regulators'] = closed_regulators
+                
+                # P2: 检查泵站是否应该停止
+                if closed_regulators or self._all_fields_completed():
+                    stopped_pumps = await self._check_pump_station_closure()
+                    result['stopped_pumps'] = stopped_pumps
+                    result['all_completed'] = len(stopped_pumps) > 0
+            
+            logger.info("=" * 60)
+            logger.info(f"检查完成: 田块完成 {len(completed_fields)}, 节制闸关闭 {len(result['closed_regulators'])}, 泵站停止 {len(result['stopped_pumps'])}")
+            logger.info("=" * 60)
+            
+            return result
     
     # ============ P0: 田块水位监控和进水阀关闭 ============
     

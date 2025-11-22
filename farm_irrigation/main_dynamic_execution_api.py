@@ -75,18 +75,35 @@ _cache = {}
 _cache_lock = threading.Lock()
 _executor = ThreadPoolExecutor(max_workers=2)  # 限制并发数
 
-# 配置日志
+# 配置日志（带自动轮转，防止日志文件无限增长）
 import os
+from logging.handlers import RotatingFileHandler
+
 # 基于项目根目录计算日志路径
 _log_dir = os.path.join(os.path.dirname(__file__), 'data', 'execution_logs')
 os.makedirs(_log_dir, exist_ok=True)
+
+# 创建轮转文件处理器（最大10MB，保留5个备份）
+file_handler = RotatingFileHandler(
+    os.path.join(_log_dir, 'main_dynamic_execution.log'),
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5,           # 保留5个备份文件
+    encoding='utf-8'
+)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+))
+
+# 控制台处理器
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(levelname)s - %(message)s'
+))
+
+# 配置根日志记录器
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(_log_dir, 'main_dynamic_execution.log'), encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+    handlers=[file_handler, console_handler]
 )
 logger = logging.getLogger(__name__)
 
