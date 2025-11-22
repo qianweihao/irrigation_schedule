@@ -2691,7 +2691,7 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
         app_id = request.app_id or os.environ.get("ILAND_APP_ID") or "YJY"
         secret = request.secret or os.environ.get("ILAND_SECRET") or "test005"
         
-        # 步骤1: 获取灌溉计划中的田块列表
+        # 步骤1: 获取灌溉计划中的田块列表、节制闸、泵编号
         logger.info("步骤1: 获取当前灌溉计划...")
         
         from pathlib import Path
@@ -2712,8 +2712,9 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
         with open(plan_file, 'r', encoding='utf-8') as f:
             plan_data = json.load(f)
         
-        # 提取需要灌溉的田块ID列表
+        # 提取需要灌溉的田块ID列表、节制闸编号、泵编号
         irrigation_fields = set()
+        virtual_devices = set()  # 存储节制闸（S-G）和泵（P1）编号
         scenarios_to_check = []
         
         if request.scenario_name:
@@ -2732,10 +2733,25 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
             # 注意：田块数据在 plan.batches 路径下
             batches = scenario.get("plan", {}).get("batches", [])
             for batch in batches:
+                # 提取田块ID
                 for field in batch.get("fields", []):
                     irrigation_fields.add(field.get("id"))
+            
+            # 注意：sequence 数据在 plan.steps 路径下
+            steps = scenario.get("plan", {}).get("steps", [])
+            for step in steps:
+                # 提取节制闸编号（从 sequence.gates_open）
+                sequence = step.get("sequence", {})
+                for gate_id in sequence.get("gates_open", []):
+                    virtual_devices.add(gate_id)
+                
+                # 提取泵编号（从 sequence.pumps_on）
+                for pump_id in sequence.get("pumps_on", []):
+                    virtual_devices.add(pump_id)
         
         logger.info(f"找到需要灌溉的田块: {len(irrigation_fields)} 个")
+        logger.info(f"提取虚拟设备（节制闸+泵）: {len(virtual_devices)} 个")
+        logger.info(f"虚拟设备列表: {sorted(virtual_devices)}")
         
         if not irrigation_fields:
             return DeviceSelfCheckResponse(
@@ -2790,19 +2806,61 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
             
             logger.debug(f"田块 {field_id}: 找到 {len(device_unique_nos)} 个设备")
         
-        logger.info(f"需要自检的设备总数: {len(all_unique_nos)}")
+        logger.info(f"田块设备总数: {len(all_unique_nos)}")
         
-        if not all_unique_nos:
+        # 步骤2.5: 获取虚拟设备（节制闸、泵）的unique_no
+        logger.info("步骤2.5: 获取虚拟设备（节制闸、泵）的unique_no...")
+        
+        virtual_device_unique_nos = []
+        virtual_device_mapping = {}  # 虚拟设备 → unique_no 映射
+        
+        if virtual_devices:
+            # 加载虚拟设备映射文件
+            from pathlib import Path
+            current_file = Path(__file__)
+            project_root = current_file.parent
+            mapping_file = project_root / "data" / "gzp_farm" / "virtual_device_c2no_mapping.json"
+            
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    virtual_mapping = json.load(f)
+                
+                logger.info(f"✅ 加载虚拟设备映射文件成功，共 {len(virtual_mapping)} 个映射")
+                
+                # 为每个虚拟设备获取 unique_no
+                for device_id in virtual_devices:
+                    unique_no = virtual_mapping.get(device_id)
+                    if unique_no:
+                        virtual_device_unique_nos.append(unique_no)
+                        virtual_device_mapping[device_id] = unique_no
+                        logger.info(f"  ✅ {device_id} → {unique_no}")
+                    else:
+                        logger.warning(f"  ⚠️ 虚拟设备 {device_id} 未找到对应的 unique_no")
+                
+                logger.info(f"成功映射 {len(virtual_device_unique_nos)} 个虚拟设备")
+                
+            except FileNotFoundError:
+                logger.warning(f"⚠️ 虚拟设备映射文件不存在: {mapping_file}")
+                logger.warning(f"   将跳过虚拟设备自检")
+            except Exception as e:
+                logger.error(f"❌ 加载虚拟设备映射文件失败: {e}")
+                logger.warning(f"   将跳过虚拟设备自检")
+        
+        # 合并所有设备的 unique_no
+        all_device_unique_nos = all_unique_nos + virtual_device_unique_nos
+        logger.info(f"需要自检的设备总数: {len(all_device_unique_nos)} (田块设备: {len(all_unique_nos)}, 虚拟设备: {len(virtual_device_unique_nos)})")
+        
+        if not all_device_unique_nos:
             return DeviceSelfCheckResponse(
                 success=False,
                 message="未找到需要自检的设备",
-                error="灌溉田块可能没有关联设备"
+                error="灌溉田块和虚拟设备都没有关联的 unique_no"
             )
         
-        # 步骤3: 触发设备自检（已移除预检查步骤）
-        logger.info("步骤3: 触发设备自检...")
+        # 步骤3: 触发设备自检（包含田块设备+虚拟设备）
+        logger.info("步骤3: 触发设备自检（田块设备+虚拟设备）...")
         
-        check_result = trigger_device_self_check(all_unique_nos, timeout=request.timeout)
+        check_result = trigger_device_self_check(all_device_unique_nos, timeout=request.timeout)
         
         if not check_result.get("success"):
             return DeviceSelfCheckResponse(
@@ -2831,7 +2889,7 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
             for attempt in range(1, request.max_polling_attempts + 1):
                 logger.info(f"📊 第 {attempt}/{request.max_polling_attempts} 次查询...")
                 
-                status_result = query_device_status(all_unique_nos, timeout=request.timeout)
+                status_result = query_device_status(all_device_unique_nos, timeout=request.timeout)
                 
                 if not status_result.get("success"):
                     logger.warning(f"⚠️ 查询失败: {status_result.get('error')}")
@@ -2862,7 +2920,7 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
                     logger.warning(f"⚠️ 已达到最大轮询次数，仍有 {len(summary['checking'])} 个设备在自检中")
         else:
             # 单次查询模式
-            status_result = query_device_status(all_unique_nos, timeout=request.timeout)
+            status_result = query_device_status(all_device_unique_nos, timeout=request.timeout)
             
             if not status_result.get("success"):
                 return DeviceSelfCheckResponse(
@@ -2873,7 +2931,7 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
             
             devices_status = status_result.get("devices", [])
         
-        # 步骤6: 过滤自检成功的设备
+        # 步骤6: 过滤自检成功的设备（区分田块设备和虚拟设备）
         logger.info("步骤6: 过滤自检成功的设备...")
         
         successful_devices = filter_successful_devices(devices_status)
@@ -2887,14 +2945,32 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
         
         logger.info(f"自检成功: {len(successful_devices)} 个设备, 失败: {len(failed_devices)} 个设备")
         
+        # 区分田块设备和虚拟设备的失败情况
+        failed_field_devices = []  # 田块设备失败
+        failed_virtual_devices = []  # 虚拟设备失败（节制闸/泵）
+        
+        # 反向映射：unique_no → 虚拟设备ID
+        unique_no_to_virtual = {v: k for k, v in virtual_device_mapping.items()}
+        
+        for device_no in failed_devices:
+            if device_no in unique_no_to_virtual:
+                # 虚拟设备失败
+                virtual_id = unique_no_to_virtual[device_no]
+                failed_virtual_devices.append(virtual_id)
+                logger.warning(f"  ⚠️ 虚拟设备自检失败: {virtual_id} (unique_no: {device_no})")
+            elif device_no in device_to_field:
+                # 田块设备失败
+                failed_field_devices.append(device_no)
+        
         # 找到自检失败的田块
         failed_fields = set()
-        for device_no in failed_devices:
+        for device_no in failed_field_devices:
             field_id = device_to_field.get(device_no)
             if field_id:
                 failed_fields.add(field_id)
         
-        logger.info(f"需要移除的田块（设备自检失败）: {len(failed_fields)} 个")
+        logger.info(f"田块设备失败: {len(failed_field_devices)} 个，影响田块: {len(failed_fields)} 个")
+        logger.info(f"虚拟设备失败: {len(failed_virtual_devices)} 个 - {failed_virtual_devices}")
         
         # 步骤7: 重新生成灌溉计划
         new_plan_file = None
@@ -2937,17 +3013,37 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
             for field_id in successful_fields:
                 final_device_list.extend(field_to_devices.get(field_id, []))
         
-        # 步骤8: 返回结果
+        # 步骤8: 返回结果（包含虚拟设备统计）
         logger.info("步骤8: 整理结果...")
         
         result_data = {
-            "total_devices": len(all_unique_nos),
+            # 总体统计
+            "total_devices": len(all_device_unique_nos),
             "successful_devices": len(successful_devices),
             "failed_devices": len(failed_devices),
+            
+            # 田块设备统计
+            "field_devices": {
+                "total": len(all_unique_nos),
+                "failed": len(failed_field_devices),
+                "successful": len(all_unique_nos) - len(failed_field_devices)
+            },
+            
+            # 虚拟设备统计（节制闸+泵）
+            "virtual_devices": {
+                "total": len(virtual_device_unique_nos),
+                "failed": len(failed_virtual_devices),
+                "failed_ids": failed_virtual_devices,
+                "successful": len(virtual_device_unique_nos) - len(failed_virtual_devices)
+            },
+            
+            # 田块统计
             "total_fields": len(irrigation_fields),
             "successful_fields": len(irrigation_fields) - len(failed_fields),
             "failed_fields": len(failed_fields),
             "failed_field_ids": list(failed_fields),
+            
+            # 详细信息
             "device_status_details": devices_status,
             "final_device_list": final_device_list,
             "new_plan_file": new_plan_file,
@@ -2955,12 +3051,15 @@ async def device_self_check_workflow(request: DeviceSelfCheckRequest):
         }
         
         logger.info(f"========== 设备自检工作流完成 ==========")
-        logger.info(f"总设备: {len(all_unique_nos)}, 成功: {len(successful_devices)}, 失败: {len(failed_devices)}")
+        logger.info(f"总设备: {len(all_device_unique_nos)} (田块: {len(all_unique_nos)}, 虚拟: {len(virtual_device_unique_nos)})")
+        logger.info(f"成功: {len(successful_devices)}, 失败: {len(failed_devices)}")
+        logger.info(f"  - 田块设备失败: {len(failed_field_devices)}")
+        logger.info(f"  - 虚拟设备失败: {len(failed_virtual_devices)}")
         logger.info(f"总田块: {len(irrigation_fields)}, 保留: {len(irrigation_fields) - len(failed_fields)}, 移除: {len(failed_fields)}")
         
         return DeviceSelfCheckResponse(
             success=True,
-            message=f"设备自检完成，{len(successful_devices)}/{len(all_unique_nos)} 个设备自检成功",
+            message=f"设备自检完成，{len(successful_devices)}/{len(all_device_unique_nos)} 个设备自检成功（田块设备+虚拟设备）",
             data=result_data
         )
         
