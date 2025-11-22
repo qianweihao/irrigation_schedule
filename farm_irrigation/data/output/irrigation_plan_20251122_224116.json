@@ -1,0 +1,742 @@
+{
+  "analysis": {
+    "total_fields_below_threshold": 10,
+    "min_fields_trigger": 1,
+    "trigger_status": "已达到触发条件",
+    "total_fields_to_irrigate": 10,
+    "required_segments": [
+      "S1",
+      "S2",
+      "S3",
+      "S5"
+    ],
+    "segment_pump_requirements": {
+      "S1": [
+        "P1"
+      ],
+      "S5": [
+        "P1"
+      ],
+      "S2": [
+        "P1"
+      ],
+      "S3": [
+        "P1"
+      ]
+    },
+    "valid_pump_combinations": [
+      [
+        "P1"
+      ]
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario_name": "P1单独使用",
+      "pumps_used": [
+        "P1"
+      ],
+      "total_electricity_cost": 1119.158869579155,
+      "total_eta_h": 31.087746377198748,
+      "total_pump_runtime_hours": {
+        "P1": 31.087746377198748
+      },
+      "coverage_info": {
+        "covered_segments": [
+          "S1",
+          "S2",
+          "S3",
+          "S5"
+        ],
+        "total_covered_segments": 4
+      },
+      "plan": {
+        "calc": {
+          "A_cover_mu": 79.99996000002,
+          "q_avail_m3ph": 240.0,
+          "t_win_h": 20.0,
+          "d_target_mm": 90.0,
+          "active_pumps": [
+            "P1"
+          ],
+          "filtered_by_feed_by": 0,
+          "allowed_zones": null,
+          "skipped_null_wl_count": 12,
+          "skipped_null_wl_fields": [
+            "S1-G2-F1",
+            "S1-G5-F4",
+            "S4-G28-F24",
+            "S2-G8-F5",
+            "S2-G9-F6",
+            "S2-G11-F8",
+            "S2-G15-F12",
+            "S3-G22-F19",
+            "S3-G24-F21",
+            "S3-G17-F14",
+            "S3-G16-F13",
+            "S3-G26-F23"
+          ],
+          "pump": {
+            "name": "P1",
+            "q_rated_m3ph": 240.0,
+            "efficiency": 0.8,
+            "power_kw": 60.0,
+            "electricity_price": 0.6
+          }
+        },
+        "drainage_targets": [],
+        "batches": [
+          {
+            "index": 1,
+            "area_mu": 124.28500000000001,
+            "fields": [
+              {
+                "id": "S1-G3-F2",
+                "area_mu": 16.356,
+                "segment_id": "S1",
+                "distance_rank": 2,
+                "wl_mm": 3.0,
+                "inlet_G_id": "S1-G3"
+              },
+              {
+                "id": "S1-G4-F3",
+                "area_mu": 8.189,
+                "segment_id": "S1",
+                "distance_rank": 3,
+                "wl_mm": 3.5,
+                "inlet_G_id": "S1-G4"
+              },
+              {
+                "id": "S2-G10-F7",
+                "area_mu": 8.448,
+                "segment_id": "S2",
+                "distance_rank": 7,
+                "wl_mm": 1.7000000000000002,
+                "inlet_G_id": "S2-G10"
+              },
+              {
+                "id": "S2-G12-F9",
+                "area_mu": 12.878,
+                "segment_id": "S2",
+                "distance_rank": 9,
+                "wl_mm": 5.8,
+                "inlet_G_id": "S2-G12"
+              },
+              {
+                "id": "S2-G13-F10",
+                "area_mu": 14.989,
+                "segment_id": "S2",
+                "distance_rank": 10,
+                "wl_mm": 0.0,
+                "inlet_G_id": "S2-G13"
+              },
+              {
+                "id": "S2-G14-F11",
+                "area_mu": 11.875,
+                "segment_id": "S2",
+                "distance_rank": 11,
+                "wl_mm": 40.0,
+                "inlet_G_id": "S2-G14"
+              },
+              {
+                "id": "S3-G18-F15",
+                "area_mu": 7.892,
+                "segment_id": "S3",
+                "distance_rank": 15,
+                "wl_mm": 9.9,
+                "inlet_G_id": "S3-G18"
+              },
+              {
+                "id": "S3-G19-F16",
+                "area_mu": 12.192,
+                "segment_id": "S3",
+                "distance_rank": 16,
+                "wl_mm": 86.4,
+                "inlet_G_id": "S3-G19"
+              },
+              {
+                "id": "S3-G20-F17",
+                "area_mu": 14.727,
+                "segment_id": "S3",
+                "distance_rank": 17,
+                "wl_mm": 0.0,
+                "inlet_G_id": "S3-G20"
+              },
+              {
+                "id": "S3-G21-F18",
+                "area_mu": 16.739,
+                "segment_id": "S3",
+                "distance_rank": 18,
+                "wl_mm": 147.5,
+                "inlet_G_id": "S3-G21"
+              }
+            ],
+            "stats": {
+              "deficit_vol_m3": 4288.9392778019,
+              "cap_vol_m3": 4800.0,
+              "eta_hours": 17.870580324174583
+            }
+          },
+          {
+            "index": 2,
+            "area_mu": 64.036,
+            "fields": [
+              {
+                "id": "S3-G23-F20",
+                "area_mu": 28.073,
+                "segment_id": "S3",
+                "distance_rank": 20,
+                "wl_mm": 3.3000000000000003,
+                "inlet_G_id": "S3-G23"
+              },
+              {
+                "id": "S3-G25-F22",
+                "area_mu": 15.978,
+                "segment_id": "S3",
+                "distance_rank": 22,
+                "wl_mm": 13.4,
+                "inlet_G_id": "S3-G25"
+              },
+              {
+                "id": "S5-G29-F25",
+                "area_mu": 19.985,
+                "segment_id": "S5",
+                "distance_rank": 25,
+                "wl_mm": 2.9,
+                "inlet_G_id": "S5-G29"
+              }
+            ],
+            "stats": {
+              "deficit_vol_m3": 3172.1198527258002,
+              "cap_vol_m3": 4800.0,
+              "eta_hours": 13.217166053024167
+            }
+          }
+        ],
+        "steps": [
+          {
+            "t_start_h": 0.0,
+            "t_end_h": 17.870580324174583,
+            "label": "批次 1",
+            "commands": [
+              {
+                "action": "start",
+                "target": "P1",
+                "value": null,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S1-G1",
+                "value": 0.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S1-G6",
+                "value": 0.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S1-G7",
+                "value": 0.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S1-G27",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S2-G10",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S2-G12",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S2-G13",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S2-G14",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S3-G18",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S3-G19",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S3-G20",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "set",
+                "target": "S3-G21",
+                "value": 100.0,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              },
+              {
+                "action": "stop",
+                "target": "P1",
+                "value": null,
+                "t_start_h": 0.0,
+                "t_end_h": 17.870580324174583
+              }
+            ],
+            "sequence": {
+              "pumps_on": [
+                "P1"
+              ],
+              "gates_open": [
+                "S1-G27",
+                "S2-G10",
+                "S2-G12",
+                "S2-G13",
+                "S2-G14",
+                "S3-G18",
+                "S3-G19",
+                "S3-G20",
+                "S3-G21"
+              ],
+              "gates_close": [
+                "S1-G1",
+                "S1-G6",
+                "S1-G7"
+              ],
+              "gates_set": [
+                {
+                  "id": "S1-G1",
+                  "open_pct": 0,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S1-G6",
+                  "open_pct": 0,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S1-G7",
+                  "open_pct": 0,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S1-G27",
+                  "open_pct": 100,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S2-G10",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S2-G12",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S2-G13",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S2-G14",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S3-G18",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S3-G19",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S3-G20",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S3-G21",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                }
+              ],
+              "fields": [
+                "S1-G3-F2",
+                "S1-G4-F3",
+                "S2-G10-F7",
+                "S2-G12-F9",
+                "S2-G13-F10",
+                "S2-G14-F11",
+                "S3-G18-F15",
+                "S3-G19-F16",
+                "S3-G20-F17",
+                "S3-G21-F18"
+              ],
+              "pumps_off": [
+                "P1"
+              ]
+            },
+            "full_order": [
+              {
+                "type": "pump_on",
+                "id": "P1"
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G1",
+                "open_pct": 0
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G6",
+                "open_pct": 0
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G7",
+                "open_pct": 0
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G27",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S2-G10",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S2-G12",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S2-G13",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S2-G14",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S3-G18",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S3-G19",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S3-G20",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S3-G21",
+                "open_pct": 100
+              },
+              {
+                "type": "field",
+                "id": "S1-G3-F2",
+                "inlet_G_id": "S1-G3"
+              },
+              {
+                "type": "field",
+                "id": "S1-G4-F3",
+                "inlet_G_id": "S1-G4"
+              },
+              {
+                "type": "field",
+                "id": "S2-G10-F7",
+                "inlet_G_id": "S2-G10"
+              },
+              {
+                "type": "field",
+                "id": "S2-G12-F9",
+                "inlet_G_id": "S2-G12"
+              },
+              {
+                "type": "field",
+                "id": "S2-G13-F10",
+                "inlet_G_id": "S2-G13"
+              },
+              {
+                "type": "field",
+                "id": "S2-G14-F11",
+                "inlet_G_id": "S2-G14"
+              },
+              {
+                "type": "field",
+                "id": "S3-G18-F15",
+                "inlet_G_id": "S3-G18"
+              },
+              {
+                "type": "field",
+                "id": "S3-G19-F16",
+                "inlet_G_id": "S3-G19"
+              },
+              {
+                "type": "field",
+                "id": "S3-G20-F17",
+                "inlet_G_id": "S3-G20"
+              },
+              {
+                "type": "field",
+                "id": "S3-G21-F18",
+                "inlet_G_id": "S3-G21"
+              },
+              {
+                "type": "pump_off",
+                "id": "P1"
+              }
+            ]
+          },
+          {
+            "t_start_h": 17.870580324174583,
+            "t_end_h": 31.087746377198748,
+            "label": "批次 2",
+            "commands": [
+              {
+                "action": "start",
+                "target": "P1",
+                "value": null,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S1-G1",
+                "value": 0.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S1-G6",
+                "value": 0.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S1-G7",
+                "value": 0.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S1-G27",
+                "value": 100.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S3-G23",
+                "value": 100.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S3-G25",
+                "value": 100.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "set",
+                "target": "S5-G29",
+                "value": 100.0,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              },
+              {
+                "action": "stop",
+                "target": "P1",
+                "value": null,
+                "t_start_h": 17.870580324174583,
+                "t_end_h": 31.087746377198748
+              }
+            ],
+            "sequence": {
+              "pumps_on": [
+                "P1"
+              ],
+              "gates_open": [
+                "S1-G27",
+                "S3-G23",
+                "S3-G25",
+                "S5-G29"
+              ],
+              "gates_close": [
+                "S1-G1",
+                "S1-G6",
+                "S1-G7"
+              ],
+              "gates_set": [
+                {
+                  "id": "S1-G1",
+                  "open_pct": 0,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S1-G6",
+                  "open_pct": 0,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S1-G7",
+                  "open_pct": 0,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S1-G27",
+                  "open_pct": 100,
+                  "type": "main-g"
+                },
+                {
+                  "id": "S3-G23",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S3-G25",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                },
+                {
+                  "id": "S5-G29",
+                  "open_pct": 100,
+                  "type": "inlet-g"
+                }
+              ],
+              "fields": [
+                "S3-G23-F20",
+                "S3-G25-F22",
+                "S5-G29-F25"
+              ],
+              "pumps_off": [
+                "P1"
+              ]
+            },
+            "full_order": [
+              {
+                "type": "pump_on",
+                "id": "P1"
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G1",
+                "open_pct": 0
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G6",
+                "open_pct": 0
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G7",
+                "open_pct": 0
+              },
+              {
+                "type": "regulator_set",
+                "id": "S1-G27",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S3-G23",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S3-G25",
+                "open_pct": 100
+              },
+              {
+                "type": "regulator_set",
+                "id": "S5-G29",
+                "open_pct": 100
+              },
+              {
+                "type": "field",
+                "id": "S3-G23-F20",
+                "inlet_G_id": "S3-G23"
+              },
+              {
+                "type": "field",
+                "id": "S3-G25-F22",
+                "inlet_G_id": "S3-G25"
+              },
+              {
+                "type": "field",
+                "id": "S5-G29-F25",
+                "inlet_G_id": "S5-G29"
+              },
+              {
+                "type": "pump_off",
+                "id": "P1"
+              }
+            ]
+          }
+        ],
+        "total_eta_h": 31.087746377198748,
+        "total_deficit_m3": 7461.0591305277,
+        "total_electricity_cost": 1119.158869579155,
+        "total_pump_runtime_hours": {
+          "P1": 31.087746377198748
+        }
+      }
+    }
+  ],
+  "total_scenarios": 1
+}

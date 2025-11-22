@@ -147,6 +147,10 @@ class BatchExecutionScheduler:
         
         # 加载配置
         self._load_config()
+        
+        # 加载虚拟设备映射（节制闸、泵站）
+        self.virtual_device_mapping = {}
+        self._load_virtual_device_mapping()
     
     def get_farm_id(self) -> str:
         """获取农场ID"""
@@ -165,6 +169,25 @@ class BatchExecutionScheduler:
         except Exception as e:
             logger.error(f"加载配置文件失败: {e}")
             self.config_data = {}
+    
+    def _load_virtual_device_mapping(self):
+        """加载虚拟设备映射文件（节制闸、泵站的 unique_no）"""
+        try:
+            # 映射文件路径：data/gzp_farm/virtual_device_c2no_mapping.json
+            project_root = self.config_path.parent
+            mapping_file = project_root / "data" / "gzp_farm" / "virtual_device_c2no_mapping.json"
+            
+            if mapping_file.exists():
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    self.virtual_device_mapping = json.load(f)
+                logger.info(f"✅ 虚拟设备映射文件加载成功: {len(self.virtual_device_mapping)} 个映射")
+            else:
+                logger.warning(f"⚠️ 虚拟设备映射文件不存在: {mapping_file}")
+                logger.warning(f"   节制闸和泵站的 unique_no 将为 None")
+                self.virtual_device_mapping = {}
+        except Exception as e:
+            logger.error(f"❌ 加载虚拟设备映射文件失败: {e}")
+            self.virtual_device_mapping = {}
     
     async def load_config(self, config_path: str):
         """
@@ -945,16 +968,23 @@ class BatchExecutionScheduler:
             gates_set = step.get('sequence', {}).get('gates_set', [])
             for gate in gates_set:
                 if gate.get('open_pct', 0) > 0:
-                    # 节制闸的 unique_no 从计划中获取（计划生成时应预先填充）
-                    gate_unique_no = gate.get('unique_no')
+                    gate_id = gate['id']
+                    
+                    # 从虚拟设备映射文件获取 unique_no
+                    gate_unique_no = self.virtual_device_mapping.get(gate_id)
+                    if gate_unique_no:
+                        logger.debug(f"✅ 节制闸 {gate_id} 从映射文件获取 unique_no: {gate_unique_no}")
+                    else:
+                        logger.warning(f"⚠️ 节制闸 {gate_id} 未找到 unique_no 映射")
+                    
                     commands.append({
                         "device_type": "regulator",
-                        "device_id": gate['id'],
+                        "device_id": gate_id,
                         "unique_no": gate_unique_no,
                         "action": "open",
                         "params": {"open_pct": gate['open_pct'], "gate_degree": gate['open_pct']},
                         "priority": 2,
-                        "description": f"开启{gate['id']}节制闸({gate['open_pct']}%)"
+                        "description": f"开启{gate_id}节制闸({gate['open_pct']}%)"
                     })
         
         # 3. 田块进水阀开启指令
@@ -989,18 +1019,23 @@ class BatchExecutionScheduler:
     
     def _get_pump_unique_no(self, pump_id: str) -> Optional[str]:
         """
-        获取泵站的 unique_no
-        
-        注意：泵站通常没有 unique_no，返回 None
+        获取泵站的 unique_no（从虚拟设备映射文件）
         
         Args:
             pump_id: 泵站ID（如 "P1"）
         
         Returns:
-            Optional[str]: 泵站的 unique_no，通常为 None
+            Optional[str]: 泵站的 unique_no，如果映射文件中不存在则返回 None
         """
-        # 泵站通常没有 unique_no
-        return None
+        # 从虚拟设备映射文件获取
+        unique_no = self.virtual_device_mapping.get(pump_id)
+        
+        if unique_no:
+            logger.debug(f"✅ 泵站 {pump_id} 的 unique_no: {unique_no}")
+        else:
+            logger.debug(f"⚠️ 泵站 {pump_id} 未找到 unique_no 映射")
+        
+        return unique_no
     
     def _get_field_device_unique_no(self, field_id: str, device_type: str = "inlet") -> Optional[str]:
         """
@@ -1092,21 +1127,23 @@ class BatchExecutionScheduler:
     
     def _get_regulator_unique_no(self, regulator_id: str) -> Optional[str]:
         """
-        获取节制闸的 unique_no
-        
-        注意：节制闸的 unique_no 较难通过 API 实时查询（需要知道其所属田块）
-        目前返回 None，建议在生成计划时预先填充
+        获取节制闸的 unique_no（从虚拟设备映射文件）
         
         Args:
             regulator_id: 节制闸ID（如 "S1-G1"）
         
         Returns:
-            Optional[str]: unique_no，暂时返回 None
+            Optional[str]: unique_no，如果映射文件中不存在则返回 None
         """
-        # 节制闸的 unique_no 较难通过 API 查询
-        # 建议在生成灌溉计划时，通过查询田块设备状态接口预先填充到计划中
-        logger.debug(f"节制闸 {regulator_id} 的 unique_no 需要在生成计划时预先填充")
-        return None
+        # 从虚拟设备映射文件获取
+        unique_no = self.virtual_device_mapping.get(regulator_id)
+        
+        if unique_no:
+            logger.debug(f"✅ 节制闸 {regulator_id} 的 unique_no: {unique_no}")
+        else:
+            logger.debug(f"⚠️ 节制闸 {regulator_id} 未找到 unique_no 映射")
+        
+        return unique_no
     
     def _initialize_batch_monitoring(self, plan: Dict[str, Any], batch_index: int):
         """
@@ -1161,10 +1198,11 @@ class BatchExecutionScheduler:
         for step in plan.get('steps', []):
             for gate in step.get('sequence', {}).get('gates_set', []):
                 if gate.get('open_pct', 0) > 0:
-                    segment_id = self._extract_segment_from_gate_id(gate['id'])
+                    gate_id = gate['id']
+                    segment_id = self._extract_segment_from_gate_id(gate_id)
                     
-                    # 节制闸的 unique_no 暂时从计划中获取（计划生成时应预先填充）
-                    gate_unique_no = gate.get('unique_no')
+                    # 从虚拟设备映射文件获取 unique_no
+                    gate_unique_no = self._get_regulator_unique_no(gate_id)
                     
                     batch_regulators.append({
                         'id': gate['id'],
