@@ -1548,6 +1548,87 @@
               }
             }
           ]
+        },
+        {
+          "name": "获取计划详情",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/plan-details?plan_file={{plan_id}}&summary_only=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "plan-details"
+              ],
+              "query": [
+                {
+                  "key": "plan_file",
+                  "value": "{{plan_id}}",
+                  "description": "计划文件名或完整路径"
+                },
+                {
+                  "key": "summary_only",
+                  "value": "false",
+                  "description": "只返回摘要（true/false）"
+                }
+              ]
+            },
+            "description": "获取灌溉计划文件的详细内容\n\n**功能**：\n- 读取指定的灌溉计划文件\n- 返回完整的计划数据或摘要信息\n\n**参数说明**：\n- plan_file: 计划文件名（如 \"irrigation_plan_selfcheck_20251123.json\"）或完整路径\n- summary_only: \n  - false（默认）：返回完整计划数据\n  - true：只返回摘要信息（田块数、批次数等）\n\n**使用场景**：\n- 设备自检后查看新生成的计划内容\n- 对比原计划和新计划的差异\n- 前端展示计划详情\n\n**返回摘要字段**：\n- scenario_name: 方案名称\n- total_fields: 田块总数\n- total_batches: 批次总数\n- fields_list: 田块ID列表\n- pumps_used: 使用的泵站\n- total_duration_h: 总耗时（小时）\n- total_electricity_cost: 总电费（元）\n\n**💡 提示**：\n- 如果只需要查看摘要信息，设置 summary_only=true 可以节省带宽\n- 适合在设备自检后查看新计划的内容\n- plan_file 可以直接使用设备自检接口返回的 new_plan_file 字段"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含成功标识\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含摘要信息\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('summary');",
+                  "    pm.expect(jsonData.summary).to.have.property('total_fields');",
+                  "    pm.expect(jsonData.summary).to.have.property('total_batches');",
+                  "    pm.expect(jsonData.summary).to.have.property('fields_list');",
+                  "    ",
+                  "    console.log('\\n=== 计划摘要 ===');",
+                  "    console.log('方案名称:', jsonData.summary.scenario_name);",
+                  "    console.log('田块数:', jsonData.summary.total_fields);",
+                  "    console.log('批次数:', jsonData.summary.total_batches);",
+                  "    console.log('使用泵站:', jsonData.summary.pumps_used.join(', '));",
+                  "    console.log('总耗时:', jsonData.summary.total_duration_h.toFixed(1) + 'h');",
+                  "    console.log('总电费: ¥' + jsonData.summary.total_electricity_cost.toFixed(2));",
+                  "    ",
+                  "    if (jsonData.summary.fields_list.length > 0) {",
+                  "        console.log('\\n前10个田块:', jsonData.summary.fields_list.slice(0, 10).join(', '));",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"检查是否返回完整数据\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var summaryOnly = pm.request.url.query.get('summary_only') === 'true';",
+                  "    ",
+                  "    if (summaryOnly) {",
+                  "        pm.expect(jsonData.data).to.be.undefined;",
+                  "        console.log('\\n✅ 摘要模式：未返回完整数据（节省带宽）');",
+                  "    } else {",
+                  "        pm.expect(jsonData).to.have.property('data');",
+                  "        console.log('\\n✅ 完整模式：已返回完整计划数据');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

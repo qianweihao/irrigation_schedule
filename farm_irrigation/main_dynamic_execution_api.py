@@ -4229,6 +4229,125 @@ async def switch_farm_with_upload(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"农场切换失败: {str(e)}")
 
+@app.get("/api/irrigation/plan-details")
+async def get_plan_details(
+    plan_file: str = Query(..., description="计划文件名或完整路径"),
+    summary_only: bool = Query(False, description="只返回摘要信息（不返回完整数据，节省带宽）")
+):
+    """
+    获取灌溉计划文件的详细内容
+    
+    **功能**：
+    - 读取指定的灌溉计划文件
+    - 返回完整的计划数据或摘要信息
+    
+    **参数说明**：
+    - plan_file: 计划文件名（如 "irrigation_plan_selfcheck_20251123.json"）或完整路径
+    - summary_only: 
+      - false（默认）：返回完整计划数据
+      - true：只返回摘要信息（田块数、批次数等）
+    
+    **使用场景**：
+    - 设备自检后查看新生成的计划内容
+    - 对比原计划和新计划的差异
+    - 前端展示计划详情
+    
+    **返回结构**：
+    ```json
+    {
+      "success": true,
+      "plan_file": "irrigation_plan_selfcheck_20251123.json",
+      "summary": {
+        "scenario_name": "P1单独使用",
+        "total_fields": 12,
+        "total_batches": 2,
+        "fields_list": ["S1-G3-F2", "S2-G10-F7", ...],
+        "pumps_used": ["P1"],
+        "total_duration_h": 28.19,
+        "total_electricity_cost": 1006.36
+      },
+      "data": {...}  // 完整数据（仅当 summary_only=false）
+    }
+    ```
+    """
+    try:
+        # 处理文件路径
+        if os.path.isabs(plan_file):
+            plan_path = plan_file
+        else:
+            plan_path = os.path.join(OUTPUT_DIR, plan_file)
+        
+        # 检查文件是否存在
+        if not os.path.exists(plan_path):
+            raise HTTPException(
+                status_code=404,
+                detail=f"计划文件不存在: {plan_file}"
+            )
+        
+        # 读取计划文件
+        logger.info(f"读取计划文件: {plan_path}")
+        with open(plan_path, 'r', encoding='utf-8') as f:
+            plan_data = json.load(f)
+        
+        # 提取摘要信息
+        summary = {
+            "total_scenarios": 0,
+            "total_fields": 0,
+            "total_batches": 0,
+            "total_duration_h": 0.0,
+            "pumps_used": [],
+            "fields_list": [],
+            "scenario_name": ""
+        }
+        
+        scenarios = plan_data.get("scenarios", [])
+        summary["total_scenarios"] = len(scenarios)
+        
+        if scenarios:
+            # 使用第一个scenario
+            first_scenario = scenarios[0]
+            summary["scenario_name"] = first_scenario.get("scenario_name", "")
+            summary["pumps_used"] = first_scenario.get("pumps_used", [])
+            summary["total_duration_h"] = first_scenario.get("total_eta_h", 0.0)
+            summary["total_electricity_cost"] = first_scenario.get("total_electricity_cost", 0.0)
+            
+            plan = first_scenario.get("plan", {})
+            batches = plan.get("batches", [])
+            summary["total_batches"] = len(batches)
+            
+            # 统计田块
+            fields_set = set()
+            for batch in batches:
+                for field in batch.get("fields", []):
+                    fields_set.add(field.get("id"))
+            
+            summary["total_fields"] = len(fields_set)
+            summary["fields_list"] = sorted(list(fields_set))
+        
+        result = {
+            "success": True,
+            "plan_file": os.path.basename(plan_path),
+            "full_path": plan_path,
+            "summary": summary
+        }
+        
+        # 如果不是只要摘要，返回完整数据
+        if not summary_only:
+            result["data"] = plan_data
+        
+        logger.info(f"✅ 计划详情获取成功: {summary['total_fields']} 个田块, {summary['total_batches']} 个批次")
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取计划详情失败: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"获取计划详情失败: {str(e)}"
+        )
+
 @app.get("/api/irrigation/rice-status")
 async def check_rice_service_status(
     rice_api_url: str = Query(
