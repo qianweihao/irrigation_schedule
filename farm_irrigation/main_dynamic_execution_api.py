@@ -107,6 +107,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Rice API URL配置（支持环境变量）
+RICE_API_URL = os.getenv(
+    "RICE_API_URL",
+    "http://rice-backend:5000/v1/rice_irrigation"  # Docker默认值
+)
+logger.info(f"Rice API URL配置: {RICE_API_URL}")
+
 # 创建FastAPI应用
 app = FastAPI(
     title="智能灌溉动态执行系统",
@@ -150,7 +157,7 @@ def get_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
         if cache_key in _cache:
             cache_data = _cache[cache_key]
             # 检查缓存是否过期（5分钟）
-            if time.time() - cache_data['timestamp'] < 300:
+            if time.time() - cache_data['timestamp'] < 60:
                 return cache_data['data']
             else:
                 del _cache[cache_key]
@@ -186,11 +193,15 @@ class SystemStatusResponse(BaseModel):
 
 class SystemInitRequest(BaseModel):
     """系统初始化请求模型"""
-    config_path: str = "config.json"
     farm_id: str = "default_farm"
-    enable_realtime_waterlevels: bool = True
-    database_path: str = "data/execution_status.db"
-    cache_file_path: str = "data/water_level_cache.json"
+    config_file_path: str = Field(default="config.json", alias="config_path", description="配置文件路径，支持绝对路径或相对于项目根目录的相对路径")
+    force_reinit: bool = Field(default=False, description="是否强制重新初始化（即使系统已初始化）")
+    enable_realtime_waterlevels: bool = Field(default=True, description="是否启用实时水位获取")
+    database_path: str = Field(default="data/execution_status.db", description="数据库路径")
+    cache_file_path: str = Field(default="data/water_level_cache.json", description="水位缓存文件路径")
+    
+    class Config:
+        populate_by_name = True  # 允许同时使用字段名和别名
 
 class IrrigationPlanRequest(BaseModel):
     """生成灌溉计划请求模型"""
@@ -863,7 +874,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         
         # 初始化水位管理器
         # 如果路径是相对路径，基于项目根目录计算
-        config_path = request.config_path
+        config_path = request.config_file_path
         if config_path and not os.path.isabs(config_path):
             config_path = os.path.join(os.path.dirname(__file__), config_path)
         
@@ -879,7 +890,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         
         # 初始化计划重新生成器
         # 如果路径是相对路径，基于项目根目录计算
-        config_path = request.config_path
+        config_path = request.config_file_path
         if config_path and not os.path.isabs(config_path):
             config_path = os.path.join(os.path.dirname(__file__), config_path)
         
@@ -890,7 +901,7 @@ async def initialize_system(request: SystemInitRequest) -> bool:
         
         # 初始化批次执行调度器
         # 如果路径是相对路径，基于项目根目录计算
-        config_path = request.config_path
+        config_path = request.config_file_path
         if config_path and not os.path.isabs(config_path):
             config_path = os.path.join(os.path.dirname(__file__), config_path)
         
@@ -919,14 +930,72 @@ async def initialize_system(request: SystemInitRequest) -> bool:
 
 @app.post("/api/system/init", response_model=Dict[str, Any])
 async def init_system(request: SystemInitRequest):
-    """初始化系统"""
+    """
+    系统初始化接口
+    
+    初始化灌溉系统的所有核心组件，包括调度器、水位管理器、计划重新生成器和状态管理器。
+    
+    **参数说明**:
+    - farm_id: 农场ID（必填）
+    - config_file_path: 配置文件路径，支持绝对路径或相对路径（默认: config.json）
+    - force_reinit: 是否强制重新初始化，即使系统已初始化（默认: false）
+    - enable_realtime_waterlevels: 是否启用实时水位获取（默认: true）
+    - database_path: 数据库路径（默认: data/execution_status.db）
+    - cache_file_path: 水位缓存文件路径（默认: data/water_level_cache.json）
+    
+    **使用场景**:
+    - 系统首次启动时调用
+    - 切换农场配置后调用
+    - 配置文件更新后需要重新加载时调用
+    
+    **注意事项**:
+    - 如果系统已初始化且force_reinit=false，将返回错误
+    - force_reinit=true会清除现有状态并重新初始化（谨慎使用）
+    """
     try:
+        global _scheduler, _waterlevel_manager, _plan_regenerator, _status_manager
+        
+        # 检查是否已初始化
+        is_initialized = _scheduler is not None
+        
+        if is_initialized and not request.force_reinit:
+            return {
+                "success": False,
+                "message": "系统已初始化，如需重新初始化请设置 force_reinit=true",
+                "already_initialized": True,
+                "current_farm_id": _scheduler.farm_id if _scheduler else None,
+                "timestamp": datetime.now().isoformat()
+            }
+        
+        # 如果强制重新初始化，先清理现有组件
+        if is_initialized and request.force_reinit:
+            logger.warning("强制重新初始化系统，清除现有组件...")
+            if _scheduler:
+                try:
+                    _scheduler.stop()
+                except:
+                    pass
+            _scheduler = None
+            _waterlevel_manager = None
+            _plan_regenerator = None
+            _status_manager = None
+            logger.info("现有组件已清除")
+        
+        # 执行初始化
         success = await initialize_system(request)
         
         if success:
             return {
                 "success": True,
-                "message": "系统初始化成功",
+                "message": "系统初始化成功" if not is_initialized else "系统重新初始化成功",
+                "farm_id": request.farm_id,
+                "config_file": request.config_file_path,
+                "components_initialized": {
+                    "scheduler": _scheduler is not None,
+                    "waterlevel_manager": _waterlevel_manager is not None,
+                    "plan_regenerator": _plan_regenerator is not None,
+                    "status_manager": _status_manager is not None
+                },
                 "timestamp": datetime.now().isoformat()
             }
         else:
@@ -934,6 +1003,8 @@ async def init_system(request: SystemInitRequest):
             
     except Exception as e:
         logger.error(f"系统初始化失败: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"系统初始化失败: {str(e)}")
 
 @app.get("/api/system/status", response_model=SystemStatusResponse)
@@ -3201,8 +3272,8 @@ class UpdateConfigFromRiceRequest(BaseModel):
     """独立配置更新请求（基于Rice决策）"""
     farm_id: str = Field(..., description="农场ID")
     rice_api_url: str = Field(
-        default="http://rice-backend:5000/v1/rice_irrigation",  # Docker 容器名访问
-        description="Rice API地址"
+        default=RICE_API_URL,  # 从环境变量读取
+        description="Rice API地址（可通过环境变量 RICE_API_URL 配置，默认: rice-backend:5000）"
     )
 
 class UpdateConfigFromRiceResponse(BaseModel):
@@ -3218,8 +3289,8 @@ class RiceIntegrationRequest(BaseModel):
     """Rice智能决策集成请求（一体化：更新配置+生成计划）"""
     farm_id: str = Field(..., description="农场ID")
     rice_api_url: str = Field(
-        "http://rice-backend:5000/v1/rice_irrigation",  # Docker 容器名访问
-        description="Rice API地址"
+        default=RICE_API_URL,  # 从环境变量读取
+        description="Rice API地址（可通过环境变量 RICE_API_URL 配置，默认: rice-backend:5000）"
     )
     pumps: str = Field("P1,P2", description="启用的水泵")
     time_constraints: bool = Field(False, description="是否启用时间约束")
@@ -4148,7 +4219,10 @@ async def switch_farm_with_upload(
 
 @app.get("/api/irrigation/rice-status")
 async def check_rice_service_status(
-    rice_api_url: str = "http://rice-backend:5000/v1/rice_irrigation"  # Docker 容器名访问
+    rice_api_url: str = Query(
+        default=RICE_API_URL,  # 从环境变量读取
+        description="Rice API地址（可通过环境变量 RICE_API_URL 配置）"
+    )
 ):
     """
     检查 Rice 服务状态
@@ -4157,7 +4231,11 @@ async def check_rice_service_status(
     
     **使用示例**:
     ```bash
+    # 使用默认地址（从环境变量）
     curl "http://localhost:8000/api/irrigation/rice-status"
+    
+    # 指定自定义地址
+    curl "http://localhost:8000/api/irrigation/rice-status?rice_api_url=http://localhost:5000/v1/rice_irrigation"
     ```
     """
     try:

@@ -20,7 +20,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_file_path\": \"/path/to/config.json\",\n  \"force_reinit\": false\n}"
+              "raw": "{\n  \"farm_id\": \"{{farm_id}}\",\n  \"config_file_path\": \"config.json\",\n  \"force_reinit\": false,\n  \"enable_realtime_waterlevels\": true,\n  \"database_path\": \"data/execution_status.db\",\n  \"cache_file_path\": \"data/water_level_cache.json\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/system/init",
@@ -32,7 +32,8 @@
                 "system",
                 "init"
               ]
-            }
+            },
+            "description": "初始化灌溉系统的所有核心组件\n\n**参数说明**:\n- farm_id: 农场ID（必填）\n- config_file_path: 配置文件路径（默认: config.json），支持绝对路径或相对路径\n  - 注意：此参数也支持别名 config_path 以保持向后兼容\n- force_reinit: 是否强制重新初始化（默认: false）\n  - false: 如果系统已初始化则返回错误\n  - true: 清除现有状态并重新初始化（⚠️ 谨慎使用！）\n- enable_realtime_waterlevels: 是否启用实时水位获取（默认: true）\n- database_path: 执行状态数据库路径（默认: data/execution_status.db）\n- cache_file_path: 水位缓存文件路径（默认: data/water_level_cache.json）\n\n**使用场景**:\n- ✅ 系统首次启动时调用\n- ✅ 切换农场配置后调用\n- ✅ 配置文件更新后需要重新加载时调用\n- ⚠️ 执行过程中需要重启系统时调用（设置 force_reinit=true）\n\n**⚠️ 重要提示**:\n1. force_reinit=true 会停止所有正在执行的灌溉任务\n2. 强制重新初始化会清除所有组件的状态\n3. 仅在确实需要完全重置系统时使用 force_reinit=true\n\n**最佳实践**:\n- 生产环境首次部署：调用一次即可\n- 切换农场：先调用 /api/farm/switch，再调用本接口\n- 配置更新：设置 force_reinit=true 重新加载"
           },
           "event": [
             {
@@ -46,7 +47,53 @@
                   "pm.test(\"响应包含成功标识\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"验证初始化结果\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    ",
+                  "    // 检查是否已初始化",
+                  "    if (jsonData.already_initialized) {",
+                  "        console.log('ℹ️ 系统已初始化');",
+                  "        console.log('当前农场ID:', jsonData.current_farm_id);",
+                  "        console.log('💡 提示：如需重新初始化，请设置 force_reinit=true');",
+                  "    } else {",
+                  "        console.log('✅ 系统初始化成功');",
+                  "        console.log('农场ID:', jsonData.farm_id);",
+                  "        console.log('配置文件:', jsonData.config_file);",
+                  "        ",
+                  "        // 验证所有组件都已初始化",
+                  "        if (jsonData.components_initialized) {",
+                  "            pm.expect(jsonData.components_initialized.scheduler).to.be.true;",
+                  "            pm.expect(jsonData.components_initialized.waterlevel_manager).to.be.true;",
+                  "            pm.expect(jsonData.components_initialized.plan_regenerator).to.be.true;",
+                  "            pm.expect(jsonData.components_initialized.status_manager).to.be.true;",
+                  "            ",
+                  "            console.log('\\n=== 组件初始化状态 ===');",
+                  "            console.log('✅ 调度器 (scheduler):', jsonData.components_initialized.scheduler);",
+                  "            console.log('✅ 水位管理器 (waterlevel_manager):', jsonData.components_initialized.waterlevel_manager);",
+                  "            console.log('✅ 计划重新生成器 (plan_regenerator):', jsonData.components_initialized.plan_regenerator);",
+                  "            console.log('✅ 状态管理器 (status_manager):', jsonData.components_initialized.status_manager);",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含时间戳\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.timestamp).to.be.a('string');",
+                  "    console.log('\\n时间戳:', jsonData.timestamp);",
                   "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log('=== 系统初始化 ===');",
+                  "console.log('准备初始化灌溉系统核心组件...');",
+                  "console.log('农场ID:', pm.environment.get('farm_id'));"
                 ]
               }
             }

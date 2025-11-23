@@ -52,7 +52,7 @@
 | 术语 | 英文 | 说明 | 示例值 |
 |------|------|------|--------|
 | **farm_id** | Farm ID | 农场唯一标识符，用于区分不同的农场 | `"13944136728576"` |
-| **plan_id** | Plan ID | 灌溉计划文件的完整路径，由生成计划接口返回 | 生产环境: `"/app/output/irrigation_plan_*.json"`<br>本地环境: `"e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_*.json"` |
+| **plan_id** | Plan ID | 灌溉计划文件的完整路径，由生成计划接口返回。<br>**⚠️ 参数名称说明**: 在不同接口中可能使用 `plan_id` 或 `plan_file_path`，两者含义相同，都指计划文件路径。<br>**最佳实践**: 建议统一使用接口文档中指定的参数名，但系统支持两种名称以保持兼容性。 | 生产环境: `"/app/output/irrigation_plan_*.json"`<br>本地环境: `"e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_*.json"` |
 | **execution_id** | Execution ID | 执行任务的唯一标识，由启动执行接口返回 | `"exec_20250109_123456"` |
 | **batch_index** | Batch Index | 批次索引号，**从1开始计数**（不是0） | `1, 2, 3, 4` |
 | **field_id** | Field ID | 田块唯一标识符，格式：`片区-闸门-田块` | `"S3-G2-F1"` |
@@ -184,6 +184,106 @@ headers: {
 
 ---
 
+## ⚠️ 重要说明
+
+### 参数命名一致性
+
+在使用本API时，您可能会注意到某些参数在不同接口中使用了不同的名称，这是为了保持向后兼容性和满足不同使用场景的需求。
+
+#### 1. plan_id vs plan_file_path
+
+**含义**: 两者都指灌溉计划文件的完整路径
+
+**使用场景**:
+| 参数名 | 使用场景 | 示例接口 |
+|--------|---------|---------|
+| `plan_id` | 环境变量、批次管理、计划查询 | `GET /api/irrigation/batch-info/{plan_id}` |
+| `plan_file_path` | 动态执行、文件上传 | `POST /api/execution/start` |
+
+**✅ 最佳实践**:
+- 使用接口文档中明确指定的参数名
+- 两种名称在功能上完全等价
+- 系统在内部会自动处理两种命名
+
+**示例**:
+```json
+// 启动执行接口 - 使用 plan_file_path
+{
+  "plan_file_path": "/app/output/irrigation_plan_20250109_123456.json",
+  "farm_id": "13944136728576"
+}
+
+// 获取批次信息 - 使用 plan_id
+GET /api/irrigation/batch-info/irrigation_plan_20250109_123456.json
+```
+
+#### 2. config_path vs config_file_path
+
+**含义**: 两者都指配置文件路径（通常是 config.json）
+
+**使用场景**:
+| 参数名 | 使用场景 | 示例接口 |
+|--------|---------|---------|
+| `config_path` | 旧版接口、内部组件 | (支持作为别名) |
+| `config_file_path` | 新版接口、推荐使用 | `POST /api/system/init` |
+
+**✅ 最佳实践**:
+- 新代码统一使用 `config_file_path`
+- 系统支持 `config_path` 作为别名以保持兼容性
+- 两种名称在功能上完全等价
+
+**示例**:
+```json
+// 系统初始化 - 推荐使用 config_file_path
+{
+  "farm_id": "13944136728576",
+  "config_file_path": "config.json",
+  "force_reinit": false
+}
+
+// 也支持使用 config_path (别名)
+{
+  "farm_id": "13944136728576",
+  "config_path": "config.json",  // ✅ 同样有效
+  "force_reinit": false
+}
+```
+
+#### 3. 参数值格式说明
+
+**路径格式**:
+- **生产环境**: `/app/output/irrigation_plan_20250109_123456.json`
+- **本地开发**: `e:/irrigation_schedule/farm_irrigation/output/irrigation_plan_20250109_123456.json`
+- **相对路径**: `output/irrigation_plan_20250109_123456.json` (相对于项目根目录)
+
+**⚠️ 注意事项**:
+1. 路径中的斜杠 `/` 和反斜杠 `\` 在Windows上会自动转换
+2. 建议使用正斜杠 `/` 以确保跨平台兼容性
+3. 如果文件不存在，API会返回404错误
+
+#### 4. 环境变量映射
+
+在Postman环境变量中：
+- `{{plan_id}}` → 对应接口中的 `plan_id` 或 `plan_file_path`
+- 两者可以互换使用，取决于具体接口的参数命名
+
+**完整映射表**:
+| 环境变量 | 接口参数名（主） | 接口参数名（别名） | 说明 |
+|---------|---------------|-----------------|------|
+| `{{plan_id}}` | `plan_file_path` | `plan_id` | 灌溉计划文件路径 |
+| `{{farm_id}}` | `farm_id` | - | 农场ID |
+| `{{config_file_path}}` | `config_file_path` | `config_path` | 配置文件路径 |
+| `{{execution_id}}` | `execution_id` | - | 执行任务ID |
+
+#### 5. 迁移建议
+
+如果您正在从旧版本迁移：
+1. ✅ **无需修改现有代码** - 别名机制确保完全兼容
+2. ✅ **渐进式更新** - 可以逐步更新参数名称
+3. ✅ **推荐新命名** - 新项目建议使用文档中的主要参数名
+
+---
+
 ## 接口列表
 
 ### 1. 系统管理
@@ -279,6 +379,239 @@ GET /api/info
   }
 }
 ```
+
+---
+
+#### 1.4 系统初始化
+
+**接口说明**: 初始化灌溉系统的所有核心组件
+
+**请求**
+```
+POST /api/system/init
+Content-Type: application/json
+```
+
+**请求参数**
+```json
+{
+  "farm_id": "13944136728576",
+  "config_file_path": "config.json",
+  "force_reinit": false,
+  "enable_realtime_waterlevels": true,
+  "database_path": "data/execution_status.db",
+  "cache_file_path": "data/water_level_cache.json"
+}
+```
+
+**参数说明**
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| farm_id | string | ✅ 是 | - | 农场唯一标识符 |
+| config_file_path | string | ❌ 否 | `"config.json"` | 配置文件路径，支持绝对路径或相对于项目根目录的相对路径。<br>**注意**: 此参数也支持别名 `config_path` 以保持向后兼容 |
+| force_reinit | boolean | ❌ 否 | `false` | 是否强制重新初始化。<br>`false`: 如果系统已初始化则返回错误<br>`true`: 清除现有状态并重新初始化（谨慎使用！） |
+| enable_realtime_waterlevels | boolean | ❌ 否 | `true` | 是否启用实时水位获取 |
+| database_path | string | ❌ 否 | `"data/execution_status.db"` | 执行状态数据库路径 |
+| cache_file_path | string | ❌ 否 | `"data/water_level_cache.json"` | 水位缓存文件路径 |
+
+**使用场景**
+- ✅ 系统首次启动时调用
+- ✅ 切换农场配置后调用
+- ✅ 配置文件更新后需要重新加载时调用
+- ⚠️ 执行过程中需要重启系统时调用（设置 `force_reinit=true`）
+
+**响应示例 - 成功**
+```json
+{
+  "success": true,
+  "message": "系统初始化成功",
+  "farm_id": "13944136728576",
+  "config_file": "config.json",
+  "components_initialized": {
+    "scheduler": true,
+    "waterlevel_manager": true,
+    "plan_regenerator": true,
+    "status_manager": true
+  },
+  "timestamp": "2025-01-09T12:34:56.789Z"
+}
+```
+
+**响应示例 - 已初始化**
+```json
+{
+  "success": false,
+  "message": "系统已初始化，如需重新初始化请设置 force_reinit=true",
+  "already_initialized": true,
+  "current_farm_id": "13944136728576",
+  "timestamp": "2025-01-09T12:34:56.789Z"
+}
+```
+
+**⚠️ 重要提示**
+1. **force_reinit=true 的影响**:
+   - 会停止所有正在执行的灌溉任务
+   - 清除调度器、水位管理器等所有组件的状态
+   - 重新加载配置文件
+   - 仅在确实需要完全重置系统时使用
+
+2. **初始化失败的常见原因**:
+   - 配置文件路径不存在
+   - 配置文件格式错误
+   - 数据库文件权限不足
+   - 依赖组件初始化失败
+
+3. **最佳实践**:
+   - 生产环境首次部署：调用一次即可
+   - 切换农场：先调用 `/api/farm/switch`，再调用本接口初始化
+   - 配置更新：设置 `force_reinit=true` 重新加载
+
+---
+
+#### 1.5 农场一键切换
+
+**接口说明**: 上传SHP文件自动完成农场配置切换
+
+**请求**
+```
+POST /api/farm/switch
+Content-Type: multipart/form-data
+```
+
+**请求参数 (FormData)**
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| farm_id | string | ✅ 是 | 新农场的唯一标识符 |
+| farm_name | string | ✅ 是 | 新农场的名称（用于显示和日志） |
+| auto_generate_plan | boolean | ❌ 否 | 切换后是否自动生成灌溉计划（默认: false） |
+| skip_backup | boolean | ❌ 否 | 是否跳过备份当前配置（默认: false，**不建议跳过**） |
+| files | file[] | ✅ 是 | SHP文件及配套文件（.shp, .dbf, .shx等），需要至少3组完整文件 |
+
+**文件要求**:
+1. **文件格式**: 每组SHP文件必须包含 `.shp`, `.dbf`, `.shx` 文件（`.prj`, `.cpg` 可选）
+2. **文件数量**: 至少需要3组完整的SHP文件（田块、水路、闸门）
+3. **文件类型识别**: 系统自动根据文件名识别类型
+
+**📋 文件命名规范**
+
+为确保系统正确识别文件类型，请遵循以下命名规范：
+
+| 文件类型 | 关键词（包含任一即可） | 示例文件名 |
+|---------|---------------------|----------|
+| **田块文件** | `田块`, `地块`, `field`, `plot`, `田`, `tian` | `港中坪田块.shp`<br>`field_data.shp`<br>`农场地块信息.shp` |
+| **水路文件** | `水路`, `渠道`, `canal`, `segment`, `水`, `shui`, `line` | `港中坪水路.shp`<br>`irrigation_canal.shp`<br>`水渠网络.shp` |
+| **闸门文件** | `阀门`, `闸门`, `gate`, `valve`, `闸`, `zha`, `阀`, `fa` | `港中坪阀门.shp`<br>`gate_valve.shp`<br>`节制闸.shp` |
+
+**⚠️ 文件名注意事项**:
+1. **中文文件名处理**: 
+   - 系统会自动将中文文件名转换为英文格式（如 `{farm_id}_fields_code.geojson`）
+   - 这样做是为了确保跨平台兼容性（Windows/Linux/Docker）
+   - 原始文件名会被记录在 `{farm_id}_file_mapping.json` 中便于追溯
+
+2. **文件名大小写**: 不敏感，系统会自动转换为小写匹配
+
+3. **文件编码**: 
+   - 建议使用 UTF-8 编码
+   - 如果SHP文件包含中文字段，请确保有 `.cpg` 文件指定编码
+
+4. **特殊字符**: 避免在文件名中使用特殊字符（如 `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`）
+
+**自动处理流程**:
+1. ✅ 自动检测文件类型（田块/fields、水路/segments、闸门/gates）
+2. ✅ 备份当前配置到 `data/farm_backups/backup_{timestamp}/`
+3. ✅ 转换SHP为GeoJSON格式，使用安全的英文文件名
+4. ✅ 更新 `auto_config_params.yaml` 配置
+5. ✅ 更新 `farm_id_mapping.json` 农场映射
+6. ✅ 自动生成 `config.json` 配置文件
+7. ✅ 验证配置完整性
+8. ✅ （可选）自动生成灌溉计划
+
+**响应示例**
+```json
+{
+  "success": true,
+  "message": "农场切换成功！已切换到 港中坪农场\n💡 提示：已将中文文件名转换为英文格式以确保跨平台兼容性",
+  "farm_id": "13944136728576",
+  "farm_name": "港中坪农场",
+  "backup_path": "/app/data/farm_backups/backup_20250109_123456",
+  "files_processed": {
+    "fields": "港中坪田块.shp",
+    "segments": "港中坪水路.shp",
+    "gates": "港中坪阀门.shp"
+  },
+  "config_path": "/app/config.json",
+  "validation": {
+    "valid": true,
+    "fields_count": 36,
+    "segments_count": 8,
+    "gates_count": 27,
+    "pumps_count": 2
+  },
+  "timestamp": "20250109_123456"
+}
+```
+
+**使用示例 (Postman)**:
+```
+Method: POST
+URL: http://localhost:8000/api/farm/switch
+Body: form-data
+  ├─ farm_id: "新农场ID"
+  ├─ farm_name: "新农场名称"
+  ├─ auto_generate_plan: false
+  ├─ skip_backup: false
+  └─ files: [选择所有SHP相关文件]
+```
+
+**使用示例 (JavaScript)**:
+```javascript
+const formData = new FormData();
+formData.append('farm_id', '13944136728576');
+formData.append('farm_name', '港中坪农场');
+formData.append('auto_generate_plan', 'false');
+formData.append('skip_backup', 'false');
+
+// 添加文件（假设通过文件选择器获得）
+files.forEach(file => {
+  formData.append('files', file);
+});
+
+const response = await fetch('/api/farm/switch', {
+  method: 'POST',
+  body: formData
+});
+```
+
+**⚠️ 重要提示**:
+1. **备份的重要性**: 
+   - 切换农场会替换当前的GeoJSON文件和配置
+   - 强烈建议保留备份（`skip_backup=false`）
+   - 备份文件保存在 `data/farm_backups/` 目录
+
+2. **恢复方法**:
+   - 如需恢复：手动将备份目录中的文件复制回 `data/gzp_farm/` 和项目根目录
+
+3. **切换后的操作**:
+   - 建议调用 `POST /api/system/init` 重新初始化系统（设置 `force_reinit=true`）
+   - 检查水位数据是否需要更新
+
+4. **文件名映射追溯**:
+   - 切换后会生成 `{farm_id}_file_mapping.json` 文件
+   - 记录了原始上传文件名（可能是中文）与生成的英文文件名的对应关系
+   - 便于追溯和问题排查
+
+**常见错误**:
+- **错误**: `"无法自动识别文件类型: fields"`
+  - **原因**: 文件名不包含识别关键词
+  - **解决**: 重命名文件，包含表格中的关键词
+
+- **错误**: `"SHP文件组 xxx 缺少必需文件"`
+  - **原因**: 缺少 .dbf 或 .shx 文件
+  - **解决**: 确保每组文件都包含 .shp, .dbf, .shx
+
+- **错误**: `"需要至少3组SHP文件"`
+  - **原因**: 上传的完整SHP组不足3组
+  - **解决**: 确保上传了田块、水路、闸门三组完整文件
 
 ---
 

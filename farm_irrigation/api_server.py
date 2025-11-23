@@ -131,7 +131,7 @@ def get_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
         if cache_key in _cache:
             cache_data = _cache[cache_key]
             # 检查缓存是否过期（5分钟）
-            if time.time() - cache_data['timestamp'] < 300:
+            if time.time() - cache_data['timestamp'] < 60:
                 return cache_data['data']
             else:
                 del _cache[cache_key]

@@ -466,20 +466,35 @@ class BatchRegenerationService:
             q_avail = calc_info.get('q_avail_m3ph', 480.0)
             d_target = calc_info.get('d_target_mm', 90.0)
             
-            # 计算缺水量
+            # 计算缺水量（使用实际田块水位参数）
             total_deficit = 0.0
             for field in fields:
                 wl_mm = field.get('wl_mm', 0)
-                wl_opt = 90.0  # 默认最优水位
-                if wl_mm < wl_opt:
-                    deficit_mm = d_target
-                    total_deficit += deficit_mm * field.get('area_mu', 0) * 0.667  # 转换为m³
+                wl_low = field.get('wl_low', 30.0)  # 从田块读取低水位阈值
+                wl_opt = field.get('wl_opt', 80.0)  # 从田块读取最优水位
+                
+                # 只有当前水位低于阈值时才计算缺水量
+                if wl_mm < wl_low:
+                    deficit_mm = wl_opt - wl_mm  # 使用实际缺水深度
+                    deficit_m3 = deficit_mm * field.get('area_mu', 0) * 0.667  # 转换为m³
+                    total_deficit += deficit_m3
+                    
+                    self.logger.debug(
+                        f"田块 {field.get('id')}: wl_mm={wl_mm}, wl_opt={wl_opt}, "
+                        f"缺水={deficit_mm:.1f}mm ({deficit_m3:.2f}m³)"
+                    )
             
-            # 计算时长
+            # 计算时长（基于实际缺水量）
             if total_deficit > 0:
                 duration_h = total_deficit / q_avail
             else:
-                duration_h = batch_area * d_target * 0.667 / q_avail
+                # 如果没有缺水量，使用默认值估算（避免除零）
+                duration_h = batch_area * d_target * 0.667 / q_avail if q_avail > 0 else 0.0
+            
+            self.logger.info(
+                f"批次 {batch_idx}: 面积={batch_area:.2f}亩, "
+                f"缺水量={total_deficit:.2f}m³, 时长={duration_h:.2f}h"
+            )
             
             # 更新batch统计信息
             batch['area_mu'] = batch_area
@@ -1009,10 +1024,17 @@ class BatchRegenerationService:
                 # 更新label以反映新的时间
                 step['label'] = f"批次 {batch_index}"
                 
-                # 计算时间偏移，用于后续批次
-                actual_duration_change = new_duration - original_duration
-                actual_start_change = new_start - original_start
-                time_offset = max(actual_duration_change, actual_start_change)
+                # 计算时间偏移，用于后续批次级联更新
+                # 使用实际的结束时间变化量（新结束时间 - 原结束时间）
+                end_time_change = new_end - original_end
+                time_offset += end_time_change  # 累加到总偏移量
+                
+                self.logger.info(
+                    f"[时间修改] 批次 {batch_index}: "
+                    f"开始时间 {original_start:.2f}h→{new_start:.2f}h, "
+                    f"结束时间 {original_end:.2f}h→{new_end:.2f}h, "
+                    f"时间偏移累计: {time_offset:.2f}h"
+                )
                 
                 # 更新对应batch的统计信息（时间、水量等）
                 for batch in batches:
