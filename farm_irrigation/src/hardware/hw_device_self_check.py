@@ -45,7 +45,8 @@ def trigger_device_self_check(unique_no_list: List[str], timeout: int = 30) -> D
         
         if data.get("code") == 200:
             logger.info(f"✅ 设备自检触发成功: {data.get('message')}")
-            accepted_list = data.get("accepted_no_list", [])
+            # 修复：从trigger_result中提取accepted_no_list
+            accepted_list = data.get("trigger_result", {}).get("accepted_no_list", [])
             logger.info(f"📋 硬件API返回的完整数据: {data}")
             logger.info(f"📋 接受的设备列表: {accepted_list}, 数量: {len(accepted_list)}")
             return {

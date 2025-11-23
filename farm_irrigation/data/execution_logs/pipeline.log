@@ -10631,3 +10631,1710 @@ C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages
 2025-11-23 12:31:18,812 - WARNING - ⚠️ 未获取到实时水位数据，将使用配置文件中的初始水位继续监控
 2025-11-23 12:32:14,431 - INFO - 智能灌溉动态执行系统关闭中...
 2025-11-23 12:32:14,432 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 13:36:19,311 - INFO - pipeline模块导入成功
+2025-11-23 13:36:19,312 - INFO - 步骤4: 设置默认参数...
+2025-11-23 13:36:19,312 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 13:36:19,312 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 13:36:19,312 - INFO - 步骤5: 确保输出目录存在...
+2025-11-23 13:36:19,312 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 13:36:19,313 - INFO - 步骤6: 构建pipeline参数...
+2025-11-23 13:36:19,313 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-23 13:36:19,313 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-23 13:36:19,313 - INFO - Pipeline实例创建成功
+2025-11-23 13:36:19,313 - INFO - 步骤8: 运行Pipeline...
+2025-11-23 13:36:19,313 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-23 13:36:19,313 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 13:36:19,314 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 13:36:19,314 - INFO - 检查依赖文件...
+2025-11-23 13:36:19,314 - INFO - 依赖文件检查通过
+2025-11-23 13:36:19,314 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 13:36:19,315 - INFO - 找到 15 个GIS数据文件
+2025-11-23 13:36:19,315 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 13:36:19,315 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-23 13:36:19,315 - INFO - === 步骤1: 数据预处理 ===
+2025-11-23 13:36:19,316 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-23 13:36:19,316 - INFO - 开始执行: GIS数据格式转换
+2025-11-23 13:36:19,316 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-23 13:36:20,050 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-23 13:36:20,051 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-23 13:36:20,051 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-23 13:36:20,052 - INFO - 开始执行: GIS数据修复
+2025-11-23 13:36:20,052 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-23 13:36:20,259 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-23 13:36:20,261 - INFO - [OK] GIS数据修复 执行成功
+2025-11-23 13:36:20,261 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-23 13:36:20,262 - INFO - 开始执行: 生成灌溉计划
+2025-11-23 13:36:20,262 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json --multi-pump --summary --realtime
+2025-11-23 13:36:21,636 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=13
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 13
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费354.37元 - 运行9.84h
+推荐方案: 水泵['P1'] (电费: 354.37元, 运行时间: 9.84h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+
+2025-11-23 13:36:21,636 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-23 13:36:21,636 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.323475
+2025-11-23 13:36:21,637 - INFO - 生成的文件:
+2025-11-23 13:36:21,637 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-23 13:36:21,637 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-23 13:36:21,637 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-23 13:36:21,637 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_141514.json
+2025-11-23 13:36:21,638 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_142501.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165047.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165603.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170020.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170448.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170650.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170859.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_172032.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183535.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183858.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_224116.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_122307.json
+2025-11-23 13:36:21,639 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_123015.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-23 13:36:21,640 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-23 13:36:21,641 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-23 13:36:21,641 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763786122.json
+2025-11-23 13:36:21,641 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-23 13:36:21,641 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-23 13:36:21,641 - INFO - Pipeline执行结果: success=True
+2025-11-23 13:36:21,643 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 13:36:21,643 - INFO - 成功读取计划数据，包含 3 项
+2025-11-23 13:36:21,643 - INFO - 开始生成多水泵方案对比
+2025-11-23 13:36:22,226 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-23 13:36:22,226 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 13:36:22,226 - INFO - 灌溉计划生成完成
+2025-11-23 13:36:46,269 - INFO - ========== 开始设备自检工作流 ==========
+2025-11-23 13:36:46,270 - INFO - 农场ID: 84911829811210, 等待时间: 5分钟
+2025-11-23 13:36:46,270 - INFO - 步骤1: 获取当前灌溉计划...
+2025-11-23 13:36:46,272 - INFO - 使用计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 13:36:46,272 - INFO - 找到需要灌溉的田块: 13 个
+2025-11-23 13:36:46,272 - INFO - 提取虚拟设备（节制闸+泵）: 13 个
+2025-11-23 13:36:46,272 - INFO - 虚拟设备列表: ['P1', 'S1-G27', 'S2-G10', 'S2-G12', 'S2-G13', 'S2-G14', 'S3-G18', 'S3-G19', 'S3-G20', 'S3-G21', 'S3-G23', 'S3-G25', 'S5-G29']
+2025-11-23 13:36:46,273 - INFO - 步骤2: 获取田块对应的设备unique_no...
+2025-11-23 13:37:21,466 - INFO - 田块设备总数: 10
+2025-11-23 13:37:21,466 - INFO - 步骤2.5: 获取虚拟设备（节制闸、泵）的unique_no...
+2025-11-23 13:37:21,466 - INFO - ✅ 加载虚拟设备映射文件成功，共 23 个映射
+2025-11-23 13:37:21,466 - INFO -   ✅ S5-G29 → 497942617010131972
+2025-11-23 13:37:21,466 - WARNING -   ⚠️ 虚拟设备 S3-G19 未找到对应的 unique_no
+2025-11-23 13:37:21,466 - INFO -   ✅ S3-G20 → 497942617010131976
+2025-11-23 13:37:21,466 - INFO -   ✅ S3-G25 → 497942617010131980
+2025-11-23 13:37:21,466 - WARNING -   ⚠️ 虚拟设备 S3-G21 未找到对应的 unique_no
+2025-11-23 13:37:21,466 - WARNING -   ⚠️ 虚拟设备 S2-G10 未找到对应的 unique_no
+2025-11-23 13:37:21,467 - INFO -   ✅ S3-G23 → 497942617010131978
+2025-11-23 13:37:21,467 - WARNING -   ⚠️ 虚拟设备 S3-G18 未找到对应的 unique_no
+2025-11-23 13:37:21,467 - INFO -   ✅ S1-G27 → 497942617010131971
+2025-11-23 13:37:21,467 - INFO -   ✅ S2-G12 → 497942617010131984
+2025-11-23 13:37:21,467 - INFO -   ✅ S2-G14 → 497942617010131985
+2025-11-23 13:37:21,467 - INFO -   ✅ P1 → 498038474729509888
+2025-11-23 13:37:21,467 - WARNING -   ⚠️ 虚拟设备 S2-G13 未找到对应的 unique_no
+2025-11-23 13:37:21,467 - INFO - 成功映射 8 个虚拟设备
+2025-11-23 13:37:21,468 - INFO - 需要自检的设备总数: 18 (田块设备: 10, 虚拟设备: 8)
+2025-11-23 13:37:21,468 - INFO - 步骤3: 触发设备自检（田块设备+虚拟设备）...
+2025-11-23 13:37:21,468 - INFO - 触发设备自检，设备数量: 18
+2025-11-23 13:37:21,468 - INFO - 📋 请求URL: http://101.201.78.54:8100/device_self_check
+2025-11-23 13:37:21,468 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:37:24,855 - INFO - ✅ 设备自检触发成功: 0/18 Task(s) accepted, starting self checking
+2025-11-23 13:37:24,856 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'message': '0/18 Task(s) accepted, starting self checking', 'trigger_result': {'accepted_no_list': [], 'unaccepted_no_list': {'202511140930590001': "操作失败：'data'", '202511140931130001': "操作失败：'data'", '477379421064159232': 'Device<477379421064159232> current status is checking, unale to trigger self-check.', '477379421064159242': 'Device<477379421064159242> current status is checking, unale to trigger self-check.', '477379421064159243': 'Device<477379421064159243> current status is checking, unale to trigger self-check.', '477379421064159246': 'Device<477379421064159246> current status is checking, unale to trigger self-check.', '477379421064159255': 'Device<477379421064159255> current status is checking, unale to trigger self-check.', '480887123677298688': 'Trigger failed！Get device open rate failed!', '480892188113780736': 'Trigger failed！Get device open rate failed!', '480911695752478720': 'Trigger failed！Get device open rate failed!', '497942617010131971': 'Device<497942617010131971> current status is checking, unale to trigger self-check.', '497942617010131972': 'Device<497942617010131972> current status is checking, unale to trigger self-check.', '497942617010131976': 'Device<497942617010131976> current status is checking, unale to trigger self-check.', '497942617010131978': 'Device<497942617010131978> current status is checking, unale to trigger self-check.', '497942617010131980': 'Device<497942617010131980> current status is checking, unale to trigger self-check.', '497942617010131984': 'Device<497942617010131984> current status is checking, unale to trigger self-check.', '497942617010131985': 'Device<497942617010131985> current status is checking, unale to trigger self-check.', '498038474729509888': 'Trigger failed！Get device open rate failed!'}}}
+2025-11-23 13:37:24,856 - INFO - 📋 接受的设备列表: [], 数量: 0
+2025-11-23 13:37:24,856 - INFO - ✅ 自检任务已接受，设备数: 0
+2025-11-23 13:37:24,856 - INFO - 步骤4: 等待 5 分钟，让设备完成自检...
+2025-11-23 13:42:24,847 - INFO - 步骤5: 查询设备自检状态...
+2025-11-23 13:42:24,847 - INFO - 🔄 启用轮询模式，最多尝试 5 次，间隔 30 秒
+2025-11-23 13:42:24,847 - INFO - 📊 第 1/5 次查询...
+2025-11-23 13:42:24,847 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:42:24,847 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:42:24,848 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:42:24,963 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:42:24,964 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 13:42:24,964 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}
+2025-11-23 13:42:24,964 - INFO - 状态统计: 成功=0, 自检中=12, 失败=0
+2025-11-23 13:42:24,964 - INFO - 还有 12 个设备在自检中，30秒后重试...
+2025-11-23 13:42:54,957 - INFO - 📊 第 2/5 次查询...
+2025-11-23 13:42:54,957 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:42:54,957 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:42:54,957 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:42:55,075 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:42:55,075 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 13:42:55,075 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}
+2025-11-23 13:42:55,075 - INFO - 状态统计: 成功=0, 自检中=12, 失败=0
+2025-11-23 13:42:55,076 - INFO - 还有 12 个设备在自检中，30秒后重试...
+2025-11-23 13:43:25,070 - INFO - 📊 第 3/5 次查询...
+2025-11-23 13:43:25,070 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:43:25,070 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:43:25,070 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:43:25,175 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:43:25,175 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 13:43:25,175 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}
+2025-11-23 13:43:25,175 - INFO - 状态统计: 成功=0, 自检中=12, 失败=0
+2025-11-23 13:43:25,175 - INFO - 还有 12 个设备在自检中，30秒后重试...
+2025-11-23 13:43:55,186 - INFO - 📊 第 4/5 次查询...
+2025-11-23 13:43:55,186 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:43:55,186 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:43:55,186 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:43:55,302 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:43:55,303 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 13:43:55,303 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}
+2025-11-23 13:43:55,303 - INFO - 状态统计: 成功=0, 自检中=12, 失败=0
+2025-11-23 13:43:55,303 - INFO - 还有 12 个设备在自检中，30秒后重试...
+2025-11-23 13:44:25,316 - INFO - 📊 第 5/5 次查询...
+2025-11-23 13:44:25,316 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:44:25,316 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:44:25,316 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:44:25,437 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:44:25,437 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'checking'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'checking'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'checking'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 13:44:25,437 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'checking'}
+2025-11-23 13:44:25,437 - INFO - 状态统计: 成功=0, 自检中=12, 失败=0
+2025-11-23 13:44:25,437 - WARNING - ⚠️ 已达到最大轮询次数，仍有 12 个设备在自检中
+2025-11-23 13:44:25,437 - INFO - 步骤6: 过滤自检成功的设备...
+2025-11-23 13:44:25,438 - INFO - 设备状态统计: 成功=0, 自检中=12, 失败=0, 总数=12
+2025-11-23 13:44:25,438 - WARNING - ⚠️ 有 12 个设备还在自检中，建议增加等待时间或启用轮询模式
+2025-11-23 13:44:25,438 - WARNING - ⚠️ 有 12 个设备超时仍在自检中，将被视为失败
+2025-11-23 13:44:25,438 - INFO - 自检成功: 0 个设备, 失败: 12 个设备
+2025-11-23 13:44:25,438 - WARNING -   ⚠️ 虚拟设备自检失败: S1-G27 (unique_no: 497942617010131971)
+2025-11-23 13:44:25,438 - WARNING -   ⚠️ 虚拟设备自检失败: S3-G20 (unique_no: 497942617010131976)
+2025-11-23 13:44:25,438 - WARNING -   ⚠️ 虚拟设备自检失败: S3-G23 (unique_no: 497942617010131978)
+2025-11-23 13:44:25,438 - WARNING -   ⚠️ 虚拟设备自检失败: S3-G25 (unique_no: 497942617010131980)
+2025-11-23 13:44:25,438 - WARNING -   ⚠️ 虚拟设备自检失败: S5-G29 (unique_no: 497942617010131972)
+2025-11-23 13:44:25,438 - WARNING -   ⚠️ 虚拟设备自检失败: S2-G14 (unique_no: 497942617010131985)
+2025-11-23 13:44:25,439 - WARNING -   ⚠️ 虚拟设备自检失败: S2-G12 (unique_no: 497942617010131984)
+2025-11-23 13:44:25,439 - INFO - 田块设备失败: 5 个，影响田块: 5 个
+2025-11-23 13:44:25,439 - INFO - 虚拟设备失败: 7 个 - ['S1-G27', 'S3-G20', 'S3-G23', 'S3-G25', 'S5-G29', 'S2-G14', 'S2-G12']
+2025-11-23 13:44:25,439 - INFO - 步骤8: 整理结果...
+2025-11-23 13:44:25,439 - INFO - ========== 设备自检工作流完成 ==========
+2025-11-23 13:44:25,439 - INFO - 总设备: 18 (田块: 10, 虚拟: 8)
+2025-11-23 13:44:25,439 - INFO - 成功: 0, 失败: 12
+2025-11-23 13:44:25,439 - INFO -   - 田块设备失败: 5
+2025-11-23 13:44:25,439 - INFO -   - 虚拟设备失败: 7
+2025-11-23 13:44:25,440 - INFO - 总田块: 13, 保留: 8, 移除: 5
+2025-11-23 13:45:29,674 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 13:45:29,674 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 13:52:08,788 - INFO - pipeline模块导入成功
+2025-11-23 13:52:08,788 - INFO - 步骤4: 设置默认参数...
+2025-11-23 13:52:08,788 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 13:52:08,789 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 13:52:08,789 - INFO - 步骤5: 确保输出目录存在...
+2025-11-23 13:52:08,789 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 13:52:08,789 - INFO - 步骤6: 构建pipeline参数...
+2025-11-23 13:52:08,789 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-23 13:52:08,789 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-23 13:52:08,789 - INFO - Pipeline实例创建成功
+2025-11-23 13:52:08,789 - INFO - 步骤8: 运行Pipeline...
+2025-11-23 13:52:08,790 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-23 13:52:08,790 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 13:52:08,790 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 13:52:08,790 - INFO - 检查依赖文件...
+2025-11-23 13:52:08,790 - INFO - 依赖文件检查通过
+2025-11-23 13:52:08,790 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 13:52:08,791 - INFO - 找到 15 个GIS数据文件
+2025-11-23 13:52:08,791 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 13:52:08,791 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-23 13:52:08,792 - INFO - === 步骤1: 数据预处理 ===
+2025-11-23 13:52:08,792 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-23 13:52:08,792 - INFO - 开始执行: GIS数据格式转换
+2025-11-23 13:52:08,792 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-23 13:52:09,550 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-23 13:52:09,551 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-23 13:52:09,551 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-23 13:52:09,551 - INFO - 开始执行: GIS数据修复
+2025-11-23 13:52:09,551 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-23 13:52:09,738 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-23 13:52:09,739 - INFO - [OK] GIS数据修复 执行成功
+2025-11-23 13:52:09,739 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-23 13:52:09,739 - INFO - 开始执行: 生成灌溉计划
+2025-11-23 13:52:09,739 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json --multi-pump --summary --realtime
+2025-11-23 13:52:11,086 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=13
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 13
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费354.37元 - 运行9.84h
+推荐方案: 水泵['P1'] (电费: 354.37元, 运行时间: 9.84h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+
+2025-11-23 13:52:11,086 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-23 13:52:11,086 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.297150
+2025-11-23 13:52:11,087 - INFO - 生成的文件:
+2025-11-23 13:52:11,087 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-23 13:52:11,087 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-23 13:52:11,087 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-23 13:52:11,087 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-23 13:52:11,087 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_141514.json
+2025-11-23 13:52:11,088 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_142501.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165047.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165603.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170020.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170448.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170650.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170859.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_172032.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183535.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183858.json
+2025-11-23 13:52:11,089 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_224116.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_122307.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_123015.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-23 13:52:11,090 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-23 13:52:11,091 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-23 13:52:11,091 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-23 13:52:11,091 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763786122.json
+2025-11-23 13:52:11,091 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-23 13:52:11,091 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-23 13:52:11,091 - INFO - Pipeline执行结果: success=True
+2025-11-23 13:52:11,093 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+2025-11-23 13:52:11,094 - INFO - 成功读取计划数据，包含 3 项
+2025-11-23 13:52:11,094 - INFO - 开始生成多水泵方案对比
+2025-11-23 13:52:11,662 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-23 13:52:11,662 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 13:52:11,662 - INFO - 灌溉计划生成完成
+2025-11-23 13:52:11,664 - INFO - 步骤5: 查询设备自检状态...
+2025-11-23 13:52:11,664 - INFO - 🔄 启用轮询模式，最多尝试 5 次，间隔 30 秒
+2025-11-23 13:52:11,664 - INFO - 📊 第 1/5 次查询...
+2025-11-23 13:52:11,664 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:52:11,664 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:52:11,664 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:52:11,774 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:52:11,775 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'check_success'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'check_success'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'check_success'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'check_success'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'check_success'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'check_success'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'check_success'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'check_success'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'check_success'}], 'message': 'ok'}
+2025-11-23 13:52:11,775 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'check_success'}
+2025-11-23 13:52:11,775 - INFO - 状态统计: 成功=12, 自检中=0, 失败=0
+2025-11-23 13:52:11,775 - INFO - ✅ 所有设备已完成自检（成功+失败）
+2025-11-23 13:52:11,776 - INFO - 步骤6: 过滤自检成功的设备...
+2025-11-23 13:52:11,776 - INFO - 设备状态统计: 成功=12, 自检中=0, 失败=0, 总数=12
+2025-11-23 13:52:11,776 - INFO - 自检成功: 12 个设备, 失败: 0 个设备
+2025-11-23 13:52:11,776 - INFO - 田块设备失败: 0 个，影响田块: 0 个
+2025-11-23 13:52:11,776 - INFO - 虚拟设备失败: 0 个 - []
+2025-11-23 13:52:11,776 - INFO - 步骤8: 整理结果...
+2025-11-23 13:52:11,776 - INFO - ========== 设备自检工作流完成 ==========
+2025-11-23 13:52:11,776 - INFO - 总设备: 18 (田块: 10, 虚拟: 8)
+2025-11-23 13:52:11,777 - INFO - 成功: 12, 失败: 0
+2025-11-23 13:52:11,777 - INFO -   - 田块设备失败: 0
+2025-11-23 13:52:11,777 - INFO -   - 虚拟设备失败: 0
+2025-11-23 13:52:11,777 - INFO - 总田块: 13, 保留: 13, 移除: 0
+2025-11-23 13:52:35,392 - INFO - 开始查询农场 84911829811210 的所有田块设备状态
+2025-11-23 13:52:35,392 - INFO - 使用 iLand app_id: YJY... (已隐藏)
+2025-11-23 13:52:35,392 - INFO - 使用 IoT app_id: siot... (已隐藏)
+2025-11-23 13:53:10,204 - INFO - ✅ 成功查询农场 84911829811210 的设备状态，共 129 个田块
+2025-11-23 13:53:40,281 - INFO - ========== 开始设备自检工作流 ==========
+2025-11-23 13:53:40,282 - INFO - 农场ID: 84911829811210, 等待时间: 5分钟
+2025-11-23 13:53:40,282 - INFO - 步骤1: 获取当前灌溉计划...
+2025-11-23 13:53:40,284 - INFO - 使用计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+2025-11-23 13:53:40,284 - INFO - 找到需要灌溉的田块: 13 个
+2025-11-23 13:53:40,284 - INFO - 提取虚拟设备（节制闸+泵）: 13 个
+2025-11-23 13:53:40,285 - INFO - 虚拟设备列表: ['P1', 'S1-G27', 'S2-G10', 'S2-G12', 'S2-G13', 'S2-G14', 'S3-G18', 'S3-G19', 'S3-G20', 'S3-G21', 'S3-G23', 'S3-G25', 'S5-G29']
+2025-11-23 13:53:40,285 - INFO - 步骤2: 获取田块对应的设备unique_no...
+2025-11-23 13:54:45,566 - INFO - 田块设备总数: 10
+2025-11-23 13:54:45,566 - INFO - 步骤2.5: 获取虚拟设备（节制闸、泵）的unique_no...
+2025-11-23 13:54:45,566 - INFO - ✅ 加载虚拟设备映射文件成功，共 23 个映射
+2025-11-23 13:54:45,566 - INFO -   ✅ S2-G12 → 497942617010131984
+2025-11-23 13:54:45,566 - INFO -   ✅ S3-G23 → 497942617010131978
+2025-11-23 13:54:45,566 - INFO -   ✅ S5-G29 → 497942617010131972
+2025-11-23 13:54:45,566 - WARNING -   ⚠️ 虚拟设备 S2-G13 未找到对应的 unique_no
+2025-11-23 13:54:45,566 - WARNING -   ⚠️ 虚拟设备 S2-G10 未找到对应的 unique_no
+2025-11-23 13:54:45,566 - INFO -   ✅ S1-G27 → 497942617010131971
+2025-11-23 13:54:45,567 - INFO -   ✅ S2-G14 → 497942617010131985
+2025-11-23 13:54:45,567 - WARNING -   ⚠️ 虚拟设备 S3-G21 未找到对应的 unique_no
+2025-11-23 13:54:45,567 - INFO -   ✅ P1 → 498038474729509888
+2025-11-23 13:54:45,567 - WARNING -   ⚠️ 虚拟设备 S3-G19 未找到对应的 unique_no
+2025-11-23 13:54:45,567 - WARNING -   ⚠️ 虚拟设备 S3-G18 未找到对应的 unique_no
+2025-11-23 13:54:45,567 - INFO -   ✅ S3-G20 → 497942617010131976
+2025-11-23 13:54:45,567 - INFO -   ✅ S3-G25 → 497942617010131980
+2025-11-23 13:54:45,568 - INFO - 成功映射 8 个虚拟设备
+2025-11-23 13:54:45,568 - INFO - 需要自检的设备总数: 18 (田块设备: 10, 虚拟设备: 8)
+2025-11-23 13:54:45,568 - INFO - 步骤3: 触发设备自检（田块设备+虚拟设备）...
+2025-11-23 13:54:45,568 - INFO - 触发设备自检，设备数量: 18
+2025-11-23 13:54:45,568 - INFO - 📋 请求URL: http://101.201.78.54:8100/device_self_check
+2025-11-23 13:54:45,568 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:54:49,265 - INFO - ✅ 设备自检触发成功: 12/18 Task(s) accepted, starting self checking
+2025-11-23 13:54:49,266 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'message': '12/18 Task(s) accepted, starting self checking', 'trigger_result': {'accepted_no_list': ['477379421064159242', '477379421064159255', '477379421064159243', '477379421064159232', '477379421064159246', '497942617010131984', '497942617010131978', '497942617010131972', '497942617010131971', '497942617010131985', '497942617010131976', '497942617010131980'], 'unaccepted_no_list': {'202511140930590001': "操作失败：'data'", '202511140931130001': "操作失败：'data'", '480887123677298688': 'Trigger failed！Get device open rate failed!', '480892188113780736': 'Trigger failed！Get device open rate failed!', '480911695752478720': 'Trigger failed！Get device open rate failed!', '498038474729509888': 'Trigger failed！Get device open rate failed!'}}}
+2025-11-23 13:54:49,266 - INFO - 📋 接受的设备列表: ['477379421064159242', '477379421064159255', '477379421064159243', '477379421064159232', '477379421064159246', '497942617010131984', '497942617010131978', '497942617010131972', '497942617010131971', '497942617010131985', '497942617010131976', '497942617010131980'], 数量: 12
+2025-11-23 13:54:49,266 - INFO - ✅ 自检任务已接受，设备数: 12
+2025-11-23 13:54:49,266 - INFO - 步骤4: 等待 5 分钟，让设备完成自检...
+2025-11-23 13:59:49,265 - INFO - 步骤5: 查询设备自检状态...
+2025-11-23 13:59:49,265 - INFO - 🔄 启用轮询模式，最多尝试 5 次，间隔 30 秒
+2025-11-23 13:59:49,265 - INFO - 📊 第 1/5 次查询...
+2025-11-23 13:59:49,265 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 13:59:49,265 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 13:59:49,266 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 13:59:49,369 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 13:59:49,370 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'scheduled'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'scheduled'}, {'least_check_time': None, 'message': '设备<477379421064159242>自检失败！自检时间超时', 'no': '477379421064159242', 'status': 'scheduled'}, {'least_check_time': None, 'message': '设备<477379421064159243>自检失败！自检时间超时', 'no': '477379421064159243', 'status': 'scheduled'}, {'least_check_time': None, 'message': '设备<477379421064159232>自检失败！自检时间超时', 'no': '477379421064159232', 'status': 'scheduled'}, {'least_check_time': None, 'message': '设备<477379421064159246>自检失败！自检时间超时', 'no': '477379421064159246', 'status': 'scheduled'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'scheduled'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'scheduled'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'scheduled'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'scheduled'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'scheduled'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'scheduled'}], 'message': 'ok'}
+2025-11-23 13:59:49,370 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '设备<477379421064159255>自检失败！自检时间超时', 'no': '477379421064159255', 'status': 'scheduled'}
+2025-11-23 13:59:49,370 - INFO - 状态统计: 成功=0, 自检中=0, 失败=0
+2025-11-23 13:59:49,370 - INFO - ✅ 所有设备已完成自检（成功+失败）
+2025-11-23 13:59:49,371 - INFO - 步骤6: 过滤自检成功的设备...
+2025-11-23 13:59:49,371 - INFO - 设备状态统计: 成功=0, 自检中=0, 失败=0, 总数=12
+2025-11-23 13:59:49,371 - INFO - 自检成功: 0 个设备, 失败: 12 个设备
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S1-G27 (unique_no: 497942617010131971)
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S3-G20 (unique_no: 497942617010131976)
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S3-G23 (unique_no: 497942617010131978)
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S3-G25 (unique_no: 497942617010131980)
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S5-G29 (unique_no: 497942617010131972)
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S2-G14 (unique_no: 497942617010131985)
+2025-11-23 13:59:49,371 - WARNING -   ⚠️ 虚拟设备自检失败: S2-G12 (unique_no: 497942617010131984)
+2025-11-23 13:59:49,372 - INFO - 田块设备失败: 5 个，影响田块: 5 个
+2025-11-23 13:59:49,372 - INFO - 虚拟设备失败: 7 个 - ['S1-G27', 'S3-G20', 'S3-G23', 'S3-G25', 'S5-G29', 'S2-G14', 'S2-G12']
+2025-11-23 13:59:49,372 - INFO - 步骤8: 整理结果...
+2025-11-23 13:59:49,372 - INFO - ========== 设备自检工作流完成 ==========
+2025-11-23 13:59:49,372 - INFO - 总设备: 18 (田块: 10, 虚拟: 8)
+2025-11-23 13:59:49,372 - INFO - 成功: 0, 失败: 12
+2025-11-23 13:59:49,372 - INFO -   - 田块设备失败: 5
+2025-11-23 13:59:49,372 - INFO -   - 虚拟设备失败: 7
+2025-11-23 13:59:49,372 - INFO - 总田块: 13, 保留: 8, 移除: 5
+2025-11-23 14:05:49,446 - INFO - 开始生成灌溉计划 - farm_id: 84911829811210
+2025-11-23 14:05:49,447 - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-23 14:05:49,447 - INFO - 步骤1: 生成缓存键...
+2025-11-23 14:05:49,447 - INFO - 缓存键生成成功: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 14:05:49,447 - INFO - 步骤2: 检查缓存...
+2025-11-23 14:05:49,447 - INFO - 缓存未命中，继续执行...
+2025-11-23 14:05:49,447 - INFO - 步骤3: 导入pipeline模块...
+2025-11-23 14:05:49,447 - INFO - pipeline模块导入成功
+2025-11-23 14:05:49,448 - INFO - 步骤4: 设置默认参数...
+2025-11-23 14:05:49,448 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 14:05:49,448 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 14:05:49,448 - INFO - 步骤5: 确保输出目录存在...
+2025-11-23 14:05:49,448 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 14:05:49,448 - INFO - 步骤6: 构建pipeline参数...
+2025-11-23 14:05:49,448 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-23 14:05:49,448 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-23 14:05:49,449 - INFO - Pipeline实例创建成功
+2025-11-23 14:05:49,449 - INFO - 步骤8: 运行Pipeline...
+2025-11-23 14:05:49,449 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-23 14:05:49,449 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 14:05:49,449 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 14:05:49,449 - INFO - 检查依赖文件...
+2025-11-23 14:05:49,449 - INFO - 依赖文件检查通过
+2025-11-23 14:05:49,449 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 14:05:49,450 - INFO - 找到 15 个GIS数据文件
+2025-11-23 14:05:49,450 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 14:05:49,450 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-23 14:05:49,450 - INFO - === 步骤1: 数据预处理 ===
+2025-11-23 14:05:49,451 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-23 14:05:49,451 - INFO - 开始执行: GIS数据格式转换
+2025-11-23 14:05:49,451 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-23 14:05:50,203 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-23 14:05:50,203 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-23 14:05:50,204 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-23 14:05:50,204 - INFO - 开始执行: GIS数据修复
+2025-11-23 14:05:50,204 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-23 14:05:50,395 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-23 14:05:50,397 - INFO - [OK] GIS数据修复 执行成功
+2025-11-23 14:05:50,397 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-23 14:05:50,397 - INFO - 开始执行: 生成灌溉计划
+2025-11-23 14:05:50,397 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json --multi-pump --summary --realtime
+2025-11-23 14:05:51,786 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=12
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 12
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费312.98元 - 运行8.69h
+推荐方案: 水泵['P1'] (电费: 312.98元, 运行时间: 8.69h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json
+
+2025-11-23 14:05:51,786 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-23 14:05:51,786 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.336442
+2025-11-23 14:05:51,787 - INFO - 生成的文件:
+2025-11-23 14:05:51,787 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-23 14:05:51,787 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-23 14:05:51,787 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-23 14:05:51,787 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-23 14:05:51,787 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-23 14:05:51,787 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_141514.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_142501.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165047.json
+2025-11-23 14:05:51,788 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165603.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170020.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170448.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170650.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170859.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_172032.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183535.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183858.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_224116.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_122307.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_123015.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+2025-11-23 14:05:51,789 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-23 14:05:51,790 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-23 14:05:51,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-23 14:05:51,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763786122.json
+2025-11-23 14:05:51,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-23 14:05:51,791 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-23 14:05:51,791 - INFO - Pipeline执行结果: success=True
+2025-11-23 14:05:51,793 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json
+2025-11-23 14:05:51,793 - INFO - 成功读取计划数据，包含 3 项
+2025-11-23 14:05:51,793 - INFO - 开始生成多水泵方案对比
+2025-11-23 14:05:52,386 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-23 14:05:52,386 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 14:05:52,386 - INFO - 灌溉计划生成完成
+2025-11-23 14:08:22,706 - INFO - ========== 开始设备自检工作流 ==========
+2025-11-23 14:08:22,706 - INFO - 农场ID: 84911829811210, 等待时间: 5分钟
+2025-11-23 14:08:22,706 - INFO - 步骤1: 获取当前灌溉计划...
+2025-11-23 14:08:22,708 - INFO - 使用计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json
+2025-11-23 14:08:22,708 - INFO - 找到需要灌溉的田块: 13 个
+2025-11-23 14:08:22,709 - INFO - 提取虚拟设备（节制闸+泵）: 13 个
+2025-11-23 14:08:22,709 - INFO - 虚拟设备列表: ['P1', 'S1-G27', 'S2-G10', 'S2-G12', 'S2-G13', 'S2-G14', 'S3-G18', 'S3-G19', 'S3-G20', 'S3-G21', 'S3-G23', 'S3-G25', 'S5-G29']
+2025-11-23 14:08:22,709 - INFO - 步骤2: 获取田块对应的设备unique_no...
+2025-11-23 14:09:28,292 - INFO - 田块设备总数: 10
+2025-11-23 14:09:28,292 - INFO - 步骤2.5: 获取虚拟设备（节制闸、泵）的unique_no...
+2025-11-23 14:09:28,293 - INFO - ✅ 加载虚拟设备映射文件成功，共 23 个映射
+2025-11-23 14:09:28,293 - INFO -   ✅ S2-G12 → 497942617010131984
+2025-11-23 14:09:28,293 - INFO -   ✅ S3-G23 → 497942617010131978
+2025-11-23 14:09:28,293 - INFO -   ✅ S5-G29 → 497942617010131972
+2025-11-23 14:09:28,293 - WARNING -   ⚠️ 虚拟设备 S2-G13 未找到对应的 unique_no
+2025-11-23 14:09:28,293 - WARNING -   ⚠️ 虚拟设备 S2-G10 未找到对应的 unique_no
+2025-11-23 14:09:28,294 - INFO -   ✅ S1-G27 → 497942617010131971
+2025-11-23 14:09:28,294 - INFO -   ✅ S2-G14 → 497942617010131985
+2025-11-23 14:09:28,294 - WARNING -   ⚠️ 虚拟设备 S3-G21 未找到对应的 unique_no
+2025-11-23 14:09:28,294 - INFO -   ✅ P1 → 498038474729509888
+2025-11-23 14:09:28,294 - WARNING -   ⚠️ 虚拟设备 S3-G19 未找到对应的 unique_no
+2025-11-23 14:09:28,294 - WARNING -   ⚠️ 虚拟设备 S3-G18 未找到对应的 unique_no
+2025-11-23 14:09:28,294 - INFO -   ✅ S3-G20 → 497942617010131976
+2025-11-23 14:09:28,294 - INFO -   ✅ S3-G25 → 497942617010131980
+2025-11-23 14:09:28,294 - INFO - 成功映射 8 个虚拟设备
+2025-11-23 14:09:28,294 - INFO - 需要自检的设备总数: 18 (田块设备: 10, 虚拟设备: 8)
+2025-11-23 14:09:28,294 - INFO - 步骤3: 触发设备自检（田块设备+虚拟设备）...
+2025-11-23 14:09:28,295 - INFO - 触发设备自检，设备数量: 18
+2025-11-23 14:09:28,295 - INFO - 📋 请求URL: http://101.201.78.54:8100/device_self_check
+2025-11-23 14:09:28,295 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 14:09:32,112 - INFO - ✅ 设备自检触发成功: 12/18 Task(s) accepted, starting self checking
+2025-11-23 14:09:32,113 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'message': '12/18 Task(s) accepted, starting self checking', 'trigger_result': {'accepted_no_list': ['477379421064159242', '477379421064159255', '477379421064159243', '477379421064159232', '477379421064159246', '497942617010131984', '497942617010131978', '497942617010131972', '497942617010131971', '497942617010131985', '497942617010131976', '497942617010131980'], 'unaccepted_no_list': {'202511140930590001': "操作失败：'data'", '202511140931130001': "操作失败：'data'", '480887123677298688': 'Trigger failed！Get device open rate failed!', '480892188113780736': 'Trigger failed！Get device open rate failed!', '480911695752478720': 'Trigger failed！Get device open rate failed!', '498038474729509888': 'Trigger failed！Get device open rate failed!'}}}
+2025-11-23 14:09:32,113 - INFO - 📋 接受的设备列表: ['477379421064159242', '477379421064159255', '477379421064159243', '477379421064159232', '477379421064159246', '497942617010131984', '497942617010131978', '497942617010131972', '497942617010131971', '497942617010131985', '497942617010131976', '497942617010131980'], 数量: 12
+2025-11-23 14:09:32,113 - INFO - ✅ 自检任务已接受，设备数: 12
+2025-11-23 14:09:32,113 - INFO - 步骤4: 等待 5 分钟，让设备完成自检...
+2025-11-23 14:14:32,114 - INFO - 步骤5: 查询设备自检状态...
+2025-11-23 14:14:32,114 - INFO - 🔄 启用轮询模式，最多尝试 5 次，间隔 30 秒
+2025-11-23 14:14:32,114 - INFO - 📊 第 1/5 次查询...
+2025-11-23 14:14:32,114 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 14:14:32,114 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 14:14:32,115 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 14:14:32,234 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 14:14:32,235 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159246', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'check_success'}, {'least_check_time': None, 'message': '归零/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 14:14:32,235 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}
+2025-11-23 14:14:32,235 - INFO - 状态统计: 成功=9, 自检中=2, 失败=0
+2025-11-23 14:14:32,235 - INFO - 还有 2 个设备在自检中，30秒后重试...
+2025-11-23 14:15:02,226 - INFO - 📊 第 2/5 次查询...
+2025-11-23 14:15:02,226 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 14:15:02,226 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 14:15:02,226 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 14:15:02,346 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 14:15:02,347 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159246', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'check_success'}, {'least_check_time': None, 'message': '打开/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 14:15:02,347 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}
+2025-11-23 14:15:02,347 - INFO - 状态统计: 成功=9, 自检中=2, 失败=0
+2025-11-23 14:15:02,347 - INFO - 还有 2 个设备在自检中，30秒后重试...
+2025-11-23 14:15:32,351 - INFO - 📊 第 3/5 次查询...
+2025-11-23 14:15:32,351 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 14:15:32,351 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 14:15:32,351 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 14:15:32,468 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 14:15:32,468 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159246', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 14:15:32,468 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}
+2025-11-23 14:15:32,468 - INFO - 状态统计: 成功=9, 自检中=2, 失败=0
+2025-11-23 14:15:32,468 - INFO - 还有 2 个设备在自检中，30秒后重试...
+2025-11-23 14:16:02,466 - INFO - 📊 第 4/5 次查询...
+2025-11-23 14:16:02,466 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 14:16:02,466 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 14:16:02,466 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 14:16:02,589 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 14:16:02,589 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159246', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 14:16:02,589 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}
+2025-11-23 14:16:02,589 - INFO - 状态统计: 成功=9, 自检中=2, 失败=0
+2025-11-23 14:16:02,589 - INFO - 还有 2 个设备在自检中，30秒后重试...
+2025-11-23 14:16:32,593 - INFO - 📊 第 5/5 次查询...
+2025-11-23 14:16:32,593 - INFO - 查询设备状态，设备数量: 18
+2025-11-23 14:16:32,593 - INFO - 📋 请求URL: http://101.201.78.54:8100/devices_status
+2025-11-23 14:16:32,593 - INFO - 📋 前5个设备示例: ['480887123677298688', '477379421064159242', '477379421064159255', '202511140931130001', '477379421064159243']
+2025-11-23 14:16:32,698 - INFO - ✅ 设备状态查询成功，共 12 个设备
+2025-11-23 14:16:32,698 - INFO - 📋 硬件API返回的完整数据: {'code': 200, 'data': [{'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131971', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159242', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159243', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159232', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159246', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131976', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131978', 'status': 'check_success'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131980', 'status': 'check_success'}, {'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131972', 'status': 'checking'}, {'least_check_time': None, 'message': '完成/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131985', 'status': 'check_success'}, {'least_check_time': None, 'message': '关闭/归零,打开,关闭,恢复到初始开度,完成', 'no': '497942617010131984', 'status': 'checking'}], 'message': 'ok'}
+2025-11-23 14:16:32,698 - INFO - 📋 设备状态示例: {'least_check_time': None, 'message': '恢复到初始开度/归零,打开,关闭,恢复到初始开度,完成', 'no': '477379421064159255', 'status': 'scheduled'}
+2025-11-23 14:16:32,698 - INFO - 状态统计: 成功=9, 自检中=2, 失败=0
+2025-11-23 14:16:32,698 - WARNING - ⚠️ 已达到最大轮询次数，仍有 2 个设备在自检中
+2025-11-23 14:16:32,698 - INFO - 步骤6: 过滤自检成功的设备...
+2025-11-23 14:16:32,699 - INFO - 设备状态统计: 成功=9, 自检中=2, 失败=0, 总数=12
+2025-11-23 14:16:32,699 - WARNING - ⚠️ 有 2 个设备还在自检中，建议增加等待时间或启用轮询模式
+2025-11-23 14:16:32,699 - WARNING - ⚠️ 有 2 个设备超时仍在自检中，将被视为失败
+2025-11-23 14:16:32,699 - INFO - 自检成功: 9 个设备, 失败: 3 个设备
+2025-11-23 14:16:32,699 - WARNING -   ⚠️ 虚拟设备自检失败: S5-G29 (unique_no: 497942617010131972)
+2025-11-23 14:16:32,699 - WARNING -   ⚠️ 虚拟设备自检失败: S2-G12 (unique_no: 497942617010131984)
+2025-11-23 14:16:32,699 - INFO - 田块设备失败: 1 个，影响田块: 1 个
+2025-11-23 14:16:32,699 - INFO - 虚拟设备失败: 2 个 - ['S5-G29', 'S2-G12']
+2025-11-23 14:16:32,699 - INFO - 步骤8: 整理结果...
+2025-11-23 14:16:32,699 - INFO - ========== 设备自检工作流完成 ==========
+2025-11-23 14:16:32,699 - INFO - 总设备: 18 (田块: 10, 虚拟: 8)
+2025-11-23 14:16:32,699 - INFO - 成功: 9, 失败: 3
+2025-11-23 14:16:32,700 - INFO -   - 田块设备失败: 1
+2025-11-23 14:16:32,700 - INFO -   - 虚拟设备失败: 2
+2025-11-23 14:16:32,700 - INFO - 总田块: 13, 保留: 12, 移除: 1
+2025-11-23 14:41:12,598 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 14:41:12,598 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 15:29:01,845 - INFO - pipeline模块导入成功
+2025-11-23 15:29:01,845 - INFO - 步骤4: 设置默认参数...
+2025-11-23 15:29:01,847 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 15:29:01,847 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 15:29:01,848 - INFO - 步骤5: 确保输出目录存在...
+2025-11-23 15:29:01,848 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 15:29:01,849 - INFO - 步骤6: 构建pipeline参数...
+2025-11-23 15:29:01,850 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-23 15:29:01,851 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-23 15:29:01,854 - INFO - Pipeline实例创建成功
+2025-11-23 15:29:01,855 - INFO - 步骤8: 运行Pipeline...
+2025-11-23 15:29:01,855 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-23 15:29:01,855 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 15:29:01,855 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 15:29:01,856 - INFO - 检查依赖文件...
+2025-11-23 15:29:01,858 - INFO - 依赖文件检查通过
+2025-11-23 15:29:01,858 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 15:29:01,860 - INFO - 找到 15 个GIS数据文件
+2025-11-23 15:29:01,860 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 15:29:01,861 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-23 15:29:01,861 - INFO - === 步骤1: 数据预处理 ===
+2025-11-23 15:29:01,862 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-23 15:29:01,863 - INFO - 开始执行: GIS数据格式转换
+2025-11-23 15:29:01,864 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-23 15:29:02,617 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-23 15:29:02,618 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-23 15:29:02,618 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-23 15:29:02,618 - INFO - 开始执行: GIS数据修复
+2025-11-23 15:29:02,618 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-23 15:29:02,812 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-23 15:29:02,813 - INFO - [OK] GIS数据修复 执行成功
+2025-11-23 15:29:02,813 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-23 15:29:02,814 - INFO - 开始执行: 生成灌溉计划
+2025-11-23 15:29:02,814 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_152902.json --multi-pump --summary --realtime
+2025-11-23 15:29:04,224 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=12
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 12
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费314.89元 - 运行8.75h
+推荐方案: 水泵['P1'] (电费: 314.89元, 运行时间: 8.75h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_152902.json
+
+2025-11-23 15:29:04,225 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-23 15:29:04,225 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.371111
+2025-11-23 15:29:04,226 - INFO - 生成的文件:
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-23 15:29:04,226 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_141514.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_142501.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165047.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165603.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170020.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170448.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170650.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170859.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_172032.json
+2025-11-23 15:29:04,227 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183535.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183858.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_224116.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_122307.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_123015.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_152902.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-23 15:29:04,228 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763786122.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-23 15:29:04,229 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-23 15:29:04,229 - INFO - Pipeline执行结果: success=True
+2025-11-23 15:29:04,231 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_152902.json
+2025-11-23 15:29:04,232 - INFO - 成功读取计划数据，包含 3 项
+2025-11-23 15:29:04,232 - INFO - 开始生成多水泵方案对比
+2025-11-23 15:29:04,788 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-23 15:29:04,788 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 15:29:04,788 - INFO - 灌溉计划生成完成
+2025-11-23 15:29:08,683 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_152902.json
+2025-11-23 15:29:08,687 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 15:29:08,687 - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 15:29:08,688 - INFO - 配置文件加载成功: config.json
+2025-11-23 15:29:08,688 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-23 15:29:08,688 - INFO - 批次 1: 开始时间 0.00h, 持续时间 8.75h
+2025-11-23 15:29:08,688 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_152902.json
+2025-11-23 15:29:08,689 - INFO - 共有 1 个批次
+2025-11-23 15:29:08,689 - INFO - 🧹 清空旧的指令队列...
+2025-11-23 15:29:08,689 - INFO - 指令队列已清空
+2025-11-23 15:29:08,691 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-23 15:29:08,693 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_152908
+2025-11-23 15:29:08,696 - INFO - [scheduler] 执行开始时间: 2025-11-23 15:29:08.689438
+2025-11-23 15:29:08,696 - INFO - 开始准备批次 1
+2025-11-23 15:29:09,350 - INFO - 批次 1 计划重新生成完成
+2025-11-23 15:29:09,350 - INFO - 开始执行批次 1
+2025-11-23 15:29:09,350 - WARNING - ⚠️ 节制闸 S2-G10 未找到 unique_no 映射
+2025-11-23 15:29:09,350 - WARNING - ⚠️ 节制闸 S2-G13 未找到 unique_no 映射
+2025-11-23 15:29:09,350 - WARNING - ⚠️ 节制闸 S3-G18 未找到 unique_no 映射
+2025-11-23 15:29:09,350 - WARNING - ⚠️ 节制闸 S3-G19 未找到 unique_no 映射
+2025-11-23 15:29:09,351 - WARNING - ⚠️ 节制闸 S3-G21 未找到 unique_no 映射
+2025-11-23 15:29:09,351 - INFO - 📝 开始为 13 个田块生成进水阀开启指令...
+2025-11-23 15:29:09,351 - INFO -    处理田块 1/13: S1-G3-F2
+2025-11-23 15:29:09,351 - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 15:29:09,890 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:09,890 - INFO -    找到 2 个设备
+2025-11-23 15:29:09,890 - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 15:29:09,890 - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 15:29:09,890 - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 15:29:09,890 - INFO -    ✅ S1-G3-F2 unique_no 获取成功: 480887123677298688
+2025-11-23 15:29:09,890 - INFO -    处理田块 2/13: S1-G4-F3
+2025-11-23 15:29:09,890 - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 15:29:10,460 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:10,460 - INFO -    找到 2 个设备
+2025-11-23 15:29:10,460 - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 15:29:10,460 - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 15:29:10,460 - INFO -    ✅ S1-G4-F3 unique_no 获取成功: 480892188113780736
+2025-11-23 15:29:10,460 - INFO -    处理田块 3/13: S2-G10-F7
+2025-11-23 15:29:10,460 - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 15:29:10,959 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:10,959 - INFO -    找到 2 个设备
+2025-11-23 15:29:10,959 - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 15:29:10,959 - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 15:29:10,960 - INFO -    ✅ S2-G10-F7 unique_no 获取成功: 477379421064159242
+2025-11-23 15:29:10,960 - INFO -    处理田块 4/13: S2-G12-F9
+2025-11-23 15:29:10,960 - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 15:29:11,504 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:11,504 - INFO -    找到 2 个设备
+2025-11-23 15:29:11,504 - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 15:29:11,505 - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 15:29:11,505 - INFO -    ✅ S2-G12-F9 unique_no 获取成功: 202511140931130001
+2025-11-23 15:29:11,505 - INFO -    处理田块 5/13: S2-G13-F10
+2025-11-23 15:29:11,505 - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 15:29:12,006 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:12,006 - INFO -    找到 2 个设备
+2025-11-23 15:29:12,006 - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 15:29:12,007 - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 15:29:12,007 - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 15:29:12,007 - INFO -    ✅ S2-G13-F10 unique_no 获取成功: 477379421064159243
+2025-11-23 15:29:12,007 - INFO -    处理田块 6/13: S2-G14-F11
+2025-11-23 15:29:12,007 - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 15:29:12,679 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:12,680 - INFO -    找到 3 个设备
+2025-11-23 15:29:12,680 - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 15:29:12,680 - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 15:29:12,680 - INFO -    ✅ S2-G14-F11 unique_no 获取成功: 480911695752478720
+2025-11-23 15:29:12,680 - INFO -    处理田块 7/13: S3-G18-F15
+2025-11-23 15:29:12,680 - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 15:29:13,410 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:13,410 - INFO -    找到 3 个设备
+2025-11-23 15:29:13,410 - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 15:29:13,411 - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 15:29:13,411 - INFO -    ✅ S3-G18-F15 unique_no 获取成功: 477379421064159255
+2025-11-23 15:29:13,411 - INFO -    处理田块 8/13: S3-G19-F16
+2025-11-23 15:29:13,411 - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 15:29:14,091 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:14,091 - INFO -    找到 3 个设备
+2025-11-23 15:29:14,091 - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 15:29:14,091 - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 15:29:14,091 - INFO -    ✅ S3-G19-F16 unique_no 获取成功: 477379421064159232
+2025-11-23 15:29:14,091 - INFO -    处理田块 9/13: S3-G20-F17
+2025-11-23 15:29:14,091 - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 15:29:14,580 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:14,580 - INFO -    找到 2 个设备
+2025-11-23 15:29:14,580 - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 15:29:14,580 - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 15:29:14,580 - INFO -    ✅ S3-G20-F17 unique_no 获取成功: 202511140930590001
+2025-11-23 15:29:14,580 - INFO -    处理田块 10/13: S3-G21-F18
+2025-11-23 15:29:14,580 - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 15:29:15,558 - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 15:29:15,558 - INFO -    找到 5 个设备
+2025-11-23 15:29:15,558 - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 15:29:15,558 - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 15:29:15,558 - INFO -    ✅ S3-G21-F18 unique_no 获取成功: 477379421064159246
+2025-11-23 15:29:15,558 - INFO -    处理田块 11/13: S3-G23-F20
+2025-11-23 15:29:15,558 - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 15:29:15,879 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:15,879 - INFO -    找到 1 个设备
+2025-11-23 15:29:15,879 - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 15:29:15,880 - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:15,880 - WARNING -    ⚠️ S3-G23-F20 unique_no 获取失败，将为 None
+2025-11-23 15:29:15,880 - INFO -    处理田块 12/13: S3-G25-F22
+2025-11-23 15:29:15,880 - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 15:29:16,328 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:16,328 - INFO -    找到 1 个设备
+2025-11-23 15:29:16,328 - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 15:29:16,328 - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:16,328 - WARNING -    ⚠️ S3-G25-F22 unique_no 获取失败，将为 None
+2025-11-23 15:29:16,328 - INFO -    处理田块 13/13: S5-G29-F25
+2025-11-23 15:29:16,328 - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 15:29:16,706 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:16,706 - INFO -    找到 1 个设备
+2025-11-23 15:29:16,706 - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 15:29:16,706 - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:16,706 - WARNING -    ⚠️ S5-G29-F25 unique_no 获取失败，将为 None
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-23 15:29:16,706 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0011 - 开启S3-G23节制闸(100%)
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0012 - 开启S3-G25节制闸(100%)
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0013 - 开启S5-G29节制闸(100%)
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0014 - 开启S1-G3-F2进水阀
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0015 - 开启S1-G4-F3进水阀
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0016 - 开启S2-G10-F7进水阀
+2025-11-23 15:29:16,707 - INFO - 添加指令: cmd_0017 - 开启S2-G12-F9进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0018 - 开启S2-G13-F10进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0019 - 开启S2-G14-F11进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0020 - 开启S3-G18-F15进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0021 - 开启S3-G19-F16进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0022 - 开启S3-G20-F17进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0023 - 开启S3-G21-F18进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0024 - 开启S3-G23-F20进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0025 - 开启S3-G25-F22进水阀
+2025-11-23 15:29:16,708 - INFO - 添加指令: cmd_0026 - 开启S5-G29-F25进水阀
+2025-11-23 15:29:16,708 - INFO - 批次 1 已生成 26 条启动指令
+2025-11-23 15:29:16,710 - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 15:29:17,236 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:17,236 - INFO -    找到 2 个设备
+2025-11-23 15:29:17,236 - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 15:29:17,236 - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 15:29:17,236 - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 15:29:17,236 - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 outlet unique_no...
+2025-11-23 15:29:17,730 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:17,730 - INFO -    找到 2 个设备
+2025-11-23 15:29:17,730 - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 15:29:17,731 - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 15:29:17,731 - WARNING - ⚠️ API 查询成功，但未找到 S1-G3-F2 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:17,731 - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 15:29:18,244 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:18,244 - INFO -    找到 2 个设备
+2025-11-23 15:29:18,244 - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 15:29:18,244 - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 15:29:18,244 - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 outlet unique_no...
+2025-11-23 15:29:18,741 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:18,741 - INFO -    找到 2 个设备
+2025-11-23 15:29:18,741 - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 15:29:18,741 - INFO -    设备2: code=101541, name=, unique_no=992504291024410001
+2025-11-23 15:29:18,741 - WARNING - ⚠️ API 查询成功，但未找到 S1-G4-F3 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:18,741 - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 15:29:19,309 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:19,309 - INFO -    找到 2 个设备
+2025-11-23 15:29:19,309 - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 15:29:19,309 - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 15:29:19,309 - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 outlet unique_no...
+2025-11-23 15:29:19,818 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:19,818 - INFO -    找到 2 个设备
+2025-11-23 15:29:19,818 - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 15:29:19,818 - INFO -    设备2: code=101541, name=, unique_no=992504291021140001
+2025-11-23 15:29:19,818 - WARNING - ⚠️ API 查询成功，但未找到 S2-G10-F7 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:19,818 - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 15:29:20,353 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:20,353 - INFO -    找到 2 个设备
+2025-11-23 15:29:20,353 - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 15:29:20,353 - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 15:29:20,353 - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 outlet unique_no...
+2025-11-23 15:29:20,855 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:20,855 - INFO -    找到 2 个设备
+2025-11-23 15:29:20,855 - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 15:29:20,856 - INFO -    设备2: code=101541, name=, unique_no=992504290852190001
+2025-11-23 15:29:20,856 - WARNING - ⚠️ API 查询成功，但未找到 S2-G12-F9 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:20,856 - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 15:29:21,421 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:21,421 - INFO -    找到 2 个设备
+2025-11-23 15:29:21,421 - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 15:29:21,421 - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 15:29:21,421 - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 15:29:21,421 - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 outlet unique_no...
+2025-11-23 15:29:22,021 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:22,021 - INFO -    找到 2 个设备
+2025-11-23 15:29:22,021 - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 15:29:22,021 - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 15:29:22,021 - WARNING - ⚠️ API 查询成功，但未找到 S2-G13-F10 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:22,021 - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 15:29:22,686 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:22,686 - INFO -    找到 3 个设备
+2025-11-23 15:29:22,686 - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 15:29:22,686 - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 15:29:22,686 - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 outlet unique_no...
+2025-11-23 15:29:23,362 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:23,362 - INFO -    找到 3 个设备
+2025-11-23 15:29:23,362 - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 15:29:23,362 - INFO -    设备2: code=101541, name=, unique_no=992504282038550001
+2025-11-23 15:29:23,362 - INFO -    设备3: code=101350, name=None, unique_no=992307121123020001
+2025-11-23 15:29:23,362 - WARNING - ⚠️ API 查询成功，但未找到 S2-G14-F11 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:23,362 - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 15:29:24,200 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:24,200 - INFO -    找到 3 个设备
+2025-11-23 15:29:24,200 - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 15:29:24,200 - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 15:29:24,200 - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 outlet unique_no...
+2025-11-23 15:29:24,925 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:24,925 - INFO -    找到 3 个设备
+2025-11-23 15:29:24,925 - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 15:29:24,926 - INFO -    设备2: code=101541, name=, unique_no=992504291104170001
+2025-11-23 15:29:24,926 - INFO -    设备3: code=101540, name=土壤墒情仪, unique_no=992409051636020001
+2025-11-23 15:29:24,926 - WARNING - ⚠️ API 查询成功，但未找到 S3-G18-F15 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:24,926 - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 15:29:25,573 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:25,573 - INFO -    找到 3 个设备
+2025-11-23 15:29:25,573 - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 15:29:25,573 - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 15:29:25,573 - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 outlet unique_no...
+2025-11-23 15:29:26,238 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:29:26,238 - INFO -    找到 3 个设备
+2025-11-23 15:29:26,238 - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 15:29:26,238 - INFO -    设备2: code=101541, name=, unique_no=992504282040540001
+2025-11-23 15:29:26,238 - INFO -    设备3: code=101350, name=None, unique_no=992308011125350001
+2025-11-23 15:29:26,238 - WARNING - ⚠️ API 查询成功，但未找到 S3-G19-F16 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:26,238 - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 15:29:26,739 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:26,739 - INFO -    找到 2 个设备
+2025-11-23 15:29:26,739 - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 15:29:26,740 - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 15:29:26,740 - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 outlet unique_no...
+2025-11-23 15:29:27,233 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:29:27,233 - INFO -    找到 2 个设备
+2025-11-23 15:29:27,233 - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 15:29:27,233 - INFO -    设备2: code=101541, name=, unique_no=992505131509170001
+2025-11-23 15:29:27,233 - WARNING - ⚠️ API 查询成功，但未找到 S3-G20-F17 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:27,233 - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 15:29:28,246 - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 15:29:28,246 - INFO -    找到 5 个设备
+2025-11-23 15:29:28,246 - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 15:29:28,246 - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 15:29:28,246 - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 outlet unique_no...
+2025-11-23 15:29:29,230 - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 15:29:29,230 - INFO -    找到 5 个设备
+2025-11-23 15:29:29,230 - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 15:29:29,230 - INFO -    设备2: code=101541, name=, unique_no=992409051638120001
+2025-11-23 15:29:29,230 - INFO -    设备3: code=101540, name=YG25-土壤墒情仪, unique_no=992409051634250001
+2025-11-23 15:29:29,230 - INFO -    设备4: code=101350, name=None, unique_no=992308011128330001
+2025-11-23 15:29:29,230 - INFO -    设备5: code=101538, name=None, unique_no=992306291845380001
+2025-11-23 15:29:29,230 - WARNING - ⚠️ API 查询成功，但未找到 S3-G21-F18 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:29,230 - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 15:29:29,603 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:29,603 - INFO -    找到 1 个设备
+2025-11-23 15:29:29,603 - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 15:29:29,603 - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:29,603 - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 outlet unique_no...
+2025-11-23 15:29:29,958 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:29,958 - INFO -    找到 1 个设备
+2025-11-23 15:29:29,958 - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 15:29:29,958 - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:29,958 - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 15:29:30,332 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:30,332 - INFO -    找到 1 个设备
+2025-11-23 15:29:30,332 - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 15:29:30,332 - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:30,332 - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 outlet unique_no...
+2025-11-23 15:29:30,756 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:30,756 - INFO -    找到 1 个设备
+2025-11-23 15:29:30,756 - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 15:29:30,756 - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:30,756 - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 15:29:31,074 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:31,075 - INFO -    找到 1 个设备
+2025-11-23 15:29:31,075 - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 15:29:31,075 - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:31,075 - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 outlet unique_no...
+2025-11-23 15:29:31,439 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:29:31,439 - INFO -    找到 1 个设备
+2025-11-23 15:29:31,439 - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 15:29:31,439 - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:29:31,439 - INFO - 初始化批次监控: 13 个田块, 12 个节制闸, 1 个泵站
+2025-11-23 15:29:31,439 - INFO - ✅ 监控初始化完成
+2025-11-23 15:29:31,439 - INFO - 批次 1 监控初始化完成: 13田块, 12节制闸, 1泵站
+2025-11-23 15:29:31,439 - INFO - 批次 1 开始实时监控（预计 8.75h）
+2025-11-23 15:29:31,439 - INFO - 💡 提示：系统将每30秒检查一次水位，自动关闭达标设备
+2025-11-23 15:29:31,742 - WARNING - ⚠️ 未获取到实时水位数据，将使用配置文件中的初始水位继续监控
+2025-11-23 15:29:54,361 - ERROR - [scheduler] 停止执行失败: 'ExecutionStatusManager' object has no attribute 'cancel_execution'
+2025-11-23 15:31:33,546 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 15:31:33,546 - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 15:32:17,157 - INFO - pipeline模块导入成功
+2025-11-23 15:32:17,158 - INFO - 步骤4: 设置默认参数...
+2025-11-23 15:32:17,158 - INFO - output_dir: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 15:32:17,158 - INFO - config_path: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 15:32:17,158 - INFO - 步骤5: 确保输出目录存在...
+2025-11-23 15:32:17,158 - INFO - 输出目录已创建/确认: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 15:32:17,159 - INFO - 步骤6: 构建pipeline参数...
+2025-11-23 15:32:17,159 - INFO - Pipeline参数: {'input_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\gzp_farm', 'output_dir': 'E:\\irrigation_schedule\\farm_irrigation\\data\\output', 'config_file': 'E:\\irrigation_schedule\\farm_irrigation\\config.json', 'merge_waterlevels': True, 'print_summary': True, 'multi_pump_scenarios': True}
+2025-11-23 15:32:17,159 - INFO - 步骤7: 创建Pipeline实例...
+2025-11-23 15:32:17,159 - INFO - Pipeline实例创建成功
+2025-11-23 15:32:17,159 - INFO - 步骤8: 运行Pipeline...
+2025-11-23 15:32:17,160 - INFO - 开始执行农场灌溉调度系统自动化流水线
+2025-11-23 15:32:17,160 - INFO - 输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 15:32:17,160 - INFO - 输出目录: E:\irrigation_schedule\farm_irrigation\data\output
+2025-11-23 15:32:17,160 - INFO - 检查依赖文件...
+2025-11-23 15:32:17,160 - INFO - 依赖文件检查通过
+2025-11-23 15:32:17,160 - INFO - 检查输入目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+2025-11-23 15:32:17,161 - INFO - 找到 15 个GIS数据文件
+2025-11-23 15:32:17,161 - INFO - 使用现有配置文件: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 15:32:17,161 - INFO - 跳过配置生成步骤（保留 Rice 决策配置）
+2025-11-23 15:32:17,162 - INFO - === 步骤1: 数据预处理 ===
+2025-11-23 15:32:17,162 - INFO - 发现Shapefile文件，运行格式转换...
+2025-11-23 15:32:17,162 - INFO - 开始执行: GIS数据格式转换
+2025-11-23 15:32:17,162 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.farmgis_convert
+2025-11-23 15:32:17,853 - INFO - 输出: 找到 6 个 .shp 文件
+已转换: 岳麓水路.shp -> 岳麓水路_code.geojson
+已转换: 岳麓田块.shp -> 岳麓田块_code.geojson
+已转换: 岳麓阀门与节制闸.shp -> 岳麓阀门与节制闸_code.geojson
+已转换: 港中坪水路.shp -> 港中坪水路_code.geojson
+已转换: 港中坪田块.shp -> 港中坪田块_code.geojson
+已转换: 港中坪阀门与节制闸.shp -> 港中坪阀门与节制闸_code.geojson
+转换完成！共转换 6/6 个文件
+
+2025-11-23 15:32:17,853 - WARNING - 警告: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\pyogrio\geopandas.py:710: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+  write(
+
+2025-11-23 15:32:17,854 - INFO - [OK] GIS数据格式转换 执行成功
+2025-11-23 15:32:17,854 - INFO - 开始执行: GIS数据修复
+2025-11-23 15:32:17,854 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.converter.fix_farmgis_convert
+2025-11-23 15:32:18,094 - INFO - 输出: 找到 9 个 geojson 文件: ['84911829811210_fields_code.geojson', '84911829811210_gates_code.geojson', '84911829811210_segments_code.geojson', '岳麓水路_code.geojson', '岳麓田块_code.geojson', '岳麓阀门与节制闸_code.geojson', '港中坪水路_code.geojson', '港中坪田块_code.geojson', '港中坪阀门与节制闸_code.geojson']
+工作目录: E:\irrigation_schedule\farm_irrigation\data\gzp_farm
+
+[处理] data/gzp_farm\84911829811210_fields_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_fields_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_fields_code.geojson
+
+[处理] data/gzp_farm\84911829811210_gates_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_gates_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_gates_code.geojson
+
+[处理] data/gzp_farm\84911829811210_segments_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\84911829811210_segments_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\84911829811210_segments_code.geojson
+
+[处理] data/gzp_farm\岳麓水路_code.geojson
+  总要素: 5  =>  保留: 5  删除: 0
+  已备份 -> data/gzp_farm\岳麓水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓水路_code.geojson
+
+[处理] data/gzp_farm\岳麓田块_code.geojson
+  总要素: 25  =>  保留: 25  删除: 0
+  已备份 -> data/gzp_farm\岳麓田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓田块_code.geojson
+
+[处理] data/gzp_farm\岳麓阀门与节制闸_code.geojson
+  总要素: 55  =>  保留: 55  删除: 0
+  已备份 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\岳麓阀门与节制闸_code.geojson
+
+[处理] data/gzp_farm\港中坪水路_code.geojson
+  总要素: 9  =>  保留: 9  删除: 0
+  已备份 -> data/gzp_farm\港中坪水路_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪水路_code.geojson
+
+[处理] data/gzp_farm\港中坪田块_code.geojson
+  总要素: 42  =>  保留: 42  删除: 0
+  已备份 -> data/gzp_farm\港中坪田块_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪田块_code.geojson
+
+[处理] data/gzp_farm\港中坪阀门与节制闸_code.geojson
+  总要素: 57  =>  保留: 57  删除: 0
+  已备份 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson.bak
+  已写回清洗后的文件 -> data/gzp_farm\港中坪阀门与节制闸_code.geojson
+
+完成。请刷新前端页面验证。
+
+2025-11-23 15:32:18,095 - INFO - [OK] GIS数据修复 执行成功
+2025-11-23 15:32:18,095 - INFO - === 步骤3: 灌溉计划生成 ===
+2025-11-23 15:32:18,095 - INFO - 开始执行: 生成灌溉计划
+2025-11-23 15:32:18,096 - INFO - 命令: C:\Users\Administrator\AppData\Local\Programs\Python\Python312\python.exe -m src.core.run_irrigation_plan --out E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_153218.json --multi-pump --summary --realtime
+2025-11-23 15:32:19,441 - INFO - 输出: [DEBUG] 使用真实实时水位API
+[DEBUG] 多水泵方案分析: 总田块数=25, 有水位数据=13, 无水位数据=12, 低于阈值=12
+====== 多水泵方案对比摘要 ======
+需要灌溉的地块总数: 12
+需要灌溉的段: ['S1', 'S2', 'S3', 'S5']
+有效水泵组合: [['P1']]
+生成方案数: 1
+方案 1: 水泵['P1'] - 覆盖段4个['S1', 'S2', 'S3', 'S5'] - 电费312.65元 - 运行8.68h
+推荐方案: 水泵['P1'] (电费: 312.65元, 运行时间: 8.68h)
+[done] 计划已写入：E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_153218.json
+
+2025-11-23 15:32:19,441 - INFO - [OK] 生成灌溉计划 执行成功
+2025-11-23 15:32:19,441 - INFO - [SUCCESS] 流水线执行完成！总耗时: 0:00:02.281809
+2025-11-23 15:32:19,442 - INFO - 生成的文件:
+2025-11-23 15:32:19,442 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_160213.json
+2025-11-23 15:32:19,442 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_161830.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_202044.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_205525.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251121_210408.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_100227.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_104939.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_110351.json
+2025-11-23 15:32:19,443 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_112951.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_114951.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_120901.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_122058.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_123116.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_141514.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_142501.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165047.json
+2025-11-23 15:32:19,444 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_165603.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170020.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170448.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170650.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_170859.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_172032.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183535.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_183858.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251122_224116.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_122307.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_123015.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_133620.json
+2025-11-23 15:32:19,445 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_135209.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_140550.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_152902.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_153218.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763778629.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779004.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779079.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779211.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763779236.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782300.json
+2025-11-23 15:32:19,446 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782410.json
+2025-11-23 15:32:19,447 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763782455.json
+2025-11-23 15:32:19,447 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763783433.json
+2025-11-23 15:32:19,447 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763785458.json
+2025-11-23 15:32:19,447 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_manual_regen_1763786122.json
+2025-11-23 15:32:19,447 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702080.json
+2025-11-23 15:32:19,447 - INFO -   - E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_modified_1763702095.json
+2025-11-23 15:32:19,447 - INFO - Pipeline执行结果: success=True
+2025-11-23 15:32:19,449 - INFO - 读取计划文件: E:\irrigation_schedule\farm_irrigation\data\output\irrigation_plan_20251123_153218.json
+2025-11-23 15:32:19,450 - INFO - 成功读取计划数据，包含 3 项
+2025-11-23 15:32:19,450 - INFO - 开始生成多水泵方案对比
+2025-11-23 15:32:20,007 - INFO - 多水泵方案生成成功，共 1 个方案（触发阈值: 1个田块）
+2025-11-23 15:32:20,007 - INFO - 灌溉计划结果已保存到缓存 - cache_key: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 15:32:20,007 - INFO - 灌溉计划生成完成
+2025-11-23 15:32:22,996 - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_153218.json
+2025-11-23 15:32:23,001 - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 15:32:23,001 - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 15:32:23,002 - INFO - 配置文件加载成功: config.json
+2025-11-23 15:32:23,002 - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-23 15:32:23,002 - INFO - 批次 1: 开始时间 0.00h, 持续时间 8.68h
+2025-11-23 15:32:23,003 - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_153218.json
+2025-11-23 15:32:23,003 - INFO - 共有 1 个批次
+2025-11-23 15:32:23,003 - INFO - 🧹 清空旧的指令队列...
+2025-11-23 15:32:23,003 - INFO - 指令队列已清空
+2025-11-23 15:32:23,005 - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-23 15:32:23,007 - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_153223
+2025-11-23 15:32:23,009 - INFO - [scheduler] 执行开始时间: 2025-11-23 15:32:23.003441
+2025-11-23 15:32:23,010 - INFO - 开始准备批次 1
+2025-11-23 15:32:23,622 - INFO - 批次 1 计划重新生成完成
+2025-11-23 15:32:23,622 - INFO - 开始执行批次 1
+2025-11-23 15:32:23,622 - WARNING - ⚠️ 节制闸 S2-G10 未找到 unique_no 映射
+2025-11-23 15:32:23,622 - WARNING - ⚠️ 节制闸 S2-G13 未找到 unique_no 映射
+2025-11-23 15:32:23,622 - WARNING - ⚠️ 节制闸 S3-G18 未找到 unique_no 映射
+2025-11-23 15:32:23,622 - WARNING - ⚠️ 节制闸 S3-G19 未找到 unique_no 映射
+2025-11-23 15:32:23,623 - WARNING - ⚠️ 节制闸 S3-G21 未找到 unique_no 映射
+2025-11-23 15:32:23,623 - INFO - 📝 开始为 13 个田块生成进水阀开启指令...
+2025-11-23 15:32:23,623 - INFO -    处理田块 1/13: S1-G3-F2
+2025-11-23 15:32:23,623 - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 15:32:24,181 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:24,181 - INFO -    找到 2 个设备
+2025-11-23 15:32:24,181 - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 15:32:24,182 - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 15:32:24,182 - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 15:32:24,182 - INFO -    ✅ S1-G3-F2 unique_no 获取成功: 480887123677298688
+2025-11-23 15:32:24,182 - INFO -    处理田块 2/13: S1-G4-F3
+2025-11-23 15:32:24,182 - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 15:32:24,715 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:24,715 - INFO -    找到 2 个设备
+2025-11-23 15:32:24,715 - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 15:32:24,716 - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 15:32:24,716 - INFO -    ✅ S1-G4-F3 unique_no 获取成功: 480892188113780736
+2025-11-23 15:32:24,716 - INFO -    处理田块 3/13: S2-G10-F7
+2025-11-23 15:32:24,716 - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 15:32:25,245 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:25,245 - INFO -    找到 2 个设备
+2025-11-23 15:32:25,245 - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 15:32:25,246 - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 15:32:25,246 - INFO -    ✅ S2-G10-F7 unique_no 获取成功: 477379421064159242
+2025-11-23 15:32:25,246 - INFO -    处理田块 4/13: S2-G12-F9
+2025-11-23 15:32:25,246 - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 15:32:25,753 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:25,753 - INFO -    找到 2 个设备
+2025-11-23 15:32:25,753 - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 15:32:25,753 - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 15:32:25,753 - INFO -    ✅ S2-G12-F9 unique_no 获取成功: 202511140931130001
+2025-11-23 15:32:25,753 - INFO -    处理田块 5/13: S2-G13-F10
+2025-11-23 15:32:25,753 - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 15:32:26,262 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:26,262 - INFO -    找到 2 个设备
+2025-11-23 15:32:26,262 - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 15:32:26,262 - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 15:32:26,262 - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 15:32:26,262 - INFO -    ✅ S2-G13-F10 unique_no 获取成功: 477379421064159243
+2025-11-23 15:32:26,262 - INFO -    处理田块 6/13: S2-G14-F11
+2025-11-23 15:32:26,262 - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 15:32:26,926 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:26,926 - INFO -    找到 3 个设备
+2025-11-23 15:32:26,926 - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 15:32:26,926 - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 15:32:26,926 - INFO -    ✅ S2-G14-F11 unique_no 获取成功: 480911695752478720
+2025-11-23 15:32:26,926 - INFO -    处理田块 7/13: S3-G18-F15
+2025-11-23 15:32:26,926 - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 15:32:27,676 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:27,676 - INFO -    找到 3 个设备
+2025-11-23 15:32:27,676 - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 15:32:27,676 - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 15:32:27,676 - INFO -    ✅ S3-G18-F15 unique_no 获取成功: 477379421064159255
+2025-11-23 15:32:27,676 - INFO -    处理田块 8/13: S3-G19-F16
+2025-11-23 15:32:27,676 - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 15:32:28,346 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:28,346 - INFO -    找到 3 个设备
+2025-11-23 15:32:28,346 - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 15:32:28,346 - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 15:32:28,346 - INFO -    ✅ S3-G19-F16 unique_no 获取成功: 477379421064159232
+2025-11-23 15:32:28,346 - INFO -    处理田块 9/13: S3-G20-F17
+2025-11-23 15:32:28,346 - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 15:32:28,870 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:28,870 - INFO -    找到 2 个设备
+2025-11-23 15:32:28,870 - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 15:32:28,870 - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 15:32:28,870 - INFO -    ✅ S3-G20-F17 unique_no 获取成功: 202511140930590001
+2025-11-23 15:32:28,870 - INFO -    处理田块 10/13: S3-G21-F18
+2025-11-23 15:32:28,870 - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 15:32:29,898 - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 15:32:29,898 - INFO -    找到 5 个设备
+2025-11-23 15:32:29,898 - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 15:32:29,899 - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 15:32:29,899 - INFO -    ✅ S3-G21-F18 unique_no 获取成功: 477379421064159246
+2025-11-23 15:32:29,899 - INFO -    处理田块 11/13: S3-G23-F20
+2025-11-23 15:32:29,899 - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 15:32:30,260 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:30,260 - INFO -    找到 1 个设备
+2025-11-23 15:32:30,260 - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 15:32:30,260 - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:30,260 - WARNING -    ⚠️ S3-G23-F20 unique_no 获取失败，将为 None
+2025-11-23 15:32:30,260 - INFO -    处理田块 12/13: S3-G25-F22
+2025-11-23 15:32:30,260 - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 15:32:30,621 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:30,621 - INFO -    找到 1 个设备
+2025-11-23 15:32:30,621 - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 15:32:30,622 - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:30,622 - WARNING -    ⚠️ S3-G25-F22 unique_no 获取失败，将为 None
+2025-11-23 15:32:30,622 - INFO -    处理田块 13/13: S5-G29-F25
+2025-11-23 15:32:30,622 - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 15:32:30,983 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:30,983 - INFO -    找到 1 个设备
+2025-11-23 15:32:30,983 - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 15:32:30,983 - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:30,983 - WARNING -    ⚠️ S5-G29-F25 unique_no 获取失败，将为 None
+2025-11-23 15:32:30,983 - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-23 15:32:30,983 - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-23 15:32:30,983 - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-23 15:32:30,983 - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-23 15:32:30,983 - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0011 - 开启S3-G23节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0012 - 开启S3-G25节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0013 - 开启S5-G29节制闸(100%)
+2025-11-23 15:32:30,984 - INFO - 添加指令: cmd_0014 - 开启S1-G3-F2进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0015 - 开启S1-G4-F3进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0016 - 开启S2-G10-F7进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0017 - 开启S2-G12-F9进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0018 - 开启S2-G13-F10进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0019 - 开启S2-G14-F11进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0020 - 开启S3-G18-F15进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0021 - 开启S3-G19-F16进水阀
+2025-11-23 15:32:30,985 - INFO - 添加指令: cmd_0022 - 开启S3-G20-F17进水阀
+2025-11-23 15:32:30,986 - INFO - 添加指令: cmd_0023 - 开启S3-G21-F18进水阀
+2025-11-23 15:32:30,986 - INFO - 添加指令: cmd_0024 - 开启S3-G23-F20进水阀
+2025-11-23 15:32:30,986 - INFO - 添加指令: cmd_0025 - 开启S3-G25-F22进水阀
+2025-11-23 15:32:30,986 - INFO - 添加指令: cmd_0026 - 开启S5-G29-F25进水阀
+2025-11-23 15:32:30,986 - INFO - 批次 1 已生成 26 条启动指令
+2025-11-23 15:32:30,988 - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 15:32:31,505 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:31,505 - INFO -    找到 2 个设备
+2025-11-23 15:32:31,505 - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 15:32:31,505 - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 15:32:31,505 - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 15:32:31,505 - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 outlet unique_no...
+2025-11-23 15:32:32,010 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:32,010 - INFO -    找到 2 个设备
+2025-11-23 15:32:32,010 - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 15:32:32,011 - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 15:32:32,011 - WARNING - ⚠️ API 查询成功，但未找到 S1-G3-F2 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:32,011 - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 15:32:32,527 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:32,527 - INFO -    找到 2 个设备
+2025-11-23 15:32:32,527 - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 15:32:32,527 - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 15:32:32,527 - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 outlet unique_no...
+2025-11-23 15:32:33,047 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:33,047 - INFO -    找到 2 个设备
+2025-11-23 15:32:33,047 - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 15:32:33,048 - INFO -    设备2: code=101541, name=, unique_no=992504291024410001
+2025-11-23 15:32:33,048 - WARNING - ⚠️ API 查询成功，但未找到 S1-G4-F3 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:33,048 - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 15:32:33,542 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:33,542 - INFO -    找到 2 个设备
+2025-11-23 15:32:33,542 - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 15:32:33,543 - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 15:32:33,543 - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 outlet unique_no...
+2025-11-23 15:32:34,061 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:34,061 - INFO -    找到 2 个设备
+2025-11-23 15:32:34,061 - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 15:32:34,062 - INFO -    设备2: code=101541, name=, unique_no=992504291021140001
+2025-11-23 15:32:34,062 - WARNING - ⚠️ API 查询成功，但未找到 S2-G10-F7 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:34,062 - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 15:32:34,609 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:34,609 - INFO -    找到 2 个设备
+2025-11-23 15:32:34,610 - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 15:32:34,610 - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 15:32:34,610 - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 outlet unique_no...
+2025-11-23 15:32:35,164 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:35,165 - INFO -    找到 2 个设备
+2025-11-23 15:32:35,165 - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 15:32:35,165 - INFO -    设备2: code=101541, name=, unique_no=992504290852190001
+2025-11-23 15:32:35,165 - WARNING - ⚠️ API 查询成功，但未找到 S2-G12-F9 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:35,165 - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 15:32:35,655 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:35,655 - INFO -    找到 2 个设备
+2025-11-23 15:32:35,655 - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 15:32:35,655 - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 15:32:35,655 - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 15:32:35,655 - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 outlet unique_no...
+2025-11-23 15:32:36,163 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:36,163 - INFO -    找到 2 个设备
+2025-11-23 15:32:36,163 - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 15:32:36,163 - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 15:32:36,163 - WARNING - ⚠️ API 查询成功，但未找到 S2-G13-F10 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:36,163 - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 15:32:36,888 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:36,888 - INFO -    找到 3 个设备
+2025-11-23 15:32:36,888 - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 15:32:36,888 - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 15:32:36,888 - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 outlet unique_no...
+2025-11-23 15:32:37,674 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:37,674 - INFO -    找到 3 个设备
+2025-11-23 15:32:37,674 - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 15:32:37,674 - INFO -    设备2: code=101541, name=, unique_no=992504282038550001
+2025-11-23 15:32:37,674 - INFO -    设备3: code=101350, name=None, unique_no=992307121123020001
+2025-11-23 15:32:37,674 - WARNING - ⚠️ API 查询成功，但未找到 S2-G14-F11 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:37,674 - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 15:32:38,387 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:38,387 - INFO -    找到 3 个设备
+2025-11-23 15:32:38,387 - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 15:32:38,387 - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 15:32:38,387 - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 outlet unique_no...
+2025-11-23 15:32:39,009 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:39,009 - INFO -    找到 3 个设备
+2025-11-23 15:32:39,009 - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 15:32:39,009 - INFO -    设备2: code=101541, name=, unique_no=992504291104170001
+2025-11-23 15:32:39,009 - INFO -    设备3: code=101540, name=土壤墒情仪, unique_no=992409051636020001
+2025-11-23 15:32:39,009 - WARNING - ⚠️ API 查询成功，但未找到 S3-G18-F15 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:39,009 - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 15:32:39,690 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:39,690 - INFO -    找到 3 个设备
+2025-11-23 15:32:39,690 - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 15:32:39,691 - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 15:32:39,691 - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 outlet unique_no...
+2025-11-23 15:32:40,357 - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 15:32:40,357 - INFO -    找到 3 个设备
+2025-11-23 15:32:40,357 - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 15:32:40,357 - INFO -    设备2: code=101541, name=, unique_no=992504282040540001
+2025-11-23 15:32:40,357 - INFO -    设备3: code=101350, name=None, unique_no=992308011125350001
+2025-11-23 15:32:40,357 - WARNING - ⚠️ API 查询成功，但未找到 S3-G19-F16 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:40,357 - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 15:32:40,818 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:40,818 - INFO -    找到 2 个设备
+2025-11-23 15:32:40,818 - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 15:32:40,819 - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 15:32:40,819 - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 outlet unique_no...
+2025-11-23 15:32:41,407 - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 15:32:41,407 - INFO -    找到 2 个设备
+2025-11-23 15:32:41,407 - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 15:32:41,407 - INFO -    设备2: code=101541, name=, unique_no=992505131509170001
+2025-11-23 15:32:41,407 - WARNING - ⚠️ API 查询成功，但未找到 S3-G20-F17 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:41,407 - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 15:32:42,460 - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 15:32:42,460 - INFO -    找到 5 个设备
+2025-11-23 15:32:42,460 - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 15:32:42,461 - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 15:32:42,461 - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 outlet unique_no...
+2025-11-23 15:32:43,464 - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 15:32:43,464 - INFO -    找到 5 个设备
+2025-11-23 15:32:43,464 - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 15:32:43,464 - INFO -    设备2: code=101541, name=, unique_no=992409051638120001
+2025-11-23 15:32:43,464 - INFO -    设备3: code=101540, name=YG25-土壤墒情仪, unique_no=992409051634250001
+2025-11-23 15:32:43,464 - INFO -    设备4: code=101350, name=None, unique_no=992308011128330001
+2025-11-23 15:32:43,464 - INFO -    设备5: code=101538, name=None, unique_no=992306291845380001
+2025-11-23 15:32:43,464 - WARNING - ⚠️ API 查询成功，但未找到 S3-G21-F18 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:43,464 - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 15:32:43,806 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:43,806 - INFO -    找到 1 个设备
+2025-11-23 15:32:43,806 - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 15:32:43,806 - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:43,806 - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 outlet unique_no...
+2025-11-23 15:32:44,173 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:44,173 - INFO -    找到 1 个设备
+2025-11-23 15:32:44,173 - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 15:32:44,173 - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:44,173 - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 15:32:44,535 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:44,535 - INFO -    找到 1 个设备
+2025-11-23 15:32:44,535 - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 15:32:44,535 - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:44,536 - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 outlet unique_no...
+2025-11-23 15:32:44,878 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:44,878 - INFO -    找到 1 个设备
+2025-11-23 15:32:44,878 - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 15:32:44,879 - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:44,879 - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 15:32:45,248 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:45,248 - INFO -    找到 1 个设备
+2025-11-23 15:32:45,248 - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 15:32:45,249 - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:45,249 - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 outlet unique_no...
+2025-11-23 15:32:45,603 - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 15:32:45,603 - INFO -    找到 1 个设备
+2025-11-23 15:32:45,603 - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 15:32:45,604 - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 15:32:45,604 - INFO - 初始化批次监控: 13 个田块, 12 个节制闸, 1 个泵站
+2025-11-23 15:32:45,604 - INFO - ✅ 监控初始化完成
+2025-11-23 15:32:45,604 - INFO - 批次 1 监控初始化完成: 13田块, 12节制闸, 1泵站
+2025-11-23 15:32:45,604 - INFO - 批次 1 开始实时监控（预计 8.68h）
+2025-11-23 15:32:45,604 - INFO - 💡 提示：系统将每30秒检查一次水位，自动关闭达标设备
+2025-11-23 15:32:45,885 - WARNING - ⚠️ 未获取到实时水位数据，将使用配置文件中的初始水位继续监控
+2025-11-23 15:32:53,069 - INFO - [scheduler] 执行已停止
+2025-11-23 15:33:39,376 - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 15:33:39,376 - INFO - 智能灌溉动态执行系统已关闭

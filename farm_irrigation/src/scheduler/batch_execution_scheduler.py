@@ -303,6 +303,14 @@ class BatchExecutionScheduler:
             self.status_manager.log_error("scheduler", "没有可执行的灌溉计划")
             return False
         
+        # 清空旧的指令队列，避免与新执行混淆
+        if self.command_queue:
+            logger.info("🧹 清空旧的指令队列...")
+            old_count = len(self.command_queue.commands)
+            self.command_queue.clear()
+            if old_count > 0:
+                logger.info(f"   已清除 {old_count} 条旧指令")
+        
         # 设置执行状态
         self.is_running = True
         self.execution_start_time = datetime.now()
@@ -587,8 +595,12 @@ class BatchExecutionScheduler:
         
         try:
             self.is_running = False
-            self.status_manager.cancel_execution()
+            self.execution_status = "stopped"
             self.status_manager.log_info("scheduler", "执行已停止")
+            
+            # 清空指令队列（可选，根据需求决定）
+            # if self.command_queue:
+            #     self.command_queue.clear()
             
             return True
             
