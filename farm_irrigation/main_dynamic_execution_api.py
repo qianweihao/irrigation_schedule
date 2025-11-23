@@ -44,10 +44,12 @@ from src.scheduler.execution_status_manager import ExecutionStatusManager
 # 导入API模型和函数
 from src.api.dynamic_execution_api import (
     DynamicExecutionRequest, DynamicExecutionResponse,
-    ExecutionStatusResponse, WaterLevelUpdateRequest, WaterLevelUpdateResponse,
+    ExecutionStatusResponse, CurrentExecutionIdResponse,
+    WaterLevelUpdateRequest, WaterLevelUpdateResponse,
     ManualRegenerationRequest, ManualRegenerationResponse,
     ExecutionHistoryResponse,
     start_dynamic_execution, stop_dynamic_execution, get_execution_status,
+    get_current_execution_id,
     update_water_levels, manual_regenerate_batch, get_execution_history,
     get_water_level_summary, get_field_trend_analysis, get_water_level_history
 )
@@ -1076,6 +1078,16 @@ async def stop_execution():
 async def execution_status():
     """获取执行状态"""
     return await get_execution_status()
+
+@app.get("/api/irrigation/dynamic-execution/current-id", response_model=CurrentExecutionIdResponse)
+async def get_dynamic_current_execution_id():
+    """
+    获取当前执行的execution_id
+    
+    轻量级接口，只返回execution_id，不查询设备。
+    前端可以定期调用此接口来获取execution_id，无需本地存储。
+    """
+    return await get_current_execution_id()
 
 @app.get("/api/execution/history", response_model=ExecutionHistoryResponse)
 async def execution_history(limit: int = 10):

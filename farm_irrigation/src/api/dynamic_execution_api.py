@@ -66,6 +66,13 @@ class DynamicExecutionResponse(BaseModel):
     current_batch: Optional[int] = None
     all_scenarios: Optional[List[ScenarioInfo]] = None
 
+class CurrentExecutionIdResponse(BaseModel):
+    """当前执行ID响应模型"""
+    success: bool
+    execution_id: Optional[str] = None
+    is_running: bool
+    message: str
+
 class ExecutionStatusResponse(BaseModel):
     """执行状态响应模型"""
     execution_id: str
@@ -217,13 +224,34 @@ async def start_dynamic_execution(request: DynamicExecutionRequest) -> DynamicEx
         
         # 检查是否已有执行在进行
         if scheduler.is_running:
-            current_status = scheduler.get_execution_status()
-            return DynamicExecutionResponse(
-                success=False,
-                message="已有执行任务在进行中",
-                execution_id=current_status.get("execution_id"),
-                scheduler_status=current_status.get("status")
+            logger.warning("检测到已有执行任务在进行中，将自动停止旧任务")
+            
+            # 获取旧任务信息用于日志记录
+            old_status = scheduler.get_execution_status()
+            old_execution_id = old_status.get("execution_id")
+            old_current_batch = old_status.get("current_batch")
+            old_total_batches = old_status.get("total_batches")
+            
+            logger.info(
+                f"旧任务详情 - ID: {old_execution_id}, "
+                f"进度: {old_current_batch}/{old_total_batches}"
             )
+            
+            # 停止旧任务
+            try:
+                scheduler.stop_execution()
+                logger.info(f"已成功停止旧执行任务: {old_execution_id}")
+            except Exception as e:
+                logger.error(f"停止旧任务时出现错误: {e}")
+                # 即使停止失败也继续，因为可能是状态不一致
+                # 强制重置状态
+                scheduler.is_running = False
+            
+            # 等待一小段时间确保旧任务完全停止
+            import asyncio
+            await asyncio.sleep(1)
+            
+            logger.info("准备启动新的执行任务...")
         
         # 加载配置和计划
         config_path = request.config_file_path or "config.json"
@@ -329,6 +357,49 @@ async def stop_dynamic_execution() -> DynamicExecutionResponse:
         raise HTTPException(
             status_code=500,
             detail=f"停止动态执行失败: {str(e)}"
+        )
+
+async def get_current_execution_id() -> CurrentExecutionIdResponse:
+    """
+    获取当前执行的execution_id
+    
+    轻量级接口，只返回execution_id和运行状态。
+    前端可以定期调用此接口来获取execution_id，无需存储在本地。
+    
+    Returns:
+        CurrentExecutionIdResponse: 当前执行ID响应
+    """
+    try:
+        scheduler = get_scheduler()
+        
+        # 检查是否有正在运行的任务
+        if not scheduler.is_running:
+            return CurrentExecutionIdResponse(
+                success=True,
+                execution_id=None,
+                is_running=False,
+                message="当前没有正在执行的任务"
+            )
+        
+        # 获取当前执行ID
+        status = scheduler.get_execution_status()
+        execution_id = status.get("execution_id")
+        
+        return CurrentExecutionIdResponse(
+            success=True,
+            execution_id=execution_id,
+            is_running=True,
+            message=f"正在执行任务 {execution_id}"
+        )
+        
+    except Exception as e:
+        logger.error(f"获取当前执行ID失败: {e}")
+        # 即使出错也返回成功响应，只是标记没有运行中的任务
+        return CurrentExecutionIdResponse(
+            success=True,
+            execution_id=None,
+            is_running=False,
+            message=f"获取执行ID时出错: {str(e)}"
         )
 
 async def get_execution_status() -> ExecutionStatusResponse:
@@ -1130,6 +1201,7 @@ def create_dynamic_execution_endpoints():
         "start_dynamic_execution": start_dynamic_execution,
         "stop_dynamic_execution": stop_dynamic_execution,
         "get_execution_status": get_execution_status,
+        "get_current_execution_id": get_current_execution_id,  # 新增：获取当前执行ID
         "update_water_levels": update_water_levels,
         "manual_regenerate_batch": manual_regenerate_batch,
         "get_execution_history": get_execution_history,

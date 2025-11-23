@@ -1390,3 +1390,81 @@
 2025-11-23 11:32:39,727 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
 2025-11-23 11:32:39,731 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
 2025-11-23 11:32:39,731 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:01:40,338 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:01:40,341 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:01:40,341 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:02:07,418 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:02:07,421 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:02:07,421 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:37,661 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:37,664 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:37,664 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:51,661 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:51,665 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:51,665 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:14,085 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:14,088 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:14,088 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:27,295 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:27,298 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:27,298 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:44,549 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:44,552 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:44,552 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:06:00,956 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:06:00,959 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:06:00,959 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:09:12,886 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:09:12,889 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:09:12,889 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:15:41,463 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:15:41,466 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:15:41,466 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:23:47,774 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_122347
+2025-11-23 12:23:47,774 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_122347
+2025-11-23 12:23:47,776 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:23:47.761820
+2025-11-23 12:23:47,776 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:23:47.761820
+2025-11-23 12:26:24,245 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:24,248 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:24,248 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:38,468 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:38,471 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:38,471 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:27,876 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:27,879 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:27,879 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:44,914 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:44,917 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:44,917 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:30:05,021 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:30:05,024 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:30:05,024 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:30:25,863 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123025
+2025-11-23 12:30:25,863 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123025
+2025-11-23 12:30:25,866 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:30:25.858997
+2025-11-23 12:30:25,866 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:30:25.858997
+2025-11-23 12:30:54,587 - src.scheduler.execution_status_manager.ExecutionStatusManager - ERROR - [scheduler] 停止执行失败: 'ExecutionStatusManager' object has no attribute 'cancel_execution'
+2025-11-23 12:30:54,587 - src.scheduler.execution_status_manager.ExecutionStatusManager - ERROR - [scheduler] 停止执行失败: 'ExecutionStatusManager' object has no attribute 'cancel_execution'
+2025-11-23 12:30:55,607 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123055
+2025-11-23 12:30:55,607 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123055
+2025-11-23 12:30:55,609 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:30:55.603140
+2025-11-23 12:30:55,609 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:30:55.603140
+2025-11-23 12:32:16,336 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:16,339 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:16,339 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:37,637 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:37,642 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:37,642 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:49,768 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123249
+2025-11-23 12:32:49,768 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123249
+2025-11-23 12:32:49,770 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:32:49.763071
+2025-11-23 12:32:49,770 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:32:49.763071
+2025-11-23 12:34:30,950 - src.scheduler.execution_status_manager.ExecutionStatusManager - ERROR - [scheduler] 停止执行失败: 'ExecutionStatusManager' object has no attribute 'cancel_execution'
+2025-11-23 12:34:30,950 - src.scheduler.execution_status_manager.ExecutionStatusManager - ERROR - [scheduler] 停止执行失败: 'ExecutionStatusManager' object has no attribute 'cancel_execution'
+2025-11-23 12:34:31,953 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123431
+2025-11-23 12:34:31,953 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123431
+2025-11-23 12:34:31,955 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:34:31.949665
+2025-11-23 12:34:31,955 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:34:31.949665
+2025-11-23 12:35:24,536 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:35:24,540 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:35:24,540 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成

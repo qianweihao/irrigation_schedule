@@ -61,6 +61,7 @@ from src.api.dynamic_execution_api import (
     DynamicExecutionRequest,
     DynamicExecutionResponse,
     ExecutionStatusResponse,
+    CurrentExecutionIdResponse,
     WaterLevelUpdateRequest,
     WaterLevelUpdateResponse,
     ManualRegenerationRequest,
@@ -551,6 +552,11 @@ async def stop_dynamic_execution():
 async def get_execution_status():
     """获取动态执行状态"""
     return await dynamic_execution_endpoints["get_execution_status"]()
+
+@app.get("/api/irrigation/dynamic-execution/current-id", response_model=CurrentExecutionIdResponse)
+async def get_current_execution_id():
+
+    return await dynamic_execution_endpoints["get_current_execution_id"]()
 
 @app.post("/api/irrigation/dynamic-execution/update-waterlevels", response_model=WaterLevelUpdateResponse)
 async def update_waterlevels(request: WaterLevelUpdateRequest):

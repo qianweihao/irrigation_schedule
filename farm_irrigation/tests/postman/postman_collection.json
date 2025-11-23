@@ -398,6 +398,68 @@
               ]
             }
           }
+        },
+        {
+          "name": "获取当前execution_id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/irrigation/dynamic-execution/current-id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "irrigation",
+                "dynamic-execution",
+                "current-id"
+              ]
+            },
+            "description": "获取当前正在执行的execution_id\n\n**功能**：\n- 轻量级接口，只返回execution_id，不包含监控信息\n- 前端可以定期调用此接口来获取execution_id，无需本地存储\n\n**使用场景**：\n- ✅ 页面刷新后恢复execution_id\n- ✅ 多标签页之间同步执行状态\n- ✅ 定时轮询获取最新的execution_id\n- ✅ 前端无法保存execution_id时的解决方案\n\n**返回信息**：\n- success: 请求是否成功\n- execution_id: 当前执行的任务ID（如果有任务运行）\n- is_running: 是否有任务正在执行\n- message: 状态消息\n\n**前端使用示例**：\n```javascript\n// 页面刷新后恢复execution_id\nasync function recoverExecutionId() {\n  const response = await fetch('/api/irrigation/dynamic-execution/current-id');\n  const data = await response.json();\n  \n  if (data.is_running && data.execution_id) {\n    // 恢复execution_id\n    localStorage.setItem('execution_id', data.execution_id);\n    console.log('已恢复execution_id:', data.execution_id);\n  } else {\n    console.log('当前没有正在执行的任务');\n  }\n}\n\n// 定时轮询（每5秒）\nsetInterval(recoverExecutionId, 5000);\n```\n\n**响应示例**（有任务）：\n```json\n{\n  \"success\": true,\n  \"execution_id\": \"exec_20251123_143025\",\n  \"is_running\": true,\n  \"message\": \"正在执行任务 exec_20251123_143025\"\n}\n```\n\n**响应示例**（无任务）：\n```json\n{\n  \"success\": true,\n  \"execution_id\": null,\n  \"is_running\": false,\n  \"message\": \"当前没有正在执行的任务\"\n}\n```"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含必要字段\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.a('boolean');",
+                  "    pm.expect(jsonData.is_running).to.be.a('boolean');",
+                  "    pm.expect(jsonData.message).to.be.a('string');",
+                  "    ",
+                  "    console.log('\\n=== 当前执行状态 ===');",
+                  "    console.log('是否运行:', jsonData.is_running);",
+                  "    console.log('execution_id:', jsonData.execution_id || '无');",
+                  "    console.log('消息:', jsonData.message);",
+                  "});",
+                  "",
+                  "pm.test(\"如果有任务运行，包含execution_id\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.is_running) {",
+                  "        pm.expect(jsonData.execution_id).to.be.a('string');",
+                  "        pm.expect(jsonData.execution_id).to.not.be.null;",
+                  "        ",
+                  "        // 自动保存execution_id到环境变量",
+                  "        pm.environment.set('execution_id', jsonData.execution_id);",
+                  "        ",
+                  "        console.log('\\n=== 执行ID ===');",
+                  "        console.log('execution_id:', jsonData.execution_id);",
+                  "        console.log('✅ execution_id已保存到环境变量');",
+                  "    } else {",
+                  "        pm.expect(jsonData.execution_id).to.be.null;",
+                  "        console.log('\\n✅ 当前没有正在执行的任务');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

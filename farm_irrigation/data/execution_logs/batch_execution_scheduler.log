@@ -9695,3 +9695,977 @@ FileNotFoundError: 84911829811210_segments_code.geojson
 2025-11-23 11:32:39,733 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
 2025-11-23 11:32:39,733 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
 2025-11-23 11:32:39,733 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:01:38,683 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:01:38,683 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:01:40,198 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:01:40,263 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:01:40,336 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:01:40,336 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:01:40,337 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:01:40,338 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:01:40,338 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:01:40,339 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:01:40,339 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:01:40,340 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:01:40,340 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:01:40,340 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:01:40,341 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:01:40,341 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:01:40,343 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:01:40,343 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:01:40,343 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:01:40,343 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:01:40,344 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:02:05,918 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:02:05,918 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:02:07,274 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:02:07,340 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:02:07,416 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:02:07,417 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:02:07,418 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:02:07,418 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:02:07,418 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:02:07,419 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:02:07,419 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:02:07,420 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:02:07,420 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:02:07,420 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:02:07,421 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:02:07,421 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:02:07,423 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:02:07,423 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:02:07,423 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:02:07,423 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:02:07,424 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:04:36,080 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:04:36,080 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:04:37,525 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:04:37,588 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:04:37,660 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:04:37,660 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:04:37,661 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:04:37,661 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:37,662 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:04:37,662 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:04:37,663 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:04:37,663 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:04:37,663 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:04:37,664 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:04:37,664 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:04:37,664 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:37,666 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:04:37,666 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:04:37,667 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:04:37,667 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:04:37,667 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:04:50,077 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:04:50,077 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:04:51,526 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:04:51,589 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:04:51,659 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:04:51,659 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:04:51,660 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:04:51,661 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:51,661 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:04:51,662 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:04:51,662 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:04:51,663 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:04:51,663 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:04:51,663 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:04:51,664 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:04:51,665 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:04:51,666 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:04:51,667 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:04:51,667 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:04:51,667 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:04:51,667 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:05:12,498 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:05:12,498 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:05:13,945 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:05:14,008 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:05:14,083 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:05:14,083 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:05:14,084 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:05:14,085 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:14,085 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:05:14,086 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:05:14,086 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:05:14,086 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:05:14,087 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:05:14,087 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:05:14,087 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:05:14,088 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:14,089 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:05:14,090 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:05:14,090 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:05:14,090 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:05:14,090 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:05:25,802 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:05:25,802 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:05:27,148 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:05:27,217 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:05:27,293 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:05:27,293 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:05:27,294 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:05:27,295 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:27,295 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:05:27,296 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:05:27,296 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:05:27,296 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:05:27,297 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:05:27,297 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:05:27,298 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:05:27,298 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:27,300 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:05:27,300 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:05:27,300 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:05:27,300 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:05:27,300 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:05:43,022 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:05:43,022 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:05:44,409 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:05:44,475 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:05:44,547 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:05:44,547 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:05:44,548 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:05:44,549 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:44,549 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:05:44,550 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:05:44,550 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:05:44,551 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:05:44,551 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:05:44,551 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:05:44,552 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:05:44,552 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:05:44,554 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:05:44,554 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:05:44,555 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:05:44,555 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:05:44,555 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:05:59,299 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:05:59,299 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:06:00,733 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:06:00,879 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:06:00,954 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:06:00,954 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:06:00,955 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:06:00,956 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:06:00,956 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:06:00,957 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:06:00,957 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:06:00,958 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:06:00,958 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:06:00,958 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:06:00,959 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:06:00,959 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:06:00,961 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:06:00,961 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:06:00,961 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:06:00,961 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:06:00,962 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:09:11,328 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:09:11,328 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:09:12,673 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:09:12,815 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:09:12,885 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:09:12,885 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:09:12,886 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:09:12,886 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:09:12,887 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:09:12,887 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:09:12,888 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:09:12,888 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:09:12,888 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:09:12,888 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:09:12,889 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:09:12,889 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:09:12,891 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:09:12,891 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:09:12,892 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:09:12,892 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:09:12,892 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:15:39,906 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:15:39,906 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:15:41,249 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:15:41,394 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:15:41,462 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:15:41,462 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:15:41,463 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:15:41,463 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:15:41,463 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:15:41,464 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:15:41,465 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:15:41,465 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:15:41,465 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:15:41,465 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:15:41,466 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:15:41,466 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:15:41,468 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:15:41,468 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:15:41,468 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:15:41,468 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:15:41,469 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:23:06,315 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 84911829811210
+2025-11-23 12:23:06,316 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-23 12:23:06,316 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-23 12:23:06,316 - main_dynamic_execution_api - INFO - 缓存键生成成功: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 12:23:06,316 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-23 12:23:06,317 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-23 12:23:06,317 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-23 12:26:24,103 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:26:24,170 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:26:24,243 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:26:24,244 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:26:24,244 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:26:24,245 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:24,245 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:26:24,246 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:26:24,246 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:26:24,247 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:26:24,247 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:26:24,247 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:26:24,248 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:26:24,248 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:24,250 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:26:24,250 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:26:24,251 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:26:24,251 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:26:24,251 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:26:36,815 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:26:36,815 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:26:38,331 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:26:38,395 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:26:38,467 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:26:38,467 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:26:38,468 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:26:38,468 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:38,468 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:26:38,469 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:26:38,469 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:26:38,470 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:26:38,470 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:26:38,470 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:26:38,471 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:26:38,471 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:26:38,473 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:26:38,474 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:26:38,474 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:26:38,474 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:26:38,474 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:27:26,360 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:27:26,360 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:27:27,728 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:27:27,798 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:27:27,874 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:27:27,874 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:27:27,875 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:27:27,876 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:27,876 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:27:27,877 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:27:27,877 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:27:27,878 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:27:27,878 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:27:27,878 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:27:27,879 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:27:27,879 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:27,881 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:27:27,881 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:27:27,881 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:27:27,882 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:27:27,882 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:27:43,344 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:27:43,345 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:27:44,769 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:27:44,840 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:27:44,913 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:27:44,913 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:27:44,914 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:27:44,914 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:44,914 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:27:44,915 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:27:44,915 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:27:44,916 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:27:44,916 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:27:44,916 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:27:44,917 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:27:44,917 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:27:44,919 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:27:44,919 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:27:44,919 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:27:44,919 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:27:44,919 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:30:03,344 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:30:03,344 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:30:04,833 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:30:04,917 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:30:05,019 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:30:05,020 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:30:05,020 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:30:05,021 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:30:05,021 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:30:05,022 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:30:05,022 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:30:05,023 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:30:05,023 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:30:05,023 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:30:05,024 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:30:05,024 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:30:05,026 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:30:05,026 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:30:05,026 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:30:05,026 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:30:05,026 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:30:14,206 - main_dynamic_execution_api - INFO - 开始生成灌溉计划 - farm_id: 84911829811210
+2025-11-23 12:30:14,206 - main_dynamic_execution_api - INFO - 请求参数: output_dir=, config_path=, multi_pump_scenarios=True
+2025-11-23 12:30:14,206 - main_dynamic_execution_api - INFO - 步骤1: 生成缓存键...
+2025-11-23 12:30:14,207 - main_dynamic_execution_api - INFO - 缓存键生成成功: efc0b01b4bed2458a3cfa18852d27fd8
+2025-11-23 12:30:14,207 - main_dynamic_execution_api - INFO - 步骤2: 检查缓存...
+2025-11-23 12:30:14,207 - main_dynamic_execution_api - INFO - 缓存未命中，继续执行...
+2025-11-23 12:30:14,207 - main_dynamic_execution_api - INFO - 步骤3: 导入pipeline模块...
+2025-11-23 12:32:16,119 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:32:16,260 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:32:16,335 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:32:16,335 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:32:16,336 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:32:16,336 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:16,336 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:32:16,337 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:32:16,337 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:32:16,338 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:32:16,338 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:32:16,338 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:32:16,339 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:32:16,339 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:16,341 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:32:16,341 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:32:16,341 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:32:16,341 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:32:16,342 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:32:35,915 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:32:35,915 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:32:37,416 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:32:37,566 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:32:37,636 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:32:37,636 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:32:37,637 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:32:37,637 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:37,637 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:32:37,639 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:32:37,639 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:32:37,639 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:32:37,640 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:32:37,640 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:32:37,641 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:32:37,642 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:32:37,643 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:32:37,643 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:32:37,644 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:32:37,644 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:32:37,644 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:32:46,146 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:32:46,147 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:32:49,761 - src.api.dynamic_execution_api - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_123015.json
+2025-11-23 12:32:49,762 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-23 12:32:49,763 - src.scheduler.batch_execution_scheduler - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-23 12:32:49,763 - src.scheduler.batch_execution_scheduler - INFO - 批次 1: 开始时间 0.00h, 持续时间 9.93h
+2025-11-23 12:32:49,763 - src.scheduler.batch_execution_scheduler - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_123015.json
+2025-11-23 12:32:49,763 - src.scheduler.batch_execution_scheduler - INFO - 共有 1 个批次
+2025-11-23 12:32:49,766 - src.scheduler.execution_status_manager - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-23 12:32:49,768 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123249
+2025-11-23 12:32:49,770 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:32:49.763071
+2025-11-23 12:32:49,771 - src.scheduler.batch_execution_scheduler - INFO - 开始准备批次 1
+2025-11-23 12:32:50,362 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 计划重新生成完成
+2025-11-23 12:32:50,362 - src.scheduler.batch_execution_scheduler - INFO - 开始执行批次 1
+2025-11-23 12:32:50,362 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S2-G10 未找到 unique_no 映射
+2025-11-23 12:32:50,362 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S2-G13 未找到 unique_no 映射
+2025-11-23 12:32:50,363 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S3-G18 未找到 unique_no 映射
+2025-11-23 12:32:50,363 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S3-G19 未找到 unique_no 映射
+2025-11-23 12:32:50,363 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S3-G21 未找到 unique_no 映射
+2025-11-23 12:32:50,363 - src.scheduler.batch_execution_scheduler - INFO - 📝 开始为 13 个田块生成进水阀开启指令...
+2025-11-23 12:32:50,363 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 1/13: S1-G3-F2
+2025-11-23 12:32:50,363 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 12:32:50,938 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:50,938 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:50,939 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 12:32:50,939 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 12:32:50,939 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 12:32:50,939 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S1-G3-F2 unique_no 获取成功: 480887123677298688
+2025-11-23 12:32:50,939 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 2/13: S1-G4-F3
+2025-11-23 12:32:50,939 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S1-G4-F3 unique_no 获取成功: 480892188113780736
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 3/13: S2-G10-F7
+2025-11-23 12:32:51,502 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 12:32:52,036 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:52,036 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:52,036 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 12:32:52,037 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 12:32:52,037 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G10-F7 unique_no 获取成功: 477379421064159242
+2025-11-23 12:32:52,037 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 4/13: S2-G12-F9
+2025-11-23 12:32:52,037 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G12-F9 unique_no 获取成功: 202511140931130001
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 5/13: S2-G13-F10
+2025-11-23 12:32:52,554 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G13-F10 unique_no 获取成功: 477379421064159243
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 6/13: S2-G14-F11
+2025-11-23 12:32:53,164 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 12:32:53,857 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:32:53,857 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:32:53,857 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 12:32:53,858 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 12:32:53,858 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G14-F11 unique_no 获取成功: 480911695752478720
+2025-11-23 12:32:53,858 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 7/13: S3-G18-F15
+2025-11-23 12:32:53,858 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G18-F15 unique_no 获取成功: 477379421064159255
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 8/13: S3-G19-F16
+2025-11-23 12:32:54,532 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G19-F16 unique_no 获取成功: 477379421064159232
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 9/13: S3-G20-F17
+2025-11-23 12:32:55,206 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G20-F17 unique_no 获取成功: 202511140930590001
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 10/13: S3-G21-F18
+2025-11-23 12:32:55,744 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO -    找到 5 个设备
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G21-F18 unique_no 获取成功: 477379421064159246
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 11/13: S3-G23-F20
+2025-11-23 12:32:56,805 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 12:32:57,176 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:32:57,176 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:32:57,177 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 12:32:57,177 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:32:57,177 - src.scheduler.batch_execution_scheduler - WARNING -    ⚠️ S3-G23-F20 unique_no 获取失败，将为 None
+2025-11-23 12:32:57,177 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 12/13: S3-G25-F22
+2025-11-23 12:32:57,177 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - WARNING -    ⚠️ S3-G25-F22 unique_no 获取失败，将为 None
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 13/13: S5-G29-F25
+2025-11-23 12:32:57,555 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 12:32:57,927 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:32:57,927 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:32:57,927 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 12:32:57,927 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:32:57,927 - src.scheduler.batch_execution_scheduler - WARNING -    ⚠️ S5-G29-F25 unique_no 获取失败，将为 None
+2025-11-23 12:32:57,927 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0001 - 启动P1泵站
+2025-11-23 12:32:57,927 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0002 - 开启S1-G27节制闸(100%)
+2025-11-23 12:32:57,927 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0003 - 开启S2-G10节制闸(100%)
+2025-11-23 12:32:57,927 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0004 - 开启S2-G12节制闸(100%)
+2025-11-23 12:32:57,927 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0005 - 开启S2-G13节制闸(100%)
+2025-11-23 12:32:57,927 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0006 - 开启S2-G14节制闸(100%)
+2025-11-23 12:32:57,928 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0007 - 开启S3-G18节制闸(100%)
+2025-11-23 12:32:57,928 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0008 - 开启S3-G19节制闸(100%)
+2025-11-23 12:32:57,928 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0009 - 开启S3-G20节制闸(100%)
+2025-11-23 12:32:57,928 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0010 - 开启S3-G21节制闸(100%)
+2025-11-23 12:32:57,928 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0011 - 开启S3-G23节制闸(100%)
+2025-11-23 12:32:57,928 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0012 - 开启S3-G25节制闸(100%)
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0013 - 开启S5-G29节制闸(100%)
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0014 - 开启S1-G3-F2进水阀
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0015 - 开启S1-G4-F3进水阀
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0016 - 开启S2-G10-F7进水阀
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0017 - 开启S2-G12-F9进水阀
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0018 - 开启S2-G13-F10进水阀
+2025-11-23 12:32:57,929 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0019 - 开启S2-G14-F11进水阀
+2025-11-23 12:32:57,930 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0020 - 开启S3-G18-F15进水阀
+2025-11-23 12:32:57,930 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0021 - 开启S3-G19-F16进水阀
+2025-11-23 12:32:57,930 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0022 - 开启S3-G20-F17进水阀
+2025-11-23 12:32:57,930 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0023 - 开启S3-G21-F18进水阀
+2025-11-23 12:32:57,930 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0024 - 开启S3-G23-F20进水阀
+2025-11-23 12:32:57,930 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0025 - 开启S3-G25-F22进水阀
+2025-11-23 12:32:57,931 - src.scheduler.device_command_queue - INFO - 添加指令: cmd_0026 - 开启S5-G29-F25进水阀
+2025-11-23 12:32:57,931 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 已生成 26 条启动指令
+2025-11-23 12:32:57,933 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 12:32:58,482 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:58,482 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:58,482 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 12:32:58,483 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 12:32:58,483 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 12:32:58,483 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 outlet unique_no...
+2025-11-23 12:32:59,010 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:59,010 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:59,010 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 12:32:59,010 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 12:32:59,010 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S1-G3-F2 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:32:59,010 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 12:32:59,532 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:32:59,532 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:32:59,532 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 12:32:59,533 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 12:32:59,533 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 outlet unique_no...
+2025-11-23 12:33:00,017 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:00,017 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:00,018 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 12:33:00,018 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504291024410001
+2025-11-23 12:33:00,018 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S1-G4-F3 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:00,018 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 12:33:00,523 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:00,523 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:00,523 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 12:33:00,524 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 12:33:00,524 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 outlet unique_no...
+2025-11-23 12:33:01,090 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:01,090 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:01,090 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 12:33:01,091 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504291021140001
+2025-11-23 12:33:01,091 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G10-F7 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:01,091 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 12:33:01,682 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:01,682 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:01,682 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 12:33:01,682 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 12:33:01,682 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 outlet unique_no...
+2025-11-23 12:33:02,217 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:02,217 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:02,217 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 12:33:02,217 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504290852190001
+2025-11-23 12:33:02,217 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G12-F9 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:02,217 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 12:33:02,802 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:02,802 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:02,802 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 12:33:02,803 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 12:33:02,803 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 12:33:02,803 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 outlet unique_no...
+2025-11-23 12:33:03,325 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:03,325 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:03,325 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 12:33:03,325 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 12:33:03,325 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G13-F10 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:03,325 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 12:33:04,018 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:33:04,018 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:33:04,018 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 12:33:04,019 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 12:33:04,019 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 outlet unique_no...
+2025-11-23 12:33:04,726 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:33:04,726 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:33:04,726 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 12:33:04,726 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504282038550001
+2025-11-23 12:33:04,726 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101350, name=None, unique_no=992307121123020001
+2025-11-23 12:33:04,726 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G14-F11 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:04,727 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 12:33:05,397 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:33:05,397 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:33:05,397 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 12:33:05,397 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 12:33:05,398 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 outlet unique_no...
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504291104170001
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101540, name=土壤墒情仪, unique_no=992409051636020001
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G18-F15 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:06,105 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 12:33:06,887 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:33:06,887 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:33:06,887 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 12:33:06,888 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 12:33:06,888 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 outlet unique_no...
+2025-11-23 12:33:07,608 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:33:07,608 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:33:07,609 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 12:33:07,609 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504282040540001
+2025-11-23 12:33:07,609 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101350, name=None, unique_no=992308011125350001
+2025-11-23 12:33:07,609 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G19-F16 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:07,609 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 12:33:08,148 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:08,148 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:08,149 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 12:33:08,149 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 12:33:08,149 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 outlet unique_no...
+2025-11-23 12:33:08,714 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:33:08,714 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:33:08,714 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 12:33:08,714 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992505131509170001
+2025-11-23 12:33:08,714 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G20-F17 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:08,714 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 12:33:09,690 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 12:33:09,690 - src.scheduler.batch_execution_scheduler - INFO -    找到 5 个设备
+2025-11-23 12:33:09,690 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 12:33:09,691 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 12:33:09,691 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 outlet unique_no...
+2025-11-23 12:33:10,798 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 12:33:10,798 - src.scheduler.batch_execution_scheduler - INFO -    找到 5 个设备
+2025-11-23 12:33:10,798 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 12:33:10,799 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992409051638120001
+2025-11-23 12:33:10,799 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101540, name=YG25-土壤墒情仪, unique_no=992409051634250001
+2025-11-23 12:33:10,799 - src.scheduler.batch_execution_scheduler - INFO -    设备4: code=101350, name=None, unique_no=992308011128330001
+2025-11-23 12:33:10,799 - src.scheduler.batch_execution_scheduler - INFO -    设备5: code=101538, name=None, unique_no=992306291845380001
+2025-11-23 12:33:10,799 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G21-F18 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:10,799 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 12:33:11,125 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:33:11,125 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:33:11,125 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 12:33:11,126 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:11,126 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 outlet unique_no...
+2025-11-23 12:33:11,481 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:33:11,481 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:33:11,481 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 12:33:11,482 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:11,482 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 12:33:11,840 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:33:11,840 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:33:11,840 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 12:33:11,840 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:11,840 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 outlet unique_no...
+2025-11-23 12:33:12,187 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:33:12,187 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:33:12,188 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 12:33:12,188 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:12,188 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 12:33:12,545 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:33:12,545 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:33:12,545 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 12:33:12,545 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:12,545 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 outlet unique_no...
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:33:12,901 - src.scheduler.field_completion_monitor - INFO - 初始化批次监控: 13 个田块, 12 个节制闸, 1 个泵站
+2025-11-23 12:33:12,901 - src.scheduler.field_completion_monitor - INFO - ✅ 监控初始化完成
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 监控初始化完成: 13田块, 12节制闸, 1泵站
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 开始实时监控（预计 9.93h）
+2025-11-23 12:33:12,901 - src.scheduler.batch_execution_scheduler - INFO - 💡 提示：系统将每30秒检查一次水位，自动关闭达标设备
+2025-11-23 12:33:13,199 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 未获取到实时水位数据，将使用配置文件中的初始水位继续监控
+2025-11-23 12:34:30,948 - src.api.dynamic_execution_api - INFO - 启动动态执行 - 计划文件: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_123015.json
+2025-11-23 12:34:30,948 - src.api.dynamic_execution_api - WARNING - 检测到已有执行任务在进行中，将自动停止旧任务
+2025-11-23 12:34:30,948 - src.api.dynamic_execution_api - INFO - 旧任务详情 - ID: exec_20251123_123249, 进度: 1/1
+2025-11-23 12:34:30,950 - src.scheduler.execution_status_manager.ExecutionStatusManager - ERROR - [scheduler] 停止执行失败: 'ExecutionStatusManager' object has no attribute 'cancel_execution'
+2025-11-23 12:34:30,951 - src.api.dynamic_execution_api - INFO - 已成功停止旧执行任务: exec_20251123_123249
+2025-11-23 12:34:31,947 - src.api.dynamic_execution_api - INFO - 准备启动新的执行任务...
+2025-11-23 12:34:31,947 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: config.json
+2025-11-23 12:34:31,948 - src.scheduler.batch_execution_scheduler - INFO - 使用scenarios格式，选择第一个scenario: P1单独使用
+2025-11-23 12:34:31,948 - src.scheduler.batch_execution_scheduler - INFO - 批次 1: 开始时间 0.00h, 持续时间 9.93h
+2025-11-23 12:34:31,948 - src.scheduler.batch_execution_scheduler - INFO - 灌溉计划加载成功: E:/irrigation_schedule/farm_irrigation/data/output/irrigation_plan_20251123_123015.json
+2025-11-23 12:34:31,948 - src.scheduler.batch_execution_scheduler - INFO - 共有 1 个批次
+2025-11-23 12:34:31,951 - src.scheduler.execution_status_manager - ERROR - 记录事件日志失败: NOT NULL constraint failed: execution_logs.category
+2025-11-23 12:34:31,953 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 开始执行灌溉计划，执行ID: exec_20251123_123431
+2025-11-23 12:34:31,955 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - [scheduler] 执行开始时间: 2025-11-23 12:34:31.949665
+2025-11-23 12:34:31,956 - src.scheduler.batch_execution_scheduler - INFO - 开始准备批次 1
+2025-11-23 12:34:32,587 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 计划重新生成完成
+2025-11-23 12:34:32,587 - src.scheduler.batch_execution_scheduler - INFO - 开始执行批次 1
+2025-11-23 12:34:32,587 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S2-G10 未找到 unique_no 映射
+2025-11-23 12:34:32,587 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S2-G13 未找到 unique_no 映射
+2025-11-23 12:34:32,588 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S3-G18 未找到 unique_no 映射
+2025-11-23 12:34:32,588 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S3-G19 未找到 unique_no 映射
+2025-11-23 12:34:32,588 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 节制闸 S3-G21 未找到 unique_no 映射
+2025-11-23 12:34:32,588 - src.scheduler.batch_execution_scheduler - INFO - 📝 开始为 13 个田块生成进水阀开启指令...
+2025-11-23 12:34:32,588 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 1/13: S1-G3-F2
+2025-11-23 12:34:32,588 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S1-G3-F2 unique_no 获取成功: 480887123677298688
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 2/13: S1-G4-F3
+2025-11-23 12:34:33,123 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S1-G4-F3 unique_no 获取成功: 480892188113780736
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 3/13: S2-G10-F7
+2025-11-23 12:34:33,687 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 12:34:34,245 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:34,245 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:34,246 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 12:34:34,246 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 12:34:34,246 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G10-F7 unique_no 获取成功: 477379421064159242
+2025-11-23 12:34:34,246 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 4/13: S2-G12-F9
+2025-11-23 12:34:34,246 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 12:34:34,778 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:34,778 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:34,778 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 12:34:34,779 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 12:34:34,779 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G12-F9 unique_no 获取成功: 202511140931130001
+2025-11-23 12:34:34,779 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 5/13: S2-G13-F10
+2025-11-23 12:34:34,779 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 12:34:35,290 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:35,290 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:35,290 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 12:34:35,291 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 12:34:35,291 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 12:34:35,291 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G13-F10 unique_no 获取成功: 477379421064159243
+2025-11-23 12:34:35,291 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 6/13: S2-G14-F11
+2025-11-23 12:34:35,291 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S2-G14-F11 unique_no 获取成功: 480911695752478720
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 7/13: S3-G18-F15
+2025-11-23 12:34:35,937 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 12:34:36,660 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:36,660 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:36,660 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 12:34:36,661 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 12:34:36,661 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G18-F15 unique_no 获取成功: 477379421064159255
+2025-11-23 12:34:36,661 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 8/13: S3-G19-F16
+2025-11-23 12:34:36,661 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 12:34:37,301 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:37,301 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:37,301 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 12:34:37,302 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 12:34:37,302 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G19-F16 unique_no 获取成功: 477379421064159232
+2025-11-23 12:34:37,302 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 9/13: S3-G20-F17
+2025-11-23 12:34:37,302 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 12:34:37,795 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:37,795 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:37,795 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 12:34:37,796 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 12:34:37,796 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G20-F17 unique_no 获取成功: 202511140930590001
+2025-11-23 12:34:37,796 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 10/13: S3-G21-F18
+2025-11-23 12:34:37,796 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 12:34:38,790 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 12:34:38,790 - src.scheduler.batch_execution_scheduler - INFO -    找到 5 个设备
+2025-11-23 12:34:38,790 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 12:34:38,791 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 12:34:38,791 - src.scheduler.batch_execution_scheduler - INFO -    ✅ S3-G21-F18 unique_no 获取成功: 477379421064159246
+2025-11-23 12:34:38,791 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 11/13: S3-G23-F20
+2025-11-23 12:34:38,791 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - WARNING -    ⚠️ S3-G23-F20 unique_no 获取失败，将为 None
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 12/13: S3-G25-F22
+2025-11-23 12:34:39,162 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 12:34:39,509 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:39,509 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:39,509 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 12:34:39,510 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:39,510 - src.scheduler.batch_execution_scheduler - WARNING -    ⚠️ S3-G25-F22 unique_no 获取失败，将为 None
+2025-11-23 12:34:39,510 - src.scheduler.batch_execution_scheduler - INFO -    处理田块 13/13: S5-G29-F25
+2025-11-23 12:34:39,510 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - WARNING -    ⚠️ S5-G29-F25 unique_no 获取失败，将为 None
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 已生成 26 条启动指令
+2025-11-23 12:34:39,878 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 inlet unique_no...
+2025-11-23 12:34:40,398 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:40,398 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:40,398 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 12:34:40,399 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 12:34:40,399 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G3-F2 的 unique_no: 480887123677298688
+2025-11-23 12:34:40,399 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G3-F2 (sectionID: 10256838164481) 的 outlet unique_no...
+2025-11-23 12:34:40,905 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:40,905 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:40,905 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260942190001
+2025-11-23 12:34:40,905 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101544, name=YG37进水阀, unique_no=480887123677298688
+2025-11-23 12:34:40,905 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S1-G3-F2 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:40,905 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 inlet unique_no...
+2025-11-23 12:34:41,422 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:41,422 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:41,422 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 12:34:41,423 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S1-G4-F3 的 unique_no: 480892188113780736
+2025-11-23 12:34:41,423 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S1-G4-F3 (sectionID: 84914581668090) 的 outlet unique_no...
+2025-11-23 12:34:41,932 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:41,932 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:41,932 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG39进水阀, unique_no=480892188113780736
+2025-11-23 12:34:41,932 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504291024410001
+2025-11-23 12:34:41,932 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S1-G4-F3 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:41,933 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 inlet unique_no...
+2025-11-23 12:34:42,418 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:42,419 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:42,419 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 12:34:42,419 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G10-F7 的 unique_no: 477379421064159242
+2025-11-23 12:34:42,419 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G10-F7 (sectionID: 84914581667980) 的 outlet unique_no...
+2025-11-23 12:34:42,921 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:42,921 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:42,921 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG18进水闸门, unique_no=477379421064159242
+2025-11-23 12:34:42,921 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504291021140001
+2025-11-23 12:34:42,921 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G10-F7 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:42,921 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 inlet unique_no...
+2025-11-23 12:34:43,427 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:43,427 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:43,427 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 12:34:43,428 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G12-F9 的 unique_no: 202511140931130001
+2025-11-23 12:34:43,428 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G12-F9 (sectionID: 84914581668010) 的 outlet unique_no...
+2025-11-23 12:34:43,948 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:43,948 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:43,948 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG22进水闸门, unique_no=202511140931130001
+2025-11-23 12:34:43,948 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504290852190001
+2025-11-23 12:34:43,948 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G12-F9 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:43,948 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 inlet unique_no...
+2025-11-23 12:34:44,455 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:44,455 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:44,455 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 12:34:44,455 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 12:34:44,455 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G13-F10 的 unique_no: 477379421064159243
+2025-11-23 12:34:44,455 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G13-F10 (sectionID: 84914581668040) 的 outlet unique_no...
+2025-11-23 12:34:44,960 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:44,960 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:44,960 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992508260946040001
+2025-11-23 12:34:44,960 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101588, name=YG26进水闸门, unique_no=477379421064159243
+2025-11-23 12:34:44,960 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G13-F10 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:44,960 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 inlet unique_no...
+2025-11-23 12:34:45,627 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:45,627 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:45,627 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 12:34:45,628 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S2-G14-F11 的 unique_no: 480911695752478720
+2025-11-23 12:34:45,628 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S2-G14-F11 (sectionID: 84914581668070) 的 outlet unique_no...
+2025-11-23 12:34:46,370 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:46,370 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:46,371 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101544, name=YG30进水阀, unique_no=480911695752478720
+2025-11-23 12:34:46,371 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504282038550001
+2025-11-23 12:34:46,371 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101350, name=None, unique_no=992307121123020001
+2025-11-23 12:34:46,371 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S2-G14-F11 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:46,371 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 inlet unique_no...
+2025-11-23 12:34:47,034 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:47,034 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:47,035 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 12:34:47,035 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G18-F15 的 unique_no: 477379421064159255
+2025-11-23 12:34:47,035 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G18-F15 (sectionID: 84914581668000) 的 outlet unique_no...
+2025-11-23 12:34:47,728 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:47,728 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:47,728 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG17进水闸门, unique_no=477379421064159255
+2025-11-23 12:34:47,729 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504291104170001
+2025-11-23 12:34:47,729 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101540, name=土壤墒情仪, unique_no=992409051636020001
+2025-11-23 12:34:47,729 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G18-F15 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:47,729 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 inlet unique_no...
+2025-11-23 12:34:48,501 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:48,501 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:48,502 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 12:34:48,502 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G19-F16 的 unique_no: 477379421064159232
+2025-11-23 12:34:48,502 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G19-F16 (sectionID: 84914581668050) 的 outlet unique_no...
+2025-11-23 12:34:49,177 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=3
+2025-11-23 12:34:49,177 - src.scheduler.batch_execution_scheduler - INFO -    找到 3 个设备
+2025-11-23 12:34:49,178 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG19进水闸门, unique_no=477379421064159232
+2025-11-23 12:34:49,178 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992504282040540001
+2025-11-23 12:34:49,178 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101350, name=None, unique_no=992308011125350001
+2025-11-23 12:34:49,178 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G19-F16 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:49,178 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 inlet unique_no...
+2025-11-23 12:34:49,665 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:49,665 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:49,665 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 12:34:49,665 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G20-F17 的 unique_no: 202511140930590001
+2025-11-23 12:34:49,665 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G20-F17 (sectionID: 84914581668080) 的 outlet unique_no...
+2025-11-23 12:34:50,210 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=2
+2025-11-23 12:34:50,210 - src.scheduler.batch_execution_scheduler - INFO -    找到 2 个设备
+2025-11-23 12:34:50,210 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG21进水闸门, unique_no=202511140930590001
+2025-11-23 12:34:50,211 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992505131509170001
+2025-11-23 12:34:50,211 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G20-F17 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:50,211 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 inlet unique_no...
+2025-11-23 12:34:51,165 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 12:34:51,165 - src.scheduler.batch_execution_scheduler - INFO -    找到 5 个设备
+2025-11-23 12:34:51,165 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 12:34:51,166 - src.scheduler.batch_execution_scheduler - INFO - ✅ 从 API 获取到 S3-G21-F18 的 unique_no: 477379421064159246
+2025-11-23 12:34:51,166 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G21-F18 (sectionID: 84914581668110) 的 outlet unique_no...
+2025-11-23 12:34:52,238 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=5
+2025-11-23 12:34:52,238 - src.scheduler.batch_execution_scheduler - INFO -    找到 5 个设备
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101588, name=YG25进水闸门, unique_no=477379421064159246
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - INFO -    设备2: code=101541, name=, unique_no=992409051638120001
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - INFO -    设备3: code=101540, name=YG25-土壤墒情仪, unique_no=992409051634250001
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - INFO -    设备4: code=101350, name=None, unique_no=992308011128330001
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - INFO -    设备5: code=101538, name=None, unique_no=992306291845380001
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G21-F18 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:52,239 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 inlet unique_no...
+2025-11-23 12:34:52,566 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:52,566 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:52,566 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 12:34:52,567 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:52,567 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G23-F20 (sectionID: 84914581668190) 的 outlet unique_no...
+2025-11-23 12:34:52,953 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:52,953 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:52,953 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992505131507240001
+2025-11-23 12:34:52,953 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G23-F20 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:52,953 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 inlet unique_no...
+2025-11-23 12:34:53,284 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:53,284 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:53,284 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 12:34:53,285 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:53,285 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S3-G25-F22 (sectionID: 84914581668220) 的 outlet unique_no...
+2025-11-23 12:34:53,658 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:53,658 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:53,659 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992504251615340001
+2025-11-23 12:34:53,659 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S3-G25-F22 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:53,659 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 inlet unique_no...
+2025-11-23 12:34:54,007 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:54,007 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:54,007 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 12:34:54,008 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 inlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:54,008 - src.scheduler.batch_execution_scheduler - INFO - 🔍 开始查询田块 S5-G29-F25 (sectionID: 84914581667910) 的 outlet unique_no...
+2025-11-23 12:34:54,364 - src.scheduler.batch_execution_scheduler - INFO - 📡 API 响应: success=True, device_count=1
+2025-11-23 12:34:54,364 - src.scheduler.batch_execution_scheduler - INFO -    找到 1 个设备
+2025-11-23 12:34:54,364 - src.scheduler.batch_execution_scheduler - INFO -    设备1: code=101541, name=, unique_no=992409051418500001
+2025-11-23 12:34:54,365 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ API 查询成功，但未找到 S5-G29-F25 的 outlet 设备 (类型需要是 101544 或 101588)
+2025-11-23 12:34:54,365 - src.scheduler.field_completion_monitor - INFO - 初始化批次监控: 13 个田块, 12 个节制闸, 1 个泵站
+2025-11-23 12:34:54,365 - src.scheduler.field_completion_monitor - INFO - ✅ 监控初始化完成
+2025-11-23 12:34:54,365 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 监控初始化完成: 13田块, 12节制闸, 1泵站
+2025-11-23 12:34:54,365 - src.scheduler.batch_execution_scheduler - INFO - 批次 1 开始实时监控（预计 9.93h）
+2025-11-23 12:34:54,365 - src.scheduler.batch_execution_scheduler - INFO - 💡 提示：系统将每30秒检查一次水位，自动关闭达标设备
+2025-11-23 12:34:54,660 - src.scheduler.batch_execution_scheduler - WARNING - ⚠️ 未获取到实时水位数据，将使用配置文件中的初始水位继续监控
+2025-11-23 12:35:23,013 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:35:23,013 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:35:24,402 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:35:24,464 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:35:24,535 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:35:24,535 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:35:24,536 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:35:24,536 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:35:24,537 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:35:24,538 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:35:24,538 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:35:24,539 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:35:24,539 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:35:24,539 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:35:24,540 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:35:24,540 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:35:24,542 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:35:24,542 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:35:24,542 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:35:24,542 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:35:24,543 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
+2025-11-23 12:35:49,698 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统关闭中...
+2025-11-23 12:35:49,698 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统已关闭
+2025-11-23 12:35:51,174 - __mp_main__ - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:35:51,317 - main_dynamic_execution_api - INFO - Rice API URL配置: http://rice-backend:5000/v1/rice_irrigation
+2025-11-23 12:35:51,392 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动中...
+2025-11-23 12:35:51,392 - main_dynamic_execution_api - INFO - 开始初始化系统组件...
+2025-11-23 12:35:51,393 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:35:51,394 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:35:51,394 - main_dynamic_execution_api - INFO - 执行状态管理器初始化完成
+2025-11-23 12:35:51,395 - src.scheduler.dynamic_waterlevel_manager - INFO - 加载了 25 个田块ID映射
+2025-11-23 12:35:51,395 - main_dynamic_execution_api - INFO - 水位管理器初始化完成
+2025-11-23 12:35:51,395 - src.scheduler.dynamic_plan_regenerator - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:35:51,396 - src.scheduler.dynamic_plan_regenerator - INFO - 计划模板加载成功: E:\irrigation_schedule\farm_irrigation\irrigation_plan_template.json
+2025-11-23 12:35:51,396 - main_dynamic_execution_api - INFO - 计划重新生成器初始化完成
+2025-11-23 12:35:51,396 - src.scheduler.execution_status_manager - INFO - 数据库初始化完成
+2025-11-23 12:35:51,397 - src.scheduler.execution_status_manager.ExecutionStatusManager - INFO - 日志系统初始化完成
+2025-11-23 12:35:51,398 - src.scheduler.batch_execution_scheduler - INFO - 配置文件加载成功: E:\irrigation_schedule\farm_irrigation\config.json
+2025-11-23 12:35:51,399 - src.scheduler.batch_execution_scheduler - INFO - ✅ 虚拟设备映射文件加载成功: 23 个映射
+2025-11-23 12:35:51,399 - main_dynamic_execution_api - INFO - 批次执行调度器初始化完成
+2025-11-23 12:35:51,399 - main_dynamic_execution_api - INFO - 所有系统组件初始化成功
+2025-11-23 12:35:51,399 - main_dynamic_execution_api - INFO - 智能灌溉动态执行系统启动完成
